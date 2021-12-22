@@ -1,591 +1,295 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:robin_flutter/src/networking/data_source.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class RobinCore {
-  static const String _url = "api.robinapp.co";
-  static final String _baseUrl = "https://$_url/api/v1";
-  final String _wss = 'wss://$_url/ws';
-  late final String _apiKey;
+  static final DataSource api = DataSource();
 
-  final JsonDecoder _decoder = const JsonDecoder();
+  final RobinController robinController = Get.find();
 
-  RobinCore(){
-    _setRobinKey();
+  WebSocketChannel connect(String? apiKey, String? userToken) {
+    String url = '$wsUrl/$apiKey/$userToken';
+    return WebSocketChannel.connect(
+      Uri.parse(url),
+    );
   }
 
-  RobinCore.named(String apiKey){
-    _apiKey = apiKey;
-  }
-
-
-  _setRobinKey() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _apiKey = prefs.getString('RobinApiKey') ?? "";
-  }
-
-  static Future<String> createUserToken(String apiKey, Map data) async {
-    try {
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/chat/user_token'),
-        headers: {
-          "x-api-key": apiKey,
-        },
-        body: json.encode(data),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data']['user_token'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-    return '';
-  }
-
-  Future<Map> getUserToken(String userToken) async {
-    try {
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/chat/user_token/$userToken'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res);
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-    return {};
-  }
-
-  Future<String> syncUserToken(Map data) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/chat/user_token/${data['userToken']}'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode(data),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-    return '';
-  }
-
-  Future createConversation(Map data) async {
-    try {
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/conversation'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode(data),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res);
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future getConversationMessages(String id, String userToken) async {
-    try {
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/conversation/messages/$id/$userToken'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-      );
-      final String res = response.body;
-      print(res);
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res);
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future searchConversation(String id, String text) async {
-    try {
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/chat/search/message/$id'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode(text),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future deleteMessages(Map body) async {
-    try {
-      http.Response response = await http.delete(
-        Uri.parse('$_baseUrl/chat/message'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode(body),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future createGroupConversation(
-      String name, Map moderator, List<Map> participants) async {
-    try {
-      print(json.encode({
-        'name': name,
-        'moderator': moderator,
-        'participants': participants
-      }));
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/chat/conversation/group'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode({
-          'name': name,
-          'moderator': moderator,
-          'participants': participants
-        }),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res);
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future assignGroupModerator(String id, String userToken) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/chat/conversation/group/assign_moderator/$id'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode({'user_token': userToken}),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future addGroupParticipants(String id, List<String> participants) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/chat/conversation/group/add_participants/$id'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode({'participants': participants}),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future removeGroupParticipant(String id, String userToken) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/chat/conversation/group/remove_participant/$id'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode({'user_token': userToken}),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future archiveConversation(String id, String userToken) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/conversation/archive/$id/$userToken'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future unarchiveConversation(String id, String userToken) async {
-    try {
-      http.Response response = await http.put(
-        Uri.parse('$_baseUrl/conversation/unarchive/$id/$userToken'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future forwardMessages(
-      String userToken, List messageIds, List conversationIds) async {
-    try {
-      http.Response response = await http.post(
-        Uri.parse('$_baseUrl/conversation/forward_messages'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-        body: json.encode({
-          'user_token': userToken,
-          'message_ids': messageIds,
-          'conversation_ids': conversationIds,
-        }),
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  connect(String userToken) {
-    if (_apiKey.length > 0) {
-      WebSocketChannel conn;
-      String uri;
-      if (_tls) {
-        uri = _wss + '/$_apiKey/$userToken';
-        conn = WebSocketChannel.connect(
-          Uri.parse(uri),
-        );
-      } else {
-        uri = _ws + '/$_apiKey/$userToken';
-        conn = WebSocketChannel.connect(
-          Uri.parse(uri),
-        );
-      }
-      return conn;
-    }
-    return false;
-  }
-
-  void subscribe(WebSocketChannel conn, String channel) {
+  void subscribe() {
     Map sub = {
       'type': 0,
-      'channel': channel,
+      'channel': robinChannel,
       'content': {},
       'conversation_id': "",
     };
-    print('subscribed');
-    conn.sink.add(json.encode(sub));
+    robinController.robinConnection.sink.add(json.encode(sub));
   }
 
-  void sendMessageToConversation(WebSocketChannel conn, String channel,
-      String conversationId, Map message, String senderToken) {
+  void replyToMessage(
+      Map message, String conversationId, String replyTo, String senderToken) {
     Map msg = {
       'type': 1,
-      'channel': channel,
-      'content': message,
-      'sender_token': senderToken,
-      'conversation_id': conversationId,
-    };
-    conn.sink.add(json.encode(msg));
-  }
-
-  void createSupportTicket(WebSocketChannel conn, String channel,
-      String supportName, String senderToken, String senderName, Map message) {
-    Map msg = {
-      'type': 1,
-      'channel': channel,
-      'content': message,
-      'support_name': supportName,
-      'sender_name': senderName,
-      'sender_token': senderToken
-    };
-    conn.sink.add(json.encode(msg));
-  }
-
-  Future getUnassignedUsers(String supportName) async {
-    try {
-      http.Response response = await http.get(
-        Uri.parse('$_baseUrl/chat/support/unassigned/$supportName'),
-        headers: {
-          "x-api-key": _apiKey,
-        },
-      );
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future sendMessageAttachment(String userToken, String senderName,
-      String conversationId, String? filePath) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$_baseUrl/chat/message/send/attachment/'),
-      );
-      request.headers.addAll({
-        "x-api-key": _apiKey,
-      });
-      request.fields.addAll({
-        'sender_token': userToken,
-        'sender_name': senderName,
-        'conversation_id': conversationId,
-      });
-      if (filePath != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'file',
-            filePath,
-          ),
-        );
-      }
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      final dynamic res = json.decode(response.body);
-      final int statusCode = response.statusCode;
-      if (statusCode == 401) {
-        throw ("Unauthorized");
-      } else if (statusCode < 200 || statusCode > 400 || json == null) {
-        throw ("${res["message"]}");
-      }
-      return res;
-    } catch (e) {
-      print(e);
-      throw (e.toString());
-    }
-  }
-
-  void replyToMessage(WebSocketChannel conn, String channel, Map message,
-      String conversationId, String replyTo, String senderToken) {
-    Map msg = {
-      'type': 1,
-      'channel': channel,
+      'channel': robinChannel,
       'content': message,
       'sender_token': senderToken,
       'conversation_id': conversationId,
       'reply_to': replyTo,
       'is_reply': true,
     };
-    conn.sink.add(json.encode(msg));
+    robinController.robinConnection.sink.add(json.encode(msg));
   }
 
-  Future replyMessageWithAttachment(String userToken, String messageId,
-      String conversationId, String? filePath) async {
+  void sendMessageToConversation(
+      String conversationId, Map message, String senderToken) {
+    Map msg = {
+      'type': 1,
+      'channel': robinChannel,
+      'content': message,
+      'sender_token': senderToken,
+      'conversation_id': conversationId,
+    };
+    robinController.robinConnection.sink.add(json.encode(msg));
+  }
+
+  void createSupportTicket(
+      String supportName, String senderToken, String senderName, Map message) {
+    Map msg = {
+      'type': 1,
+      'channel': robinChannel,
+      'content': message,
+      'support_name': supportName,
+      'sender_name': senderName,
+      'sender_token': senderToken
+    };
+    robinController.robinConnection.sink.add(json.encode(msg));
+  }
+
+  static Future<String> createUserToken(
+      String apiKey, Map<String, dynamic> body) async {
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$_baseUrl/chat/message/send/attachment/reply'),
-      );
-      request.headers.addAll({
-        "x-api-key": _apiKey,
+      Map<String, String> headers = {"x-api-key": apiKey};
+      api.createUserToken(body, headers).then((String userToken) async {
+        return userToken;
+      }).catchError((e) {
+        throw e.toString();
       });
-      request.fields.addAll({
-        'sender_token': userToken,
-        'message_id': messageId,
-        'conversation_id': conversationId,
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'User Token Could Not Be Created';
+  }
+
+  getDetailsFromUserToken(String userToken) async {
+    try {
+      api.getDetailsFromUserToken(userToken).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
       });
-      if (filePath != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'file',
-            filePath,
-          ),
-        );
-      }
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      final dynamic res = json.decode(response.body);
-      final int statusCode = response.statusCode;
-      if (statusCode == 401) {
-        throw ("Unauthorized");
-      } else if (statusCode < 200 || statusCode > 400 || json == null) {
-        throw ("${res["message"]}");
-      }
-      return res;
     } catch (e) {
-      print(e);
-      throw (e.toString());
+      throw e.toString();
     }
+    throw 'Could Not Get Messages';
   }
 
-  Future reactToMessage(String reaction, String messageId,
-      String conversationId, String senderToken) async {
-    String now = DateTime.now().toString();
-    now = now.replaceAll(" ", "T");
-    var x = json.encode({
-      "user_token": senderToken,
-      "reaction": reaction,
-      "conversation_id": conversationId,
-      "timestamp": "2021-12-04T20:48:07.338Z",
-    });
-    print(x);
+  createConversation(Map<String, String> body) async {
     try {
-      http.Response response = await http.post(
-          Uri.parse('$_baseUrl/chat/message/reaction/$messageId'),
-          headers: {
-            "x-api-key": _apiKey,
-          },
-          body: json.encode({
-            "user_token": senderToken,
-            "reaction": reaction,
-            "conversation_id": conversationId,
-            "timestamp": "2021-12-04T20:48:07.338Z",
-          }));
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        print(res);
-        return _decoder.convert(res)['data'];
-      }
+      api.createConversation(body).then((conversation) async {
+        return conversation;
+      }).catchError((e) {
+        throw e.toString();
+      });
     } catch (e) {
-      print(e.toString());
+      throw e.toString();
     }
+    throw 'Conversation Could Not Be Created';
   }
 
-  Future removeReaction(String reactionId, String messageId,
-      String conversationId, String senderToken) async {
+  getConversationMessages(String id, String userToken) async {
     try {
-      http.Response response = await http.delete(
-          Uri.parse(
-              '$_baseUrl/chat/message/reaction/delete/$reactionId/$messageId'),
-          headers: {
-            "x-api-key": _apiKey,
-          });
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        return _decoder.convert(res)['data'];
-      }
+      api.getConversationMessages(id, userToken).then((messages) async {
+        return messages;
+      }).catchError((e) {
+        throw e.toString();
+      });
     } catch (e) {
-      print(e.toString());
+      throw e.toString();
     }
+    throw 'Could Not Get Messages';
   }
 
-  Future sendReadReceipts(
-      List<String> messageIds, String conversationId) async {
+  createGroupChat(Map<String, dynamic> body) async {
     try {
-      http.Response response =
-          await http.post(Uri.parse('$_baseUrl/chat/message/read/receipt'),
-              headers: {
-                "x-api-key": _apiKey,
-              },
-              body: json.encode({
-                "message_ids": messageIds,
-                "conversation_id": conversationId,
-              }));
-      final String res = response.body;
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400) {
-        print("Error while fetching data");
-      } else {
-        print(res);
-        return _decoder.convert(res)['data'];
-      }
+      api.createGroupChat(body).then((conversation) async {
+        return conversation;
+      }).catchError((e) {
+        throw e.toString();
+      });
     } catch (e) {
-      print(e.toString());
+      throw e.toString();
     }
+    throw 'Group Chat Could Not Be Created';
   }
 
-  close(WebSocketChannel conn) {
-    conn.sink.close();
+  assignGroupModerator(Map<String, dynamic> body, String id) async {
+    try {
+      api.assignGroupModerator(body, id).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Could Not Assign Group Moderator';
+  }
+
+  addGroupParticipants(Map<String, dynamic> body, String id) async {
+    try {
+      api.addGroupParticipants(body, id).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Participant Could Not Be Added To Group';
+  }
+
+  removeGroupParticipant(Map<String, dynamic> body, String id) async {
+    try {
+      api.removeGroupParticipant(body, id).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Participant Could Not Be Removed From Group';
+  }
+
+  archiveConversation(String id, String userToken) async {
+    try {
+      api.archiveConversation(id, userToken).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Conversation Could Not Be Archived';
+  }
+
+  unarchiveConversation(String id, String userToken) async {
+    try {
+      api.unarchiveConversation(id, userToken).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Conversation Could Not Be Unarchived';
+  }
+
+  forwardMessages(Map<String, dynamic> body) async {
+    try {
+      api.forwardMessages(body).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Messages Could Not Be Forwarded';
+  }
+
+  deleteMessages(Map<String, dynamic> body) async {
+    try {
+      api.deleteMessages(body).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Conversation Could Not Be Created';
+  }
+
+  sendAttachment(
+      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+    try {
+      api.sendAttachment(body, files).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'File Could Not Be Sent';
+  }
+
+  replyWithAttachment(
+      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+    try {
+      api.replyWithAttachment(body, files).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'File Could Not Be Sent';
+  }
+
+  sendReaction(Map<String, dynamic> body, String messageId) async {
+    try {
+      api.sendReaction(body, messageId).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Reaction Could Not Be Sent';
+  }
+
+  removeReaction(
+      Map<String, dynamic> body, String messageId, String reactionId) async {
+    try {
+      api.removeReaction(body, messageId, reactionId).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Reaction Could Not Be Removed';
+  }
+
+  sendReadReceipts(Map<String, dynamic> body) async {
+    try {
+      api.sendReadReceipts(body).then((response) async {
+        return response;
+      }).catchError((e) {
+        throw e.toString();
+      });
+    } catch (e) {
+      throw e.toString();
+    }
+    throw 'Read Receipts Could Not Be Sent';
   }
 }

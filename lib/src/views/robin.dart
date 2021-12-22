@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class Robin extends StatelessWidget {
-  final Map currentUser;
   final String apiKey;
+  final Map currentUser;
   final Function getUsers;
   final Map keys;
 
-  const Robin({
+  final RobinController robinController = Get.put(RobinController());
+
+  Robin({
     Key? key,
-    required this.currentUser,
     required this.apiKey,
+    required this.currentUser,
     required this.getUsers,
     required this.keys,
-  }) : super(key: key);
+  }) : super(key: key) {
+    robinController.initializeController(apiKey, currentUser, getUsers, keys);
+  }
 
   @override
   Widget build(BuildContext context) {
