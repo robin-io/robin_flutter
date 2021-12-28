@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/models/robin_conversation.dart';
+import 'package:robin_flutter/src/widgets/conversations_loading.dart';
+import 'package:robin_flutter/src/widgets/empty_conversation.dart';
+import 'package:robin_flutter/src/widgets/conversation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:robin_flutter/src/models/robin_user.dart';
+import 'package:robin_flutter/src/models/robin_keys.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
 class Robin extends StatelessWidget {
   final String apiKey;
-  final Map currentUser;
+  final RobinUser currentUser;
   final Function getUsers;
-  final Map keys;
-
-  final RobinController robinController = Get.put(RobinController());
+  final RobinKeys keys;
 
   Robin({
     Key? key,
@@ -18,133 +23,136 @@ class Robin extends StatelessWidget {
     required this.getUsers,
     required this.keys,
   }) : super(key: key) {
-    robinController.initializeController(apiKey, currentUser, getUsers, keys);
+    rc.initializeController(apiKey, currentUser, getUsers, keys);
   }
+
+  final RobinController rc = Get.put(RobinController());
+
+  // List<Widget> renderConversations() {
+  //   List<Widget> conversations = [];
+  //   for (RobinConversation conversation in rc.allConversations) {
+  //     if(!conversation.archived ){
+  //       conversations.add(
+  //         Conversation(
+  //           conversation: conversation,
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   return conversations;
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0XFFFFFFFF),
-        appBar: AppBar(
-          backgroundColor: Color(0XFFFFFFFF),
-          title: const Text(
-            'Settings',
-            style: TextStyle(
-              color: Color(0XFF535F89),
-              fontSize: 16,
-            ),
+      backgroundColor: const Color(0XFFFAFAFA),
+      appBar: AppBar(
+        backgroundColor: white,
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            color: blueGrey,
+            fontSize: 16,
           ),
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              icon: SizedBox(
-                width: 20,
-                height: 20,
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/icons/edit.svg',
-                    semanticsLabel: 'edit',
-                    package: 'robin',
-                    width: 20,
-                    height: 20,
-                  ),
-                ),
-              ),
-              onPressed: () {
-                // _showNewModal();
-              },
-            )
-          ],
-          shadowColor: const Color.fromRGBO(0, 104, 255, 0.2),
-          bottom: PreferredSize(
-            preferredSize: Size(double.infinity, 80),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
-                  child: Container(
-                    height: 50,
-                    child: TextFormField(
-                      style: const TextStyle(
-                        color: Color(0XFF535F89),
-                        fontSize: 14,
-                      ),
-                      // controller: _searchController,
-                      onChanged: (value) {},
-                      decoration: InputDecoration(
-                        prefixIcon: Container(
-                          width: 22,
-                          height: 22,
-                          child: Center(
-                            child: SvgPicture.asset(
-                              'assets/icons/search.svg',
-                              semanticsLabel: 'search',
-                              package: 'robin',
-                              width: 22,
-                              height: 22,
-                            ),
+        ),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/edit.svg',
+              semanticsLabel: 'edit',
+              package: 'robin_flutter',
+              width: 20,
+              height: 20,
+            ),
+            onPressed: () {
+              // _showNewModal();
+            },
+          )
+        ],
+        shadowColor: const Color.fromRGBO(0, 104, 255, 0.2),
+        bottom: PreferredSize(
+          preferredSize: const Size(double.infinity, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
+                child: SizedBox(
+                  height: 50,
+                  child: TextFormField(
+                    style: const TextStyle(
+                      color: Color(0XFF535F89),
+                      fontSize: 14,
+                    ),
+                    controller: rc.searchController,
+                    decoration: textFieldDecoration.copyWith(
+                      prefixIcon: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/icons/search.svg',
+                            semanticsLabel: 'search',
+                            package: 'robin_flutter',
+                            width: 22,
+                            height: 22,
                           ),
                         ),
-                        hintText: 'Search Messages...',
-                        hintStyle: const TextStyle(
-                          color: Color(0XFFBBC1D6),
-                          fontSize: 16,
-                        ),
-                        contentPadding: EdgeInsets.all(15.0),
-                        filled: true,
-                        fillColor: Color(0XFFF4F6F8),
-                        // border: textFieldBorder,
-                        // focusedBorder: textFieldBorder,
-                        // enabledBorder: textFieldBorder,
                       ),
+                      hintText: 'Search Messages...',
                     ),
                   ),
                 ),
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     InkWell(
-                //       onTap: () async {
-                //         await Navigator.push(
-                //           context,
-                //           MaterialPageRoute(
-                //             builder: (context) =>
-                //                 Archived(widget.currentUser, _passConversations),
-                //           ),
-                //         );
-                //         _getConversations();
-                //       },
-                //       child: Text(
-                //         'Archived',
-                //         style: TextStyle(
-                //           color: Color(0XFF15AE73),
-                //           fontSize: 16,
-                //         ),
-                //       ),
-                //     ),
-                //     SizedBox(
-                //       width: 15,
-                //     )
-                //   ],
-                // ),
-                SizedBox(
-                  height: 15,
-                ),
-              ],
-            ),
-          ),
-          centerTitle: false,
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Color(0XFF15AE73),
               ),
-            ),
+              InkWell(
+                onTap: () async {
+                  // await Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) =>
+                  //         Archived(widget.currentUser, _passConversations),
+                  //   ),
+                  // );
+                  // _getConversations();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 15),
+                  child: Text(
+                    'Archived',
+                    style: TextStyle(
+                      color: green,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
           ),
-        ));
+        ),
+        centerTitle: false,
+      ),
+      body: Obx(
+        () {
+          if (rc.isConversationsLoading.value) {
+            return const ConversationsLoading();
+          } else if (rc.renderedConversations.isEmpty) {
+            return const EmptyConversation();
+          } else {
+            return ListView.builder(
+                // the number of items in the list
+                itemCount: rc.renderedConversations.value.length,
+
+                // display each item of the product list
+                itemBuilder: (context, index) {
+                  return Text(rc.renderedConversations.isEmpty.toString());
+                });
+          }
+        },
+      ),
+    );
   }
 }

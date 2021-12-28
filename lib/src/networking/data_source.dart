@@ -31,7 +31,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data']['conversations'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -43,7 +43,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -57,7 +57,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -69,7 +69,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -81,7 +81,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -93,7 +93,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -105,7 +105,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -117,7 +117,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -129,7 +129,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -141,7 +141,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -153,7 +153,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -165,7 +165,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -177,7 +177,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -189,7 +189,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -201,7 +201,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
@@ -213,7 +213,7 @@ class DataSource {
       if (response['error']) {
         throw response['message'];
       } else {
-        return response['message'];
+        return response['data'];
       }
     }).catchError((e) {
       errorHandler.handleError(e);
