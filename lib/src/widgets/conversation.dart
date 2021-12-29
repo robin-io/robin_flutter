@@ -32,10 +32,10 @@ class Conversation extends StatelessWidget {
             SlidableAction(
               onPressed: (context) {},
               backgroundColor: green,
+              autoClose: true,
               foregroundColor: white,
-              icon: Icons.archive,
-              label: 'Archive',
-            ),
+              icon: conversation.archived ? Icons.unarchive : Icons.archive,
+            )
           ],
         ),
         child: Container(
@@ -48,7 +48,8 @@ class Conversation extends StatelessWidget {
               ),
             ),
           ),
-          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
+          padding:
+              const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,

@@ -4,7 +4,6 @@ import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/models/robin_keys.dart';
-import 'package:robin_flutter/src/widgets/conversation.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -22,9 +21,10 @@ class RobinController extends GetxController {
 
   List<RobinConversation> allConversations = [];
 
-  RxList renderedConversations = [].obs;
+  RxList homeConversations = [].obs;
+  RxList archivedConversations = [].obs;
 
-  TextEditingController searchController = TextEditingController();
+  TextEditingController homeSearchController = TextEditingController();
 
   initializeController(String _apiKey, RobinUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
@@ -37,9 +37,8 @@ class RobinController extends GetxController {
     if (!robinInitialized) {
       robinInitialized = true;
       getConversations();
-      searchController.addListener(() {
-        filterAllConversations();
-        renderConversations();
+      homeSearchController.addListener(() {
+        renderHomeConversations();
       });
     }
   }
@@ -51,7 +50,8 @@ class RobinController extends GetxController {
           await robinCore!.getDetailsFromUserToken(currentUser!.robinToken);
       allConversations =
           conversations == null ? [] : toRobinConversations(conversations);
-      renderConversations();
+      renderHomeConversations();
+      renderArchivedConversations();
       isConversationsLoading(false);
     } catch (e) {
       isConversationsLoading(false);
@@ -60,29 +60,28 @@ class RobinController extends GetxController {
     }
   }
 
-  RxList renderConversations() {
-    renderedConversations = [].obs;
-    for (RobinConversation conversation in allConversations) {
-      if (!conversation.archived) {
-        renderedConversations.add(
-          Conversation(
-            conversation: conversation,
-          ),
-        );
-      }
-    }
-    print(renderedConversations.length);
-    return renderedConversations;
+  void renderHomeConversations() {
+    List<RobinConversation> conversations = [];
+    conversations = allConversations
+        .where((RobinConversation conversation) =>
+            !conversation.archived &&
+                (conversation.name
+                    .toLowerCase()
+                    .contains(homeSearchController.text.toLowerCase())) ||
+            (!conversation.lastMessage.isAttachment &&
+                conversation.lastMessage.text
+                    .toLowerCase()
+                    .contains(homeSearchController.text.toLowerCase())))
+        .toList();
+    homeConversations.value = conversations;
   }
 
-  filterAllConversations() {
+  void renderArchivedConversations() {
     List<RobinConversation> conversations = [];
-    for (RobinConversation conversation in allConversations) {
-      if (conversation.name.contains(searchController.text)) {
-        conversations.add(conversation);
-      }
-    }
-    allConversations = conversations;
+    conversations = allConversations
+        .where((RobinConversation conversation) => conversation.archived)
+        .toList();
+    archivedConversations.value = conversations;
   }
 
   List<RobinConversation> toRobinConversations(List conversations) {
@@ -94,5 +93,9 @@ class RobinController extends GetxController {
       return b.updatedAt.compareTo(a.updatedAt);
     });
     return allConversations;
+  }
+
+  void archiveConversation(String conversationId){
+
   }
 }

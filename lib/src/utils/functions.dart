@@ -18,3 +18,16 @@ String formatDate(String dateString) {
   formattedDate = formattedDate.replaceAll(' ago', '');
   return formattedDate;
 }
+
+IconButton goBack(BuildContext context){
+  return IconButton(
+    icon: const Icon(
+      Icons.arrow_back_ios,
+      size: 16,
+      color: Color(0XFF535F89),
+    ),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  );
+}
