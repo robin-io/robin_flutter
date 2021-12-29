@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -9,9 +11,17 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 class Conversation extends StatelessWidget {
   final RobinConversation conversation;
 
-  const Conversation({Key? key, required this.conversation}) : super(key: key);
+  Conversation({Key? key, required this.conversation}) : super(key: key);
 
-  void doNothing(BuildContext context) {}
+  final RobinController rc = Get.put(RobinController());
+
+  void handleArchive(BuildContext context) {
+    if (conversation.archived!) {
+      rc.unarchiveConversation(conversation.id!);
+    } else {
+      rc.archiveConversation(conversation.id!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +33,22 @@ class Conversation extends StatelessWidget {
         //TODO: Nav to chat page
       },
       child: Slidable(
-        // key: ValueKey(conversation.id),
+        key: ValueKey(conversation.id),
         endActionPane: ActionPane(
-          // dismissible: DismissiblePane(onDismissed: () {}),
+          dismissible: DismissiblePane(
+            onDismissed: () {
+              handleArchive(context);
+            },
+          ),
           extentRatio: 0.23,
           motion: const DrawerMotion(),
           children: [
             SlidableAction(
-              onPressed: (context) {},
+              onPressed: handleArchive,
               backgroundColor: green,
               autoClose: true,
               foregroundColor: white,
-              icon: conversation.archived ? Icons.unarchive : Icons.archive,
+              icon: conversation.archived! ? Icons.unarchive : Icons.archive,
             )
           ],
         ),
@@ -70,7 +84,7 @@ class Conversation extends StatelessWidget {
                   ),
                   child: Center(
                     child: SvgPicture.asset(
-                      conversation.isGroup
+                      conversation.isGroup!
                           ? 'assets/icons/people.svg'
                           : 'assets/icons/person.svg',
                       package: 'robin_flutter',
@@ -92,7 +106,7 @@ class Conversation extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            conversation.name,
+                            conversation.name!,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: const TextStyle(
@@ -117,12 +131,12 @@ class Conversation extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            conversation.lastMessage.text,
+                            conversation.lastMessage!.text,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: conversation.lastMessage.isAttachment
+                              fontWeight: conversation.lastMessage!.isAttachment
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: const Color(0XFF7A7A7A),
