@@ -3,22 +3,23 @@ import 'package:robin_flutter/src/models/robin_last_message.dart';
 import 'package:get/get.dart';
 
 class RobinConversation {
-  late final String id;
-  late final bool isGroup;
-  late final String name;
-  late final RobinLastMessage lastMessage;
-  late final List participants;
-  late final Map unreadMessages;
-  late final bool archived;
-  late final List deletedFor;
-  late final DateTime updatedAt;
+  String? id;
+  bool? isGroup;
+  String? name;
+  RobinLastMessage? lastMessage;
+  List? participants;
+  Map? unreadMessages;
+  bool? archived;
+  List? deletedFor;
+  DateTime? updatedAt;
+  int? index;
 
   final RobinController rc = Get.find();
 
   RobinConversation.fromJson(Map json) {
     id = json['_id'];
     isGroup = json['is_group'];
-    if (isGroup) {
+    if (isGroup!) {
       name = json['name'];
     } else {
       if (rc.currentUser?.robinToken == json['sender_token']) {

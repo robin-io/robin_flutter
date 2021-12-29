@@ -45,16 +45,16 @@ class RobinController extends GetxController {
 
   getConversations() async {
     try {
-      isConversationsLoading(true);
+      isConversationsLoading.value = true;
       var conversations =
           await robinCore!.getDetailsFromUserToken(currentUser!.robinToken);
       allConversations =
           conversations == null ? [] : toRobinConversations(conversations);
       renderHomeConversations();
       renderArchivedConversations();
-      isConversationsLoading(false);
+      isConversationsLoading.value = false;
     } catch (e) {
-      isConversationsLoading(false);
+      isConversationsLoading.value = false;
       showErrorMessage(e.toString());
       rethrow;
     }
@@ -64,14 +64,14 @@ class RobinController extends GetxController {
     List<RobinConversation> conversations = [];
     conversations = allConversations
         .where((RobinConversation conversation) =>
-            !conversation.archived &&
-                (conversation.name
+            !conversation.archived! &&
+            (conversation.name!
                     .toLowerCase()
-                    .contains(homeSearchController.text.toLowerCase())) ||
-            (!conversation.lastMessage.isAttachment &&
-                conversation.lastMessage.text
-                    .toLowerCase()
-                    .contains(homeSearchController.text.toLowerCase())))
+                    .contains(homeSearchController.text.toLowerCase()) ||
+                (!conversation.lastMessage!.isAttachment &&
+                    conversation.lastMessage!.text
+                        .toLowerCase()
+                        .contains(homeSearchController.text.toLowerCase()))))
         .toList();
     homeConversations.value = conversations;
   }
@@ -79,7 +79,7 @@ class RobinController extends GetxController {
   void renderArchivedConversations() {
     List<RobinConversation> conversations = [];
     conversations = allConversations
-        .where((RobinConversation conversation) => conversation.archived)
+        .where((RobinConversation conversation) => conversation.archived!)
         .toList();
     archivedConversations.value = conversations;
   }
@@ -90,12 +90,32 @@ class RobinController extends GetxController {
       allConversations.add(RobinConversation.fromJson(conversation));
     }
     allConversations.sort((a, b) {
-      return b.updatedAt.compareTo(a.updatedAt);
+      return b.updatedAt!.compareTo(a.updatedAt!);
     });
     return allConversations;
   }
 
-  void archiveConversation(String conversationId){
+  void archiveConversation(String conversationId) {
+    robinCore!.archiveConversation(conversationId, currentUser!.robinToken);
+    for (RobinConversation conversation in allConversations) {
+      if (conversation.id == conversationId) {
+        conversation.archived = true;
+        renderHomeConversations();
+        renderArchivedConversations();
+        break;
+      }
+    }
+  }
 
+  void unarchiveConversation(String conversationId) {
+    robinCore!.unarchiveConversation(conversationId, currentUser!.robinToken);
+    for (RobinConversation conversation in allConversations) {
+      if (conversation.id == conversationId) {
+        conversation.archived = false;
+        renderHomeConversations();
+        renderArchivedConversations();
+        break;
+      }
+    }
   }
 }
