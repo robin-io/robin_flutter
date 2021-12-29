@@ -1,5 +1,4 @@
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 
 class RobinLastMessage {

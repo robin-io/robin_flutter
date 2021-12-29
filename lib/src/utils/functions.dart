@@ -16,6 +16,7 @@ void showErrorMessage(String message) {
 String formatDate(String dateString) {
   String formattedDate = Jiffy(dateString).fromNow();
   formattedDate = formattedDate.replaceAll(' ago', '');
+  formattedDate = formattedDate.replaceAll('a few seconds', 'few seconds');
   return formattedDate;
 }
 

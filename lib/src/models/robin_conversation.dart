@@ -33,6 +33,7 @@ class RobinConversation {
     unreadMessages = {};
     archived = json['archived_for'].contains(rc.currentUser?.robinToken);
     deletedFor = [];
-    updatedAt = DateTime.parse(json['updated_at']);
+    updatedAt = json['last_message'] == null ? DateTime.parse(json['updated_at']) : DateTime.parse(json['last_message']['timestamp']);
+    index = json['index'];
   }
 }

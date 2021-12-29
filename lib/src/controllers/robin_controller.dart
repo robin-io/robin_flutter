@@ -19,7 +19,7 @@ class RobinController extends GetxController {
 
   RxBool isConversationsLoading = true.obs;
 
-  List<RobinConversation> allConversations = [];
+  Map<String, RobinConversation> allConversations = {};
 
   RxList homeConversations = [].obs;
   RxList archivedConversations = [].obs;
@@ -49,7 +49,7 @@ class RobinController extends GetxController {
       var conversations =
           await robinCore!.getDetailsFromUserToken(currentUser!.robinToken);
       allConversations =
-          conversations == null ? [] : toRobinConversations(conversations);
+          conversations == null ? {} : toRobinConversations(conversations);
       renderHomeConversations();
       renderArchivedConversations();
       isConversationsLoading.value = false;
@@ -62,7 +62,7 @@ class RobinController extends GetxController {
 
   void renderHomeConversations() {
     List<RobinConversation> conversations = [];
-    conversations = allConversations
+    conversations = allConversations.values
         .where((RobinConversation conversation) =>
             !conversation.archived! &&
             (conversation.name!
@@ -78,44 +78,40 @@ class RobinController extends GetxController {
 
   void renderArchivedConversations() {
     List<RobinConversation> conversations = [];
-    conversations = allConversations
+    conversations = allConversations.values
         .where((RobinConversation conversation) => conversation.archived!)
         .toList();
     archivedConversations.value = conversations;
   }
 
-  List<RobinConversation> toRobinConversations(List conversations) {
-    List<RobinConversation> allConversations = [];
+  Map<String, RobinConversation> toRobinConversations(List conversations) {
+    Map<String, RobinConversation> allConversations = {};
     for (Map conversation in conversations) {
-      allConversations.add(RobinConversation.fromJson(conversation));
+      allConversations[conversation['_id']] =
+          (RobinConversation.fromJson(conversation));
     }
-    allConversations.sort((a, b) {
-      return b.updatedAt!.compareTo(a.updatedAt!);
-    });
-    return allConversations;
+    var sortedEntries = allConversations.entries.toList()
+      ..sort((e1, e2) {
+        var diff = e2.value.updatedAt!.compareTo(e1.value.updatedAt!);
+        if (diff == 0) diff = e2.key.compareTo(e1.key);
+        return diff;
+      });
+    Map<String, RobinConversation> sortedConversations =
+        Map<String, RobinConversation>.fromEntries(sortedEntries);
+    return sortedConversations;
   }
 
   void archiveConversation(String conversationId) {
     robinCore!.archiveConversation(conversationId, currentUser!.robinToken);
-    for (RobinConversation conversation in allConversations) {
-      if (conversation.id == conversationId) {
-        conversation.archived = true;
-        renderHomeConversations();
-        renderArchivedConversations();
-        break;
-      }
-    }
+    allConversations[conversationId]!.archived = true;
+    renderHomeConversations();
+    renderArchivedConversations();
   }
 
   void unarchiveConversation(String conversationId) {
     robinCore!.unarchiveConversation(conversationId, currentUser!.robinToken);
-    for (RobinConversation conversation in allConversations) {
-      if (conversation.id == conversationId) {
-        conversation.archived = false;
-        renderHomeConversations();
-        renderArchivedConversations();
-        break;
-      }
-    }
+    allConversations[conversationId]!.archived = false;
+    renderHomeConversations();
+    renderArchivedConversations();
   }
 }
