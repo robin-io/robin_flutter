@@ -133,17 +133,17 @@ class RobinCore {
     }
   }
 
-  archiveConversation(String id, String userToken) async {
+  archiveConversation(String conversationId, String userToken) async {
     try {
-      return await api.archiveConversation(id, userToken);
+      return await api.archiveConversation(conversationId, userToken);
     } catch (e) {
       throw e.toString();
     }
   }
 
-  unarchiveConversation(String id, String userToken) async {
+  unarchiveConversation(String conversationId, String userToken) async {
     try {
-      return await api.unarchiveConversation(id, userToken);
+      return await api.unarchiveConversation(conversationId, userToken);
     } catch (e) {
       throw e.toString();
     }

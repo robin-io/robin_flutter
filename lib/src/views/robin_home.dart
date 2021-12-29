@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
+import 'package:robin_flutter/src/views/robin_archived.dart';
 import 'package:robin_flutter/src/widgets/conversations_loading.dart';
 import 'package:robin_flutter/src/widgets/empty_conversation.dart';
 import 'package:robin_flutter/src/widgets/conversation.dart';
@@ -27,20 +28,6 @@ class Robin extends StatelessWidget {
   }
 
   final RobinController rc = Get.put(RobinController());
-
-  // List<Widget> renderConversations() {
-  //   List<Widget> conversations = [];
-  //   for (RobinConversation conversation in rc.allConversations) {
-  //     if(!conversation.archived ){
-  //       conversations.add(
-  //         Conversation(
-  //           conversation: conversation,
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   return conversations;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +72,7 @@ class Robin extends StatelessWidget {
                       color: Color(0XFF535F89),
                       fontSize: 14,
                     ),
-                    controller: rc.searchController,
+                    controller: rc.homeSearchController,
                     decoration: textFieldDecoration.copyWith(
                       prefixIcon: SizedBox(
                         width: 22,
@@ -107,14 +94,12 @@ class Robin extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // await Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) =>
-                  //         Archived(widget.currentUser, _passConversations),
-                  //   ),
-                  // );
-                  // _getConversations();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RobinArchived(),
+                    ),
+                  );
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(right: 15),
@@ -139,17 +124,17 @@ class Robin extends StatelessWidget {
         () {
           if (rc.isConversationsLoading.value) {
             return const ConversationsLoading();
-          } else if (rc.renderedConversations.isEmpty) {
+          } else if (rc.homeConversations.isEmpty) {
             return const EmptyConversation();
           } else {
-            return ListView.builder(
-                // the number of items in the list
-                itemCount: rc.renderedConversations.value.length,
-
-                // display each item of the product list
-                itemBuilder: (context, index) {
-                  return Text(rc.renderedConversations.isEmpty.toString());
-                });
+            return ListView(
+              children: [
+                for (RobinConversation conversation in rc.homeConversations)
+                  Conversation(
+                    conversation: conversation,
+                  )
+              ],
+            );
           }
         },
       ),

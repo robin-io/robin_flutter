@@ -7,6 +7,7 @@ const String wsUrl = 'wss://$baseUrl/ws';
 const String robinChannel = 'private_chat';
 
 const Color white = Color(0XFFFFFFFF);
+const Color black = Color(0XFF000000);
 const Color blueGrey = Color(0XFF535F89);
 const Color green = Color(0XFF15AE73);
 
@@ -31,4 +32,3 @@ InputDecoration textFieldDecoration = InputDecoration(
   focusedBorder: textFieldBorder,
   enabledBorder: textFieldBorder,
 );
-

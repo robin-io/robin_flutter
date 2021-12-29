@@ -77,7 +77,9 @@ class DataSource {
   }
 
   assignGroupModerator(Map<String, dynamic> body, String id) async {
-    return netUtil.put('$assignGroupModeratorUrl/$id', body: body).then((response) {
+    return netUtil
+        .put('$assignGroupModeratorUrl/$id', body: body)
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -89,7 +91,9 @@ class DataSource {
   }
 
   addGroupParticipants(Map<String, dynamic> body, String id) async {
-    return netUtil.put('$addGroupParticipantsUrl/$id', body: body).then((response) {
+    return netUtil
+        .put('$addGroupParticipantsUrl/$id', body: body)
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -101,7 +105,9 @@ class DataSource {
   }
 
   removeGroupParticipant(Map<String, dynamic> body, String id) async {
-    return netUtil.put('$removeGroupParticipantUrl/id', body: body).then((response) {
+    return netUtil
+        .put('$removeGroupParticipantUrl/id', body: body)
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -112,8 +118,10 @@ class DataSource {
     });
   }
 
-  archiveConversation(String id, String userToken) async {
-    return netUtil.put('$archiveConversationUrl/$id/$userToken').then((response) {
+  archiveConversation(String conversationId, String userToken) async {
+    return netUtil
+        .put('$archiveConversationUrl/$conversationId/$userToken')
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -124,8 +132,10 @@ class DataSource {
     });
   }
 
-  unarchiveConversation(String id, String userToken) async {
-    return netUtil.put('$unarchiveConversationUrl/$id/$userToken').then((response) {
+  unarchiveConversation(String conversationId, String userToken) async {
+    return netUtil
+        .put('$unarchiveConversationUrl/$conversationId/$userToken')
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -160,8 +170,15 @@ class DataSource {
     });
   }
 
-  sendAttachment(Map<String, dynamic> body, List<http.MultipartFile> files) async {
-    return netUtil.postForm(sendAttachmentUrl, files, body: body,).then((response) {
+  sendAttachment(
+      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+    return netUtil
+        .postForm(
+      sendAttachmentUrl,
+      files,
+      body: body,
+    )
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -172,8 +189,11 @@ class DataSource {
     });
   }
 
-  replyWithAttachment(Map<String, dynamic> body, List<http.MultipartFile> files) async {
-    return netUtil.postForm(replyWithAttachmentUrl, files, body:body).then((response) {
+  replyWithAttachment(
+      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+    return netUtil
+        .postForm(replyWithAttachmentUrl, files, body: body)
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
@@ -196,8 +216,11 @@ class DataSource {
     });
   }
 
-  removeReaction(Map<String, dynamic> body, String messageId, String reactionId) async {
-    return netUtil.delete('$removeReactionUrl/$reactionId/$messageId', body:body).then((response) {
+  removeReaction(
+      Map<String, dynamic> body, String messageId, String reactionId) async {
+    return netUtil
+        .delete('$removeReactionUrl/$reactionId/$messageId', body: body)
+        .then((response) {
       if (response['error']) {
         throw response['message'];
       } else {
