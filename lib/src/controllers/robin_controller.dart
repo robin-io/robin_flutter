@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
-import 'package:robin_flutter/src/models/robin_user.dart';
+import 'package:robin_flutter/src/models/robin_current_user.dart';
 import 'package:robin_flutter/src/models/robin_keys.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -11,22 +11,25 @@ class RobinController extends GetxController {
   RobinCore? robinCore;
   WebSocketChannel? robinConnection;
   String? apiKey;
-  RobinUser? currentUser;
+  RobinCurrentUser? currentUser;
   Function? getUsers;
   RobinKeys? keys;
 
   bool robinInitialized = false;
 
   RxBool isConversationsLoading = true.obs;
+  RxBool isGettingUsersLoading = false.obs;
 
   Map<String, RobinConversation> allConversations = {};
+
+  var allUsers = [];
 
   RxList homeConversations = [].obs;
   RxList archivedConversations = [].obs;
 
   TextEditingController homeSearchController = TextEditingController();
 
-  initializeController(String _apiKey, RobinUser _currentUser,
+  initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
     robinCore ??= RobinCore();
     apiKey ??= _apiKey;
@@ -114,4 +117,12 @@ class RobinController extends GetxController {
     renderHomeConversations();
     renderArchivedConversations();
   }
+
+  getAllUsers() async{
+    isGettingUsersLoading.value = true;
+    var users = await getUsers!();
+    print(users);
+    isGettingUsersLoading.value = false;
+  }
+
 }

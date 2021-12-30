@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/views/robin_archived.dart';
 import 'package:robin_flutter/src/widgets/conversations_loading.dart';
 import 'package:robin_flutter/src/widgets/empty_conversation.dart';
 import 'package:robin_flutter/src/widgets/conversation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:robin_flutter/src/models/robin_user.dart';
+import 'package:robin_flutter/src/models/robin_current_user.dart';
 import 'package:robin_flutter/src/models/robin_keys.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
 class Robin extends StatelessWidget {
   final String apiKey;
-  final RobinUser currentUser;
+  final RobinCurrentUser currentUser;
   final Function getUsers;
   final RobinKeys keys;
 
@@ -53,7 +54,7 @@ class Robin extends StatelessWidget {
               height: 20,
             ),
             onPressed: () {
-              // _showNewModal();
+              showCreateConversation(context);
             },
           )
         ],
@@ -65,30 +66,27 @@ class Robin extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
-                child: SizedBox(
-                  height: 50,
-                  child: TextFormField(
-                    style: const TextStyle(
-                      color: Color(0XFF535F89),
-                      fontSize: 14,
-                    ),
-                    controller: rc.homeSearchController,
-                    decoration: textFieldDecoration.copyWith(
-                      prefixIcon: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            'assets/icons/search.svg',
-                            semanticsLabel: 'search',
-                            package: 'robin_flutter',
-                            width: 22,
-                            height: 22,
-                          ),
+                child: TextFormField(
+                  style: const TextStyle(
+                    color: Color(0XFF535F89),
+                    fontSize: 14,
+                  ),
+                  controller: rc.homeSearchController,
+                  decoration: textFieldDecoration.copyWith(
+                    prefixIcon: SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icons/search.svg',
+                          semanticsLabel: 'search',
+                          package: 'robin_flutter',
+                          width: 22,
+                          height: 22,
                         ),
                       ),
-                      hintText: 'Search Messages...',
                     ),
+                    hintText: 'Search Messages...',
                   ),
                 ),
               ),

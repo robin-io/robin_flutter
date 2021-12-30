@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -7,13 +6,14 @@ import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:robin_flutter/src/widgets/user_avatar.dart';
 
 class Conversation extends StatelessWidget {
   final RobinConversation conversation;
 
   Conversation({Key? key, required this.conversation}) : super(key: key);
 
-  final RobinController rc = Get.put(RobinController());
+  final RobinController rc = Get.find();
 
   void handleArchive(BuildContext context) {
     if (conversation.archived!) {
@@ -68,31 +68,8 @@ class Conversation extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  width: 45,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0XFFF4F6F8),
-                    border: Border.all(
-                      width: 1,
-                      style: BorderStyle.solid,
-                      color: const Color(0XFFCADAF8),
-                    ),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      conversation.isGroup!
-                          ? 'assets/icons/people.svg'
-                          : 'assets/icons/person.svg',
-                      package: 'robin_flutter',
-                      width: 18,
-                      height: 18,
-                    ),
-                  ),
-                ),
+              UserAvatar(
+                isGroup: conversation.isGroup!,
               ),
               const SizedBox(width: 12),
               Expanded(

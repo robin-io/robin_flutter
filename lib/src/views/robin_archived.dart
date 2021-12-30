@@ -9,7 +9,8 @@ import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 
 class RobinArchived extends StatelessWidget {
-  final RobinController rc = Get.put(RobinController());
+
+  final RobinController rc = Get.find();
 
   RobinArchived({Key? key}) : super(key: key);
 

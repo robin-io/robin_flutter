@@ -1,15 +1,15 @@
-class RobinUser {
+class RobinCurrentUser {
 
-  String displayName;
+  String fullName;
   String robinToken;
 
-  RobinUser({
-    required this.displayName,
+  RobinCurrentUser({
+    required this.fullName,
     required this.robinToken,
   });
 
   Map<String, dynamic> toJson() => {
-    "displayName": displayName,
+    "fullName": fullName,
     "robinToken": robinToken,
   };
 }

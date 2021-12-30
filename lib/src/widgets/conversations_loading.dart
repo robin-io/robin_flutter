@@ -17,8 +17,9 @@ class ConversationsLoading extends StatelessWidget {
               highlightColor: const Color(0XFFF5F5F5),
               enabled: true,
               child: ListView.builder(
-                itemBuilder: (_, __) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                itemBuilder: (_, __) => Container(
+                  padding: EdgeInsets.only(top: 7, bottom: 7),
+
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -34,9 +35,7 @@ class ConversationsLoading extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      ),
+                      const SizedBox(width: 12,),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,19 +45,15 @@ class ConversationsLoading extends StatelessWidget {
                               height: 6.0,
                               color: Colors.white,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.0),
-                            ),
+                            const SizedBox(height: 2),
                             Container(
                               width: double.infinity,
                               height: 6.0,
                               color: Colors.white,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.0),
-                            ),
+                            const SizedBox(height: 2),
                             Container(
-                              width: 40.0,
+                              width: 80.0,
                               height: 6.0,
                               color: Colors.white,
                             ),
