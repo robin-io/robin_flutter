@@ -17,9 +17,11 @@ class Conversation extends StatelessWidget {
 
   void handleArchive(BuildContext context) {
     if (conversation.archived!) {
-      rc.unarchiveConversation(conversation.id!);
+      rc.unarchiveConversation(
+          conversation.id!, conversation.token ?? conversation.id!);
     } else {
-      rc.archiveConversation(conversation.id!);
+      rc.archiveConversation(
+          conversation.id!, conversation.token ?? conversation.id!);
     }
   }
 

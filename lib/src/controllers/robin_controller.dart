@@ -23,7 +23,7 @@ class RobinController extends GetxController {
   RxBool isGettingUsersLoading = false.obs;
   RxBool createGroup = false.obs;
 
-  RxList createGroupParticipants = [].obs;
+  RxMap createGroupParticipants = {}.obs;
 
   Map<String, RobinConversation> allConversations = {};
 
@@ -95,8 +95,10 @@ class RobinController extends GetxController {
   Map<String, RobinConversation> toRobinConversations(List conversations) {
     Map<String, RobinConversation> allConversations = {};
     for (Map conversation in conversations) {
-      allConversations[conversation['_id']] =
-          (RobinConversation.fromJson(conversation));
+      RobinConversation robinConversation =
+          RobinConversation.fromJson(conversation);
+      allConversations[robinConversation.token ?? robinConversation.id!] =
+          robinConversation;
     }
     var sortedEntries = allConversations.entries.toList()
       ..sort((e1, e2) {
@@ -109,16 +111,16 @@ class RobinController extends GetxController {
     return sortedConversations;
   }
 
-  void archiveConversation(String conversationId) {
+  void archiveConversation(String conversationId, String key) {
     robinCore!.archiveConversation(conversationId, currentUser!.robinToken);
-    allConversations[conversationId]!.archived = true;
+    allConversations[key]!.archived = true;
     renderHomeConversations();
     renderArchivedConversations();
   }
 
-  void unarchiveConversation(String conversationId) {
+  void unarchiveConversation(String conversationId, String key) {
     robinCore!.unarchiveConversation(conversationId, currentUser!.robinToken);
-    allConversations[conversationId]!.archived = false;
+    allConversations[key]!.archived = false;
     renderHomeConversations();
     renderArchivedConversations();
   }
@@ -126,7 +128,7 @@ class RobinController extends GetxController {
   getAllUsers() async {
     try {
       createGroup.value = false;
-      createGroupParticipants.value = [];
+      createGroupParticipants.value = {};
       isGettingUsersLoading.value = true;
       var response = await getUsers!();
       List<RobinUser> users = [];

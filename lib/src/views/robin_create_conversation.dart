@@ -36,38 +36,80 @@ class RobinCreateConversation extends StatelessWidget {
         );
       }
       users.add(
-        Container(
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                width: 1,
-                style: BorderStyle.solid,
-                color: Color(0XFFF4F6F8),
-              ),
-            ),
-          ),
-          padding:
-              const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const UserAvatar(
-                isGroup: false,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  user.displayName,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0XFF000000),
-                  ),
+        InkWell(
+          onTap: () {
+            if (rc.createGroupParticipants.keys.contains(user.robinToken)) {
+              rc.createGroupParticipants.remove(user.robinToken);
+            } else {
+              rc.createGroupParticipants[user.robinToken] = user;
+            }
+          },
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  width: 1,
+                  style: BorderStyle.solid,
+                  color: Color(0XFFF4F6F8),
                 ),
               ),
-            ],
+            ),
+            padding:
+                const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const UserAvatar(
+                  isGroup: false,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    user.displayName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0XFF000000),
+                    ),
+                  ),
+                ),
+                rc.createGroup.value
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: rc.createGroupParticipants.keys
+                                    .contains(user.robinToken)
+                                ? green
+                                : null,
+                            border: Border.all(
+                              width: 2,
+                              style: rc.createGroupParticipants.keys
+                                      .contains(user.robinToken)
+                                  ? BorderStyle.none
+                                  : BorderStyle.solid,
+                              color: const Color(0xFFBBC1D6),
+                            ),
+                          ),
+                          child: Center(
+                            child: rc.createGroup.value
+                                ? const Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: Colors.white,
+                                  )
+                                : Container(),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
           ),
         ),
       );
