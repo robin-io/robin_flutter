@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/views/robin_chat.dart';
+import 'package:robin_flutter/src/views/robin_create_group.dart';
 import 'package:robin_flutter/src/widgets/user_avatar.dart';
 import 'package:robin_flutter/src/widgets/users_loading.dart';
 
@@ -15,7 +18,7 @@ class RobinCreateConversation extends StatelessWidget {
     rc.getAllUsers();
   }
 
-  List<Widget> renderUsers() {
+  List<Widget> renderUsers(BuildContext context) {
     List<Widget> users = [];
     String currentLetter = '';
     for (RobinUser user in rc.allUsers) {
@@ -37,11 +40,44 @@ class RobinCreateConversation extends StatelessWidget {
       }
       users.add(
         InkWell(
-          onTap: () {
-            if (rc.createGroupParticipants.keys.contains(user.robinToken)) {
-              rc.createGroupParticipants.remove(user.robinToken);
+          key: UniqueKey(),
+          onTap: () async {
+            if (rc.createGroup.value) {
+              if (rc.createGroupParticipants.keys.contains(user.robinToken)) {
+                rc.createGroupParticipants.remove(user.robinToken);
+              } else {
+                rc.createGroupParticipants[user.robinToken] = user.toJson();
+              }
             } else {
-              rc.createGroupParticipants[user.robinToken] = user;
+              if (rc.allConversations.keys.contains(user.robinToken)) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RobinChat(
+                      conversation: rc.allConversations[user.robinToken]!,
+                    ),
+                  ),
+                );
+              } else {
+                Map<String, String> body = {
+                  'receiver_name': user.displayName,
+                  'receiver_token': user.robinToken,
+                };
+                RobinConversation conversation =
+                    await rc.createConversation(body);
+                try {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RobinChat(
+                        conversation: conversation,
+                      ),
+                    ),
+                  );
+                } finally {
+                  // widget was disposed before conversation was created
+                }
+              }
             }
           },
           child: Container(
@@ -167,7 +203,17 @@ class RobinCreateConversation extends StatelessWidget {
                       ),
                       rc.createGroup.value
                           ? InkWell(
-                              onTap: () async {},
+                              onTap: rc.createGroupParticipants.isNotEmpty
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RobinCreateGroup(),
+                                        ),
+                                      );
+                                    }
+                                  : null,
                               child: Text(
                                 'Done',
                                 overflow: TextOverflow.ellipsis,
@@ -195,7 +241,7 @@ class RobinCreateConversation extends StatelessWidget {
                       color: Color(0XFF535F89),
                       fontSize: 14,
                     ),
-                    controller: rc.homeSearchController,
+                    controller: rc.allUsersSearchController,
                     decoration: textFieldDecoration.copyWith(
                       prefixIcon: SizedBox(
                         width: 22,
@@ -295,11 +341,23 @@ class RobinCreateConversation extends StatelessWidget {
                               const SizedBox(height: 13),
                             ],
                           )
-                        : Expanded(
-                            child: ListView(
-                              children: renderUsers(),
-                            ),
-                          )
+                        : rc.isCreatingConversation.value
+                            ? const Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      green,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Expanded(
+                                child: ListView(
+                                  children: renderUsers(context),
+                                ),
+                              )
               ],
             ),
           ),

@@ -9,8 +9,10 @@ class RobinUser {
   });
 
   Map<String, dynamic> toJson() => {
-    "displayName": displayName,
-    "robinToken": robinToken,
+    "meta_data": {
+      'display_name': displayName
+    },
+    "user_token": robinToken,
   };
 }
 
