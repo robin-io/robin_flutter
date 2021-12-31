@@ -1,18 +1,17 @@
 class RobinKeys {
   final List<String> robinToken;
   final List<List<String>> displayName;
-  final List<String>? profilePicture;
+  final String? separator;
 
   RobinKeys({
     required this.robinToken,
     required this.displayName,
-    this.profilePicture,
+    this.separator,
   });
-
 
   Map<String, dynamic> toJson() => {
         "robinToken": robinToken,
         "displayName": displayName,
-        "profilePicture": profilePicture,
+        "separator": separator,
       };
 }

@@ -18,8 +18,7 @@ class ConversationsLoading extends StatelessWidget {
               enabled: true,
               child: ListView.builder(
                 itemBuilder: (_, __) => Container(
-                  padding: EdgeInsets.only(top: 7, bottom: 7),
-
+                  padding: const EdgeInsets.only(top: 7, bottom: 7),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[

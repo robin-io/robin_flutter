@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_current_user.dart';
@@ -18,11 +19,15 @@ class RobinController extends GetxController {
   bool robinInitialized = false;
 
   RxBool isConversationsLoading = true.obs;
+
   RxBool isGettingUsersLoading = false.obs;
+  RxBool createGroup = false.obs;
+
+  RxList createGroupParticipants = [].obs;
 
   Map<String, RobinConversation> allConversations = {};
 
-  var allUsers = [];
+  RxList allUsers = [].obs;
 
   RxList homeConversations = [].obs;
   RxList archivedConversations = [].obs;
@@ -118,11 +123,64 @@ class RobinController extends GetxController {
     renderArchivedConversations();
   }
 
-  getAllUsers() async{
-    isGettingUsersLoading.value = true;
-    var users = await getUsers!();
-    print(users);
-    isGettingUsersLoading.value = false;
+  getAllUsers() async {
+    try {
+      createGroup.value = false;
+      createGroupParticipants.value = [];
+      isGettingUsersLoading.value = true;
+      var response = await getUsers!();
+      List<RobinUser> users = [];
+      for (Map user in response) {
+        String displayName = '';
+        String robinToken = '';
+        Map displayNameMap = user;
+        Map robinTokenMap = user;
+        try {
+          for (int i = 0; i < keys!.robinToken.length; i++) {
+            if (i == keys!.robinToken.length - 1) {
+              robinToken = robinTokenMap[keys!.robinToken[i]];
+            } else {
+              robinTokenMap = robinTokenMap[keys!.robinToken[i]];
+            }
+          }
+        } catch (e) {
+          throw "RobinKeys robinToken does not match user model";
+        }
+        try {
+          String separator = keys!.separator ?? " ";
+          for (int i = 0; i < keys!.displayName.length; i++) {
+            for (int j = 0; j < keys!.displayName[i].length; j++) {
+              if (j == keys!.displayName[i].length - 1) {
+                displayName +=
+                    '${displayNameMap[keys!.displayName[i][j]]}$separator';
+              } else {
+                displayNameMap = displayNameMap[keys!.displayName[i][j]];
+              }
+            }
+            displayNameMap = user;
+          }
+          displayName = removeLastSeparator(displayName, separator);
+        } catch (e) {
+          throw "RobinKeys displayName does not match user model";
+        }
+        users.add(
+          RobinUser(displayName: displayName, robinToken: robinToken),
+        );
+      }
+      users.sort(
+        (RobinUser a, RobinUser b) => a.displayName.compareTo(b.displayName),
+      );
+      allUsers.value = users;
+      isGettingUsersLoading.value = false;
+    } catch (e) {
+      isGettingUsersLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
   }
 
+  String removeLastSeparator(String str, String separator) {
+    str = str.substring(0, str.length - separator.length);
+    return str;
+  }
 }
