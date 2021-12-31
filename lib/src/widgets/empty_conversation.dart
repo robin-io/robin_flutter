@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
 
 class EmptyConversation extends StatelessWidget {
   const EmptyConversation({Key? key}) : super(key: key);
@@ -34,7 +35,7 @@ class EmptyConversation extends StatelessWidget {
             const SizedBox(height: 13),
             InkWell(
               onTap: () {
-                // _showNewModal();
+                showCreateConversation(context);
               },
               child: const Text(
                 'Start a chat',

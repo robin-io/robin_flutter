@@ -6,6 +6,7 @@ class RobinConversation {
   String? id;
   bool? isGroup;
   String? name;
+  String? token;
   RobinLastMessage? lastMessage;
   List? participants;
   Map? unreadMessages;
@@ -24,8 +25,10 @@ class RobinConversation {
     } else {
       if (rc.currentUser?.robinToken == json['sender_token']) {
         name = json['receiver_name'];
+        token = json['receiver_token'];
       } else {
         name = json['sender_name'];
+        token = json['sender_token'];
       }
     }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);
