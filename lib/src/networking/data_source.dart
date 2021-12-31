@@ -15,7 +15,7 @@ class DataSource {
         .post(createUserTokenUrl, body, headers: header)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data']['user_token'];
       }
@@ -29,7 +29,7 @@ class DataSource {
         .get('$getDetailsFromUserTokenUrl/$userToken')
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data']['conversations'];
       }
@@ -41,7 +41,7 @@ class DataSource {
   createConversation(Map<String, dynamic> body) async {
     return netUtil.post(createConversationUrl, body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -55,7 +55,7 @@ class DataSource {
         .get('$getConversationMessagesUrl/$id/$userToken')
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -64,10 +64,10 @@ class DataSource {
     });
   }
 
-  createGroupChat(Map<String, dynamic> body) async {
+  createGroupChat(Map body) async {
     return netUtil.post(createGroupChatUrl, body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -81,7 +81,7 @@ class DataSource {
         .put('$assignGroupModeratorUrl/$id', body: body)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -95,7 +95,7 @@ class DataSource {
         .put('$addGroupParticipantsUrl/$id', body: body)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -109,7 +109,7 @@ class DataSource {
         .put('$removeGroupParticipantUrl/id', body: body)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -123,7 +123,7 @@ class DataSource {
         .put('$archiveConversationUrl/$conversationId/$userToken')
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -137,7 +137,7 @@ class DataSource {
         .put('$unarchiveConversationUrl/$conversationId/$userToken')
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -149,7 +149,7 @@ class DataSource {
   forwardMessages(Map<String, dynamic> body) async {
     return netUtil.post(forwardMessagesUrl, body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -161,7 +161,7 @@ class DataSource {
   deleteMessages(Map<String, dynamic> body) async {
     return netUtil.delete(deleteMessagesUrl, body: body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -180,7 +180,7 @@ class DataSource {
     )
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -195,7 +195,7 @@ class DataSource {
         .postForm(replyWithAttachmentUrl, files, body: body)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -207,7 +207,7 @@ class DataSource {
   sendReaction(Map<String, dynamic> body, String messageId) async {
     return netUtil.post('$sendReactionUrl/$messageId', body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -222,7 +222,7 @@ class DataSource {
         .delete('$removeReactionUrl/$reactionId/$messageId', body: body)
         .then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }
@@ -234,7 +234,7 @@ class DataSource {
   sendReadReceipts(Map<String, dynamic> body) async {
     return netUtil.post(sendReadReceiptsUrl, body).then((response) {
       if (response['error']) {
-        throw response['message'];
+        throw response['msg'];
       } else {
         return response['data'];
       }

@@ -22,10 +22,14 @@ class RobinController extends GetxController {
 
   RxBool isGettingUsersLoading = false.obs;
   RxBool createGroup = false.obs;
+  RxBool isCreatingConversation = false.obs;
+  RxBool isCreatingGroup = false.obs;
 
   RxMap createGroupParticipants = {}.obs;
 
   Map<String, RobinConversation> allConversations = {};
+
+  List<RobinUser> allRobinUsers = [];
 
   RxList allUsers = [].obs;
 
@@ -33,6 +37,8 @@ class RobinController extends GetxController {
   RxList archivedConversations = [].obs;
 
   TextEditingController homeSearchController = TextEditingController();
+
+  TextEditingController allUsersSearchController = TextEditingController();
 
   initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
@@ -47,6 +53,9 @@ class RobinController extends GetxController {
       getConversations();
       homeSearchController.addListener(() {
         renderHomeConversations();
+      });
+      allUsersSearchController.addListener(() {
+        renderAllUsers();
       });
     }
   }
@@ -130,8 +139,11 @@ class RobinController extends GetxController {
       createGroup.value = false;
       createGroupParticipants.value = {};
       isGettingUsersLoading.value = true;
+      isCreatingConversation.value = false;
+      isCreatingGroup.value = false;
+      allUsersSearchController.clear();
       var response = await getUsers!();
-      List<RobinUser> users = [];
+      allRobinUsers = [];
       for (Map user in response) {
         String displayName = '';
         String robinToken = '';
@@ -165,14 +177,14 @@ class RobinController extends GetxController {
         } catch (e) {
           throw "RobinKeys displayName does not match user model";
         }
-        users.add(
+        allRobinUsers.add(
           RobinUser(displayName: displayName, robinToken: robinToken),
         );
       }
-      users.sort(
+      allRobinUsers.sort(
         (RobinUser a, RobinUser b) => a.displayName.compareTo(b.displayName),
       );
-      allUsers.value = users;
+      renderAllUsers();
       isGettingUsersLoading.value = false;
     } catch (e) {
       isGettingUsersLoading.value = false;
@@ -184,5 +196,59 @@ class RobinController extends GetxController {
   String removeLastSeparator(String str, String separator) {
     str = str.substring(0, str.length - separator.length);
     return str;
+  }
+
+  renderAllUsers() {
+    allUsers.value = allRobinUsers
+        .where((RobinUser user) =>
+            user.displayName
+                .toLowerCase()
+                .contains(allUsersSearchController.text.toLowerCase()) &&
+            user.robinToken != currentUser?.robinToken)
+        .toList();
+  }
+
+  Future<RobinConversation> createConversation(Map<String, String> body) async {
+    try {
+      isCreatingConversation.value = true;
+      body['sender_name'] = currentUser!.fullName;
+      body['sender_token'] = currentUser!.robinToken;
+      var response = await robinCore!.createConversation(body);
+      RobinConversation conversation = RobinConversation.fromJson(response);
+      allConversations = {
+        conversation.token ?? conversation.id!: conversation,
+        ...allConversations,
+      };
+      renderHomeConversations();
+      renderArchivedConversations();
+      isCreatingConversation.value = false;
+      return conversation;
+    } catch (e) {
+      isCreatingConversation.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<RobinConversation> createGroupChat(Map body) async {
+    try {
+      isCreatingGroup.value = true;
+      body['participants'] = createGroupParticipants.values.toList();
+      body['moderator'] = {'user_token': currentUser!.robinToken};
+      var response = await robinCore!.createGroupChat(body);
+      RobinConversation conversation = RobinConversation.fromJson(response);
+      allConversations = {
+        conversation.token ?? conversation.id!: conversation,
+        ...allConversations,
+      };
+      renderHomeConversations();
+      renderArchivedConversations();
+      isCreatingGroup.value = false;
+      return conversation;
+    } catch (e) {
+      isCreatingGroup.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
   }
 }

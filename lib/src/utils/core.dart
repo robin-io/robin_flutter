@@ -101,7 +101,7 @@ class RobinCore {
     }
   }
 
-  createGroupChat(Map<String, dynamic> body) async {
+  createGroupChat(Map body) async {
     try {
       return await api.createGroupChat(body);
     } catch (e) {

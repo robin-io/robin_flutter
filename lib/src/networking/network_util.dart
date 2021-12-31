@@ -56,7 +56,7 @@ class NetworkHelper {
         final String res = response.body;
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw result['message'];
+        if (statusCode < 200 || statusCode > 400) throw result['msg'];
         return result;
       });
     } catch (e) {
@@ -78,7 +78,7 @@ class NetworkHelper {
         final String res = response.body;
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw result['message'];
+        if (statusCode < 200 || statusCode > 400) throw result['msg'];
         return result;
       });
     } catch (e) {
@@ -122,7 +122,7 @@ class NetworkHelper {
         final String res = response.body;
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
-        if (statusCode < 200 || statusCode > 400) throw result['message'];
+        if (statusCode < 200 || statusCode > 400) throw result['msg'];
         return result;
       });
     } catch (e) {
