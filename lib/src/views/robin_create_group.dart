@@ -117,15 +117,15 @@ class RobinCreateGroup extends StatelessWidget {
                                   };
                                   RobinConversation conversation =
                                       await rc.createGroupChat(body);
-                                  Navigator.pushAndRemoveUntil(
+                                  Navigator.pop(context);
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                         builder: (BuildContext context) =>
                                             RobinChat(
                                           conversation: conversation,
                                         ),
-                                      ),
-                                      (route) => route is Robin);
+                                      ),);
                                 }
                               },
                               child: const Padding(
