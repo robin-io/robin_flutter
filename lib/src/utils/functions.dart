@@ -21,7 +21,7 @@ String formatDate(String dateString) {
   return formattedDate;
 }
 
-IconButton goBack(BuildContext context) {
+IconButton backButton(BuildContext context) {
   return IconButton(
     icon: const Icon(
       Icons.arrow_back_ios,

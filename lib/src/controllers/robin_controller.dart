@@ -25,6 +25,8 @@ class RobinController extends GetxController {
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
 
+  RxBool forwardView = false.obs;
+
   RxMap createGroupParticipants = {}.obs;
 
   Map<String, RobinConversation> allConversations = {};
@@ -250,5 +252,10 @@ class RobinController extends GetxController {
       showErrorMessage(e.toString());
       rethrow;
     }
+  }
+
+  initChatView(){
+    forwardView.value = false;
+
   }
 }

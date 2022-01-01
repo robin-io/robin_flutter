@@ -20,7 +20,7 @@ class RobinArchived extends StatelessWidget {
       backgroundColor: white,
       appBar: AppBar(
         backgroundColor: white,
-        leading: goBack(context),
+        leading: backButton(context),
         title: const Text(
           'Archived Chats',
           style: TextStyle(
