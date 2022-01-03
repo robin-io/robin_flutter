@@ -72,7 +72,7 @@ class Robin extends StatelessWidget {
                     fontSize: 14,
                   ),
                   controller: rc.homeSearchController,
-                  decoration: textFieldDecoration.copyWith(
+                  decoration: textFieldDecoration().copyWith(
                     prefixIcon: SizedBox(
                       width: 22,
                       height: 22,

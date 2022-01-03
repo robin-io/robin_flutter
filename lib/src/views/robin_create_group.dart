@@ -166,7 +166,7 @@ class RobinCreateGroup extends StatelessWidget {
                     fontSize: 14,
                   ),
                   controller: groupNameController,
-                  decoration: textFieldDecoration.copyWith(
+                  decoration: textFieldDecoration().copyWith(
                     hintText: 'Type a group chat name',
                   ),
                 ),

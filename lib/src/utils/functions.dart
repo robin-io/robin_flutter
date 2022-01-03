@@ -1,7 +1,15 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/views/robin_create_conversation.dart';
+
+import 'constants.dart';
+
+final RobinController rc = Get.find();
 
 void showErrorMessage(String message) {
   Fluttertoast.showToast(
@@ -62,4 +70,56 @@ void showCreateConversation(BuildContext context) {
     isScrollControlled: true,
     builder: (_) => RobinCreateConversation(),
   );
+}
+
+InputDecoration textFieldDecoration({double? radius}) {
+  radius = radius ?? 4;
+  OutlineInputBorder border = textFieldBorder.copyWith(
+    borderRadius: BorderRadius.circular(radius),
+  );
+  return InputDecoration(
+    hintStyle: const TextStyle(
+      color: Color(0XFFBBC1D6),
+      fontSize: 16,
+    ),
+    contentPadding: const EdgeInsets.all(15.0),
+    filled: true,
+    fillColor: const Color(0XFFF4F6F8),
+    border: border,
+    focusedBorder: border,
+    enabledBorder: border,
+  );
+}
+
+getMedia({required String source}) async {
+  ImageSource imageSource = ImageSource.camera;
+  if (source == 'gallery') {
+    imageSource = ImageSource.gallery;
+  }
+  final ImagePicker picker = ImagePicker();
+  rc.file.value = {
+    'file': await picker.pickImage(
+      source: imageSource,
+      imageQuality: 20,
+    )
+  };
+}
+
+getDocument() async {
+  FilePickerResult? document = await FilePicker.platform.pickFiles();
+  rc.file.value = {'file': document?.files.first};
+}
+
+String fileType() {
+  String? ext = rc.file['file'].path.split('.').last.toLowerCase();
+
+  if (imageFormats.contains(ext)) {
+    return 'image';
+  }
+  if (audioFormats.contains(ext)) {
+    return 'audio';
+  } else if (supportedFormats.contains(ext)) {
+    return ext.toString();
+  }
+  return 'generic';
 }

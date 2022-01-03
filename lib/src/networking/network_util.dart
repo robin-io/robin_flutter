@@ -24,7 +24,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .get(Uri.parse(url), headers: headers)
@@ -48,7 +48,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .post(Uri.parse(url), body: json.encode(body), headers: headers)
@@ -70,7 +70,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .put(Uri.parse(url), body: json.encode(body), headers: headers)
@@ -114,7 +114,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .delete(Uri.parse(url), body: json.encode(body), headers: headers)

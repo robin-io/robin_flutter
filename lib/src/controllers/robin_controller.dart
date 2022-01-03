@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -26,6 +27,14 @@ class RobinController extends GetxController {
   RxBool isCreatingGroup = false.obs;
 
   RxBool forwardView = false.obs;
+  RxBool replyView = false.obs;
+  RxBool chatViewLoading = false.obs;
+  RxBool showSendButton = false.obs;
+  RxBool isFileSending = false.obs;
+
+  RobinConversation? chatConversation;
+
+  RxMap file = {}.obs;
 
   RxMap createGroupParticipants = {}.obs;
 
@@ -42,7 +51,9 @@ class RobinController extends GetxController {
 
   TextEditingController allUsersSearchController = TextEditingController();
 
-  initializeController(String _apiKey, RobinCurrentUser _currentUser,
+  TextEditingController messageController = TextEditingController();
+
+  void initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
     robinCore ??= RobinCore();
     apiKey ??= _apiKey;
@@ -59,10 +70,13 @@ class RobinController extends GetxController {
       allUsersSearchController.addListener(() {
         renderAllUsers();
       });
+      messageController.addListener(() {
+        showSendButton.value = messageController.text.isNotEmpty;
+      });
     }
   }
 
-  getConversations() async {
+  void getConversations() async {
     try {
       isConversationsLoading.value = true;
       var conversations =
@@ -136,7 +150,7 @@ class RobinController extends GetxController {
     renderArchivedConversations();
   }
 
-  getAllUsers() async {
+  void getAllUsers() async {
     try {
       createGroup.value = false;
       createGroupParticipants.value = {};
@@ -200,7 +214,7 @@ class RobinController extends GetxController {
     return str;
   }
 
-  renderAllUsers() {
+  void renderAllUsers() {
     allUsers.value = allRobinUsers
         .where((RobinUser user) =>
             user.displayName
@@ -254,8 +268,31 @@ class RobinController extends GetxController {
     }
   }
 
-  initChatView(){
-    forwardView.value = false;
+  void initChatView(RobinConversation conversation) {
+    resetChatView();
+    chatConversation = conversation;
+    //todo: get messages ,listen etc.
+  }
 
+  void resetChatView() {
+    forwardView.value = false;
+    file['file'] = null;
+    chatViewLoading.value = false;
+  }
+
+  Future<bool> leaveGroup(String groupId) async {
+    try {
+      chatViewLoading.value = true;
+      Map<String, String> body = {
+        'user_token': currentUser!.robinToken,
+      };
+      await robinCore!.removeGroupParticipant(body, groupId);
+      chatViewLoading.value = false;
+      return true;
+    } catch (e) {
+      chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
   }
 }

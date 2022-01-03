@@ -242,7 +242,7 @@ class RobinCreateConversation extends StatelessWidget {
                       fontSize: 14,
                     ),
                     controller: rc.allUsersSearchController,
-                    decoration: textFieldDecoration.copyWith(
+                    decoration: textFieldDecoration().copyWith(
                       prefixIcon: SizedBox(
                         width: 22,
                         height: 22,

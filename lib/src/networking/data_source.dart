@@ -104,9 +104,9 @@ class DataSource {
     });
   }
 
-  removeGroupParticipant(Map<String, dynamic> body, String id) async {
+  removeGroupParticipant(Map<String, dynamic> body, String groupId) async {
     return netUtil
-        .put('$removeGroupParticipantUrl/id', body: body)
+        .put('$removeGroupParticipantUrl/$groupId', body: body)
         .then((response) {
       if (response['error']) {
         throw response['msg'];

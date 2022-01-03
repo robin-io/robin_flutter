@@ -125,9 +125,9 @@ class RobinCore {
     }
   }
 
-  removeGroupParticipant(Map<String, dynamic> body, String id) async {
+  removeGroupParticipant(Map<String, dynamic> body, String groupId) async {
     try {
-      return await api.removeGroupParticipant(body, id);
+      return await api.removeGroupParticipant(body, groupId);
     } catch (e) {
       throw e.toString();
     }
