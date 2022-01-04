@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -32,7 +32,7 @@ class RobinController extends GetxController {
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
 
-  RobinConversation? chatConversation;
+  RobinConversation? currentConversation;
 
   RxMap file = {}.obs;
 
@@ -270,7 +270,7 @@ class RobinController extends GetxController {
 
   void initChatView(RobinConversation conversation) {
     resetChatView();
-    chatConversation = conversation;
+    currentConversation = conversation;
     //todo: get messages ,listen etc.
   }
 
@@ -291,6 +291,54 @@ class RobinController extends GetxController {
       return true;
     } catch (e) {
       chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  sendTextMessage() {
+    try {
+      if (messageController.text.isNotEmpty) {
+        Map<String, String> message = {
+          'msg': messageController.text,
+          'timestamp': DateTime.now().toString(),
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        robinCore!.sendTextMessage(
+          currentConversation!.id!,
+          message,
+          currentUser!.robinToken,
+        );
+        messageController.clear();
+      }
+    } catch (e) {
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  sendAttachment() async {
+    try {
+      if (file['file'] != null) {
+        isFileSending.value = true;
+        Map<String, String> body = {
+          'conversation_id': currentConversation!.id!,
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            file['file'].path,
+          ),
+        ];
+        await robinCore!.sendAttachment(body, files);
+        file['file'] = null;
+        isFileSending.value = false;
+      }
+    } catch (e) {
+      isFileSending.value = false;
       showErrorMessage(e.toString());
       rethrow;
     }

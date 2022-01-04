@@ -8,8 +8,8 @@ import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/views/robin_chat.dart';
 import 'package:robin_flutter/src/views/robin_create_group.dart';
-import 'package:robin_flutter/src/widgets/user_avatar.dart';
-import 'package:robin_flutter/src/widgets/users_loading.dart';
+import 'package:robin_flutter/src/components/user_avatar.dart';
+import 'package:robin_flutter/src/components/users_loading.dart';
 
 class RobinCreateConversation extends StatelessWidget {
   final RobinController rc = Get.find();

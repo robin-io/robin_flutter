@@ -7,7 +7,7 @@ import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:robin_flutter/src/views/robin_chat.dart';
-import 'package:robin_flutter/src/widgets/user_avatar.dart';
+import 'package:robin_flutter/src/components/user_avatar.dart';
 
 class Conversation extends StatelessWidget {
   final RobinConversation conversation;

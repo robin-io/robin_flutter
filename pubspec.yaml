@@ -28,6 +28,7 @@ dependencies:
   get: ^4.6.1
   fluttertoast: ^8.0.8
   jiffy: ^5.0.0
+  scrollable_positioned_list: ^0.2.3
 
 dev_dependencies:
   flutter_test:

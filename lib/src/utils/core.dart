@@ -42,7 +42,7 @@ class RobinCore {
     rc.robinConnection!.sink.add(json.encode(msg));
   }
 
-  void sendMessageToConversation(
+  void sendTextMessage(
       String conversationId, Map message, String senderToken) {
     Map msg = {
       'type': 1,

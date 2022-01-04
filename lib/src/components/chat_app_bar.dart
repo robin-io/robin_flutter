@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/widgets/user_avatar.dart';
+import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
@@ -16,7 +16,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   List<String> chatOptions() {
     List<String> options = ['Select Messages'];
-    if (rc.chatConversation!.isGroup!) {
+    if (rc.currentConversation!.isGroup!) {
       options.add('Leave Group');
       options.add('Group Info');
     }
@@ -85,7 +85,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   //   ),
                   // ),
                   UserAvatar(
-                    isGroup: rc.chatConversation!.isGroup!,
+                    isGroup: rc.currentConversation!.isGroup!,
                     size: 40,
                   ),
                   const SizedBox(width: 10),
@@ -98,7 +98,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                rc.chatConversation!.name!,
+                                rc.currentConversation!.name!,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
@@ -110,14 +110,14 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                           ],
                         ),
-                        rc.chatConversation!.isGroup!
+                        rc.currentConversation!.isGroup!
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 3.0),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        '${rc.chatConversation!.participants!.length.toString()} Members',
+                                        '${rc.currentConversation!.participants!.length.toString()} Members',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: const TextStyle(
@@ -178,7 +178,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       rc.forwardView.value = true;
                     } else if (value == 'Leave Group') {
                       bool successful =
-                          await rc.leaveGroup(rc.chatConversation!.id!);
+                          await rc.leaveGroup(rc.currentConversation!.id!);
                       if (successful) {
                         Navigator.pop(context);
                       }

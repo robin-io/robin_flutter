@@ -1,10 +1,9 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
-import 'dart:io';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 
@@ -63,7 +62,7 @@ class ChatBottomSheet extends StatelessWidget {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   Text(
-                                    '${rc.chatConversation!.name}',
+                                    '${rc.currentConversation!.name}',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: const TextStyle(
@@ -80,7 +79,7 @@ class ChatBottomSheet extends StatelessWidget {
                                           ? "Photo"
                                           : false
                                               ? ""
-                                              : "${rc.chatConversation!.name}",
+                                              : "${rc.currentConversation!.name}",
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: const TextStyle(
@@ -230,9 +229,19 @@ class ChatBottomSheet extends StatelessWidget {
                   const SizedBox(
                     width: 10,
                   ),
-                  rc.showSendButton.value
+                  rc.showSendButton.value || rc.file['file'] != null
                       ? GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            if(!rc.isFileSending.value){
+                              if(rc.file['file'] != null){
+                                rc.sendAttachment();
+                                //todo: send file reply
+                              }else if(rc.messageController.text.isNotEmpty){
+                                rc.sendTextMessage();
+                                //todo: send reply
+                              }
+                            }
+                          },
                           child: Container(
                             width: 45,
                             height: 45,

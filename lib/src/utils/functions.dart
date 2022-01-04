@@ -100,7 +100,7 @@ getMedia({required String source}) async {
   rc.file.value = {
     'file': await picker.pickImage(
       source: imageSource,
-      imageQuality: 20,
+      imageQuality: 10,
     )
   };
 }

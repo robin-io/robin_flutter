@@ -6,7 +6,7 @@ import 'package:robin_flutter/src/views/robin_chat.dart';
 import 'package:robin_flutter/src/views/robin_home.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
-import 'package:robin_flutter/src/widgets/user_avatar.dart';
+import 'package:robin_flutter/src/components/user_avatar.dart';
 
 class RobinCreateGroup extends StatelessWidget {
   RobinCreateGroup({Key? key}) : super(key: key);
