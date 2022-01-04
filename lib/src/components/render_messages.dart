@@ -22,7 +22,7 @@ class RenderMessages extends StatelessWidget {
       () => ListView.builder(
         itemCount: rc.conversationMessages.length,
         itemBuilder: (context, index) => Text(
-          '$index. ${rc.conversationMessages[index]['content']['msg']}..',
+          '$index...',
           style: const TextStyle(
             fontSize: 17,
           ),

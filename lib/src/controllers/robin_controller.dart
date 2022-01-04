@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:robin_flutter/src/models/robin_message.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
@@ -35,7 +36,7 @@ class RobinController extends GetxController {
 
   RobinConversation? currentConversation;
 
-  RxList conversationMessages = [].obs;
+  RxMap conversationMessages = {}.obs;
 
   RxMap file = {}.obs;
 
@@ -87,7 +88,8 @@ class RobinController extends GetxController {
     robinConnection!.stream.listen((data) {
       data = json.decode(data);
       if (data['is_event'] == null || data['is_event'] == false) {
-        conversationMessages.add(data);
+        RobinMessage robinMessage = RobinMessage.fromJson(data);
+        conversationMessages[robinMessage.id] = robinMessage;
         scrollToEnd();
       }
     });
@@ -96,7 +98,7 @@ class RobinController extends GetxController {
   scrollToEnd() {
     messagesScrollController.animateTo(
       messagesScrollController.position.maxScrollExtent,
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       curve: Curves.fastOutSlowIn,
     );
   }
@@ -329,13 +331,22 @@ class RobinController extends GetxController {
         currentConversation!.id!,
         currentUser!.robinToken,
       );
-      conversationMessages.value = response ?? [];
+      conversationMessages.value = toRobinMessage(response ?? []);
       chatViewLoading.value = false;
     } catch (e) {
       chatViewLoading.value = false;
       showErrorMessage(e.toString());
       rethrow;
     }
+  }
+
+  Map<String, RobinMessage> toRobinMessage(List messages) {
+    Map<String, RobinMessage> allMessages = {};
+    for (Map message in messages) {
+      RobinMessage robinMessage = RobinMessage.fromJson(message);
+      allMessages[robinMessage.id] = robinMessage;
+    }
+    return allMessages;
   }
 
   sendTextMessage() {
