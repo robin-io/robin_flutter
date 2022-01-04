@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -25,6 +26,16 @@ class RobinController extends GetxController {
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
 
+  RxBool forwardView = false.obs;
+  RxBool replyView = false.obs;
+  RxBool chatViewLoading = false.obs;
+  RxBool showSendButton = false.obs;
+  RxBool isFileSending = false.obs;
+
+  RobinConversation? currentConversation;
+
+  RxMap file = {}.obs;
+
   RxMap createGroupParticipants = {}.obs;
 
   Map<String, RobinConversation> allConversations = {};
@@ -40,7 +51,9 @@ class RobinController extends GetxController {
 
   TextEditingController allUsersSearchController = TextEditingController();
 
-  initializeController(String _apiKey, RobinCurrentUser _currentUser,
+  TextEditingController messageController = TextEditingController();
+
+  void initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
     robinCore ??= RobinCore();
     apiKey ??= _apiKey;
@@ -57,10 +70,13 @@ class RobinController extends GetxController {
       allUsersSearchController.addListener(() {
         renderAllUsers();
       });
+      messageController.addListener(() {
+        showSendButton.value = messageController.text.isNotEmpty;
+      });
     }
   }
 
-  getConversations() async {
+  void getConversations() async {
     try {
       isConversationsLoading.value = true;
       var conversations =
@@ -134,7 +150,7 @@ class RobinController extends GetxController {
     renderArchivedConversations();
   }
 
-  getAllUsers() async {
+  void getAllUsers() async {
     try {
       createGroup.value = false;
       createGroupParticipants.value = {};
@@ -198,7 +214,7 @@ class RobinController extends GetxController {
     return str;
   }
 
-  renderAllUsers() {
+  void renderAllUsers() {
     allUsers.value = allRobinUsers
         .where((RobinUser user) =>
             user.displayName
@@ -247,6 +263,82 @@ class RobinController extends GetxController {
       return conversation;
     } catch (e) {
       isCreatingGroup.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  void initChatView(RobinConversation conversation) {
+    resetChatView();
+    currentConversation = conversation;
+    //todo: get messages ,listen etc.
+  }
+
+  void resetChatView() {
+    forwardView.value = false;
+    file['file'] = null;
+    chatViewLoading.value = false;
+  }
+
+  Future<bool> leaveGroup(String groupId) async {
+    try {
+      chatViewLoading.value = true;
+      Map<String, String> body = {
+        'user_token': currentUser!.robinToken,
+      };
+      await robinCore!.removeGroupParticipant(body, groupId);
+      chatViewLoading.value = false;
+      return true;
+    } catch (e) {
+      chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  sendTextMessage() {
+    try {
+      if (messageController.text.isNotEmpty) {
+        Map<String, String> message = {
+          'msg': messageController.text,
+          'timestamp': DateTime.now().toString(),
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        robinCore!.sendTextMessage(
+          currentConversation!.id!,
+          message,
+          currentUser!.robinToken,
+        );
+        messageController.clear();
+      }
+    } catch (e) {
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  sendAttachment() async {
+    try {
+      if (file['file'] != null) {
+        isFileSending.value = true;
+        Map<String, String> body = {
+          'conversation_id': currentConversation!.id!,
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            file['file'].path,
+          ),
+        ];
+        await robinCore!.sendAttachment(body, files);
+        file['file'] = null;
+        isFileSending.value = false;
+      }
+    } catch (e) {
+      isFileSending.value = false;
       showErrorMessage(e.toString());
       rethrow;
     }

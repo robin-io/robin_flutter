@@ -11,6 +11,34 @@ const Color black = Color(0XFF000000);
 const Color blueGrey = Color(0XFF535F89);
 const Color green = Color(0XFF15AE73);
 
+const List<String> imageFormats = ['png', 'jpg', 'jpeg', 'gif', 'heic'];
+const List<String> audioFormats = [
+  'mp3',
+  'm4a',
+  'ogg',
+  'wav',
+  'flac',
+  'aac',
+  'wma'
+];
+const List<String> supportedFormats = [
+  'pdf',
+  'odt',
+  'md',
+  'txt',
+  'rtf',
+  'doc',
+  'docx',
+  'ppt',
+  'pptx',
+  'zip',
+  'rar',
+  'html',
+  'csv',
+  'xls',
+  'xlsx'
+];
+
 OutlineInputBorder textFieldBorder = OutlineInputBorder(
   borderSide: const BorderSide(
     width: 1,
@@ -18,17 +46,4 @@ OutlineInputBorder textFieldBorder = OutlineInputBorder(
     color: Color(0XFFCADAF8),
   ),
   borderRadius: BorderRadius.circular(4),
-);
-
-InputDecoration textFieldDecoration = InputDecoration(
-  hintStyle: const TextStyle(
-    color: Color(0XFFBBC1D6),
-    fontSize: 16,
-  ),
-  contentPadding: const EdgeInsets.all(15.0),
-  filled: true,
-  fillColor: const Color(0XFFF4F6F8),
-  border: textFieldBorder,
-  focusedBorder: textFieldBorder,
-  enabledBorder: textFieldBorder,
 );

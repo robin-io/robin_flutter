@@ -1,37 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
-import 'package:robin_flutter/src/widgets/conversations_loading.dart';
-import 'package:robin_flutter/src/widgets/empty_conversation.dart';
-import 'package:robin_flutter/src/widgets/conversation.dart';
+import 'package:robin_flutter/src/components/chat_app_bar.dart';
+import 'package:robin_flutter/src/components/chat_bottom_sheet.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
-import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 
 class RobinChat extends StatelessWidget {
   final RobinConversation conversation;
   final RobinController rc = Get.find();
 
-  RobinChat({Key? key, required this.conversation}) : super(key: key);
+  RobinChat({Key? key, required this.conversation}) : super(key: key) {
+    rc.initChatView(conversation);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      appBar: AppBar(
+    return GestureDetector(
+      onTap: () {
+        //todo: reimplement remove focus
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
         backgroundColor: white,
-        leading: goBack(context),
-        title: const Text(
-          'Archived Chats',
-          style: TextStyle(
-            color: black,
-            fontSize: 15,
-          ),
+        appBar: ChatAppBar(),
+        body: Obx(
+          () => rc.chatViewLoading.value
+              ? const Padding(
+                  padding: EdgeInsets.only(top: 15),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        green,
+                      ),
+                    ),
+                  ),
+                )
+              : ListView(
+                  children: const [Text('E don Finish')],
+                ),
         ),
-        shadowColor: const Color.fromRGBO(0, 104, 255, 0.075),
-        centerTitle: true,
+        bottomSheet: ChatBottomSheet(
+          bottomPadding: MediaQuery.of(context).padding.bottom,
+        ),
       ),
-      body: Text(conversation.name!),
     );
   }
 }

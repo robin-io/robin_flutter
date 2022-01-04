@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
-import 'package:robin_flutter/src/widgets/conversations_loading.dart';
-import 'package:robin_flutter/src/widgets/empty_conversation.dart';
-import 'package:robin_flutter/src/widgets/conversation.dart';
+import 'package:robin_flutter/src/components/conversations_loading.dart';
+import 'package:robin_flutter/src/components/empty_conversation.dart';
+import 'package:robin_flutter/src/components/conversation.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
@@ -20,7 +20,7 @@ class RobinArchived extends StatelessWidget {
       backgroundColor: white,
       appBar: AppBar(
         backgroundColor: white,
-        leading: goBack(context),
+        leading: backButton(context),
         title: const Text(
           'Archived Chats',
           style: TextStyle(

@@ -3,9 +3,9 @@ import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/views/robin_archived.dart';
-import 'package:robin_flutter/src/widgets/conversations_loading.dart';
-import 'package:robin_flutter/src/widgets/empty_conversation.dart';
-import 'package:robin_flutter/src/widgets/conversation.dart';
+import 'package:robin_flutter/src/components/conversations_loading.dart';
+import 'package:robin_flutter/src/components/empty_conversation.dart';
+import 'package:robin_flutter/src/components/conversation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:robin_flutter/src/models/robin_current_user.dart';
 import 'package:robin_flutter/src/models/robin_keys.dart';
@@ -72,7 +72,7 @@ class Robin extends StatelessWidget {
                     fontSize: 14,
                   ),
                   controller: rc.homeSearchController,
-                  decoration: textFieldDecoration.copyWith(
+                  decoration: textFieldDecoration().copyWith(
                     prefixIcon: SizedBox(
                       width: 22,
                       height: 22,

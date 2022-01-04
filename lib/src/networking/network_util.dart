@@ -24,7 +24,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .get(Uri.parse(url), headers: headers)
@@ -48,7 +48,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .post(Uri.parse(url), body: json.encode(body), headers: headers)
@@ -70,7 +70,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .put(Uri.parse(url), body: json.encode(body), headers: headers)
@@ -91,8 +91,13 @@ class NetworkHelper {
   Future<dynamic> postForm(String url, List<http.MultipartFile> files,
       {Map<String, String>? header, body, encoding}) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(url));
-      request.headers.addAll(header!);
+      header ??= {
+        'Content-Type': 'application/json',
+        'x-api-key': rc.apiKey!,
+      };
+      http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse(url));
+      request.headers.addAll(header);
       request.fields.addAll(body!);
       request.files.addAll(files);
 
@@ -114,7 +119,7 @@ class NetworkHelper {
     try {
       headers ??= {
         'Content-Type': 'application/json',
-        'x-api-key': rc.apiKey.toString(),
+        'x-api-key': rc.apiKey!,
       };
       return http
           .delete(Uri.parse(url), body: json.encode(body), headers: headers)
