@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:linkify/linkify.dart';
+import 'package:robin_flutter/src/components/url-preview/url_preview.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/views/robin_create_conversation.dart';
 
@@ -110,8 +112,9 @@ getDocument() async {
   rc.file.value = {'file': document?.files.first};
 }
 
-String fileType() {
-  String? ext = rc.file['file'].path.split('.').last.toLowerCase();
+String fileType({String? path}) {
+  String filePath = path ?? rc.file['file'].path;
+  String? ext = filePath.split('.').last.toLowerCase();
 
   if (imageFormats.contains(ext)) {
     return 'image';
@@ -122,4 +125,42 @@ String fileType() {
     return ext.toString();
   }
   return 'generic';
+}
+
+List<LinkifyElement> matchLinks(String str) {
+  return linkify(
+    str,
+    options: const LinkifyOptions(
+      looseUrl: true,
+      humanize: true,
+      removeWww: false,
+      excludeLastPeriod: true,
+    ),
+  );
+}
+
+
+
+Widget getURLPreview(String string) {
+  var formattedTexts = matchLinks(string);
+  String firstLink = '';
+  for (LinkifyElement formattedText in formattedTexts) {
+    if (formattedText is UrlElement) {
+      firstLink = formattedText.url;
+      break;
+    }
+  }
+  return firstLink.isNotEmpty
+      ? Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: UrlPreview(
+            url: firstLink,
+            titleLines: 2,
+            descriptionLines: 2,
+            bgColor: black,
+          ),
+        )
+      : Container(
+          width: 0,
+        );
 }

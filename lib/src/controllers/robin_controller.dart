@@ -34,6 +34,8 @@ class RobinController extends GetxController {
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
 
+  RxList forwardMessages = [].obs;
+
   RobinConversation? currentConversation;
 
   RxMap conversationMessages = {}.obs;
