@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 const String baseUrl = "api.robinapp.co";
 const String httpUrl = "https://$baseUrl/api/v1";
 const String wsUrl = 'wss://$baseUrl/ws';
 
 const String robinChannel = 'private_chat';
+
+DateFormat dateFormat = DateFormat('hh:mm');
 
 const Color white = Color(0XFFFFFFFF);
 const Color black = Color(0XFF000000);

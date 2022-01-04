@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/components/render_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/components/chat_app_bar.dart';
@@ -27,25 +28,32 @@ class RobinChat extends StatelessWidget {
       child: Scaffold(
         backgroundColor: white,
         appBar: ChatAppBar(),
-        body: Obx(
-          () => rc.chatViewLoading.value
-              ? const Padding(
-                  padding: EdgeInsets.only(top: 15),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        green,
-                      ),
-                    ),
-                  ),
-                )
-              : ListView(
-                  children: const [Text('E don Finish')],
-                ),
-        ),
-        bottomSheet: ChatBottomSheet(
-          bottomPadding: MediaQuery.of(context).padding.bottom,
+        body: Column(
+          children: [
+            Expanded(
+              child: Obx(
+                () => rc.chatViewLoading.value
+                    ? const Padding(
+                        padding: EdgeInsets.only(top: 15),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              green,
+                            ),
+                          ),
+                        ),
+                      )
+                    : RenderMessages(),
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            ChatBottomSheet(
+              bottomPadding: MediaQuery.of(context).padding.bottom,
+            ),
+          ],
         ),
       ),
     );

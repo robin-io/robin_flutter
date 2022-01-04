@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:robin_flutter/src/models/robin_message.dart';
+import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -32,9 +34,15 @@ class RobinController extends GetxController {
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
 
+  RxList forwardMessages = [].obs;
+
   RobinConversation? currentConversation;
 
+  RxMap conversationMessages = {}.obs;
+
   RxMap file = {}.obs;
+
+  final ScrollController messagesScrollController = ScrollController();
 
   RxMap createGroupParticipants = {}.obs;
 
@@ -62,8 +70,10 @@ class RobinController extends GetxController {
     keys ??= _keys;
     robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
     if (!robinInitialized) {
+      robinCore!.subscribe();
       robinInitialized = true;
       getConversations();
+      connectionStartListen();
       homeSearchController.addListener(() {
         renderHomeConversations();
       });
@@ -74,6 +84,25 @@ class RobinController extends GetxController {
         showSendButton.value = messageController.text.isNotEmpty;
       });
     }
+  }
+
+  connectionStartListen() {
+    robinConnection!.stream.listen((data) {
+      data = json.decode(data);
+      if (data['is_event'] == null || data['is_event'] == false) {
+        RobinMessage robinMessage = RobinMessage.fromJson(data);
+        conversationMessages[robinMessage.id] = robinMessage;
+        scrollToEnd();
+      }
+    });
+  }
+
+  scrollToEnd() {
+    messagesScrollController.animateTo(
+      messagesScrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.fastOutSlowIn,
+    );
   }
 
   void getConversations() async {
@@ -270,8 +299,9 @@ class RobinController extends GetxController {
 
   void initChatView(RobinConversation conversation) {
     resetChatView();
+    messageController.clear();
     currentConversation = conversation;
-    //todo: get messages ,listen etc.
+    getMessages();
   }
 
   void resetChatView() {
@@ -294,6 +324,31 @@ class RobinController extends GetxController {
       showErrorMessage(e.toString());
       rethrow;
     }
+  }
+
+  getMessages() async {
+    try {
+      chatViewLoading.value = true;
+      var response = await robinCore!.getConversationMessages(
+        currentConversation!.id!,
+        currentUser!.robinToken,
+      );
+      conversationMessages.value = toRobinMessage(response ?? []);
+      chatViewLoading.value = false;
+    } catch (e) {
+      chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  Map<String, RobinMessage> toRobinMessage(List messages) {
+    Map<String, RobinMessage> allMessages = {};
+    for (Map message in messages) {
+      RobinMessage robinMessage = RobinMessage.fromJson(message);
+      allMessages[robinMessage.id] = robinMessage;
+    }
+    return allMessages;
   }
 
   sendTextMessage() {

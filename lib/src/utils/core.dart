@@ -30,7 +30,7 @@ class RobinCore {
 
   void replyToMessage(
       Map message, String conversationId, String replyTo, String senderToken) {
-    Map msg = {
+    Map body = {
       'type': 1,
       'channel': robinChannel,
       'content': message,
@@ -39,24 +39,27 @@ class RobinCore {
       'reply_to': replyTo,
       'is_reply': true,
     };
-    rc.robinConnection!.sink.add(json.encode(msg));
+    rc.robinConnection!.sink.add(json.encode(body));
   }
 
-  void sendTextMessage(
-      String conversationId, Map message, String senderToken) {
-    Map msg = {
-      'type': 1,
-      'channel': robinChannel,
-      'content': message,
-      'sender_token': senderToken,
-      'conversation_id': conversationId,
-    };
-    rc.robinConnection!.sink.add(json.encode(msg));
+  void sendTextMessage(String conversationId, Map message, String senderToken) {
+    try {
+      Map body = {
+        'type': 1,
+        'channel': robinChannel,
+        'content': message,
+        'sender_token': senderToken,
+        'conversation_id': conversationId,
+      };
+      rc.robinConnection!.sink.add(json.encode(body));
+    } catch (e) {
+      throw e.toString();
+    }
   }
 
   void createSupportTicket(
       String supportName, String senderToken, String senderName, Map message) {
-    Map msg = {
+    Map body = {
       'type': 1,
       'channel': robinChannel,
       'content': message,
@@ -64,7 +67,7 @@ class RobinCore {
       'sender_name': senderName,
       'sender_token': senderToken
     };
-    rc.robinConnection!.sink.add(json.encode(msg));
+    rc.robinConnection!.sink.add(json.encode(body));
   }
 
   static Future<String> createUserToken(
@@ -93,9 +96,9 @@ class RobinCore {
     }
   }
 
-  getConversationMessages(String id, String userToken) async {
+  getConversationMessages(String conversationId, String userToken) async {
     try {
-      return await api.getConversationMessages(id, userToken);
+      return await api.getConversationMessages(conversationId, userToken);
     } catch (e) {
       throw e.toString();
     }

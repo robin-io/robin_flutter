@@ -50,9 +50,9 @@ class DataSource {
     });
   }
 
-  getConversationMessages(String id, String userToken) async {
+  getConversationMessages(String conversationId, String userToken) async {
     return netUtil
-        .get('$getConversationMessagesUrl/$id/$userToken')
+        .get('$getConversationMessagesUrl/$conversationId/$userToken')
         .then((response) {
       if (response['error']) {
         throw response['msg'];
