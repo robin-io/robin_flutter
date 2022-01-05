@@ -72,242 +72,199 @@ class TextBubble extends StatelessWidget {
                             )
                           : BorderRadius.circular(20),
                 ),
-                child: message.isAttachment
-                    ? Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            fileType(path: message.link) == 'image'
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(15),
-                                    child: Container(
-                                      constraints: BoxConstraints(
-                                        maxWidth: (MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.75) -
-                                            91,
-                                        maxHeight: 211,
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(
-                                          //     builder: (context) => ImagePreview(
-                                          //       widget.messageDetails['content']
-                                          //           ['attachment'],
-                                          //     ),
-                                          //   ),
-                                          // );
-                                        },
-                                        child: Hero(
-                                          tag: message.link,
-                                          child: CachedNetworkImage(
-                                            imageUrl: message.link,
-                                            placeholder: (context, url) =>
-                                                const Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  10, 10, 15, 10),
-                                              child: SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2.5,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    Color(0XFF15AE73),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : InkWell(
-                                    onTap: () {
-                                      // if (_fileDownloaded) {
-                                      //   OpenFile.open(_filePath);
-                                      // } else {
-                                      //   if (!_fileDownloading) {
-                                      //     _downloadFile(widget.messageDetails['content']
-                                      //         ['attachment']);
-                                      //   }
-                                      // }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                color:
-                                                    const Color(0XFFECEBEB),
-                                                width: 1,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            padding:
-                                                const EdgeInsets.all(8),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Image.asset(
-                                                  'assets/images/fileTypes/${fileType(path: message.link)}.png',
-                                                  package: 'robin_flutter',
-                                                  fit: BoxFit.fitHeight,
-                                                  width: 34,
-                                                  height: 40,
-                                                ),
-                                                const SizedBox(
-                                                  width: 7,
-                                                ),
-                                                SizedBox(
-                                                  height: 40,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      Text(
-                                                        message.senderName,
-                                                        overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                        maxLines: 1,
-                                                        style:
-                                                            const TextStyle(
-                                                          fontSize: 15,
-                                                          color: Color(
-                                                              0XFF000000),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const Spacer(),
-                                                false
-                                                    ? Container()
-                                                    : SizedBox(
-                                                        width: 20,
-                                                        height: 20,
-                                                        child: false
-                                                            ? const SizedBox(
-                                                                width: 20,
-                                                                height: 20,
-                                                                child:
-                                                                    CircularProgressIndicator(
-                                                                  strokeWidth:
-                                                                      2.5,
-                                                                  valueColor:
-                                                                      AlwaysStoppedAnimation<Color>(
-                                                                          green),
-                                                                ),
-                                                              )
-                                                            : Center(
-                                                                child: SvgPicture
-                                                                    .asset(
-                                                                  'assets/icons/export.svg',
-                                                                  package:
-                                                                      'robin_flutter',
-                                                                  width: 20,
-                                                                  height:
-                                                                      20,
-                                                                ),
-                                                              ),
-                                                      ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                            const SizedBox(
-                              height: 5,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    firstInSeries
+                        ? Padding(
+                            padding: const EdgeInsets.only(
+                                left: 12, right: 10, top: 5),
+                            child: Text(
+                              message.senderName,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: rc.userColors[message.senderToken] ??
+                                    const Color(0XFF7A7A7A),
+                              ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
+                          )
+                        : const SizedBox(),
+                    message.isAttachment
+                        ? Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  dateFormat.format(message.timestamp),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0XFF7A7A7A),
-                                  ),
-                                ),
-                                message.sentByMe &&
-                                        !rc.currentConversation!.isGroup!
-                                    ? SizedBox(
-                                        height: 10,
-                                        child: SvgPicture.asset(
-                                          message.isRead
-                                              ? 'assets/icons/read_receipt.svg'
-                                              : 'assets/icons/unread_receipt.svg',
-                                          package: 'robin_flutter',
-                                          width: 18,
-                                          height: 18,
-                                          fit: BoxFit.cover,
+                                fileType(path: message.link) == 'image'
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                            maxWidth: (MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.75) -
+                                                91,
+                                            maxHeight: 211,
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //     builder: (context) => ImagePreview(
+                                              //       widget.messageDetails['content']
+                                              //           ['attachment'],
+                                              //     ),
+                                              //   ),
+                                              // );
+                                            },
+                                            child: Hero(
+                                              tag: message.link,
+                                              child: CachedNetworkImage(
+                                                imageUrl: message.link,
+                                                placeholder: (context, url) =>
+                                                    const Padding(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      10, 10, 15, 10),
+                                                  child: SizedBox(
+                                                    width: 24,
+                                                    height: 24,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      strokeWidth: 2.5,
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                              Color>(
+                                                        Color(0XFF15AE73),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.error),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       )
-                                    : Container(),
+                                    : InkWell(
+                                        onTap: () {
+                                          // if (_fileDownloaded) {
+                                          //   OpenFile.open(_filePath);
+                                          // } else {
+                                          //   if (!_fileDownloading) {
+                                          //     _downloadFile(widget.messageDetails['content']
+                                          //         ['attachment']);
+                                          //   }
+                                          // }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color:
+                                                        const Color(0XFFECEBEB),
+                                                    width: 1,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/fileTypes/${fileType(path: message.link)}.png',
+                                                      package: 'robin_flutter',
+                                                      fit: BoxFit.fitHeight,
+                                                      width: 34,
+                                                      height: 40,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 7,
+                                                    ),
+                                                    SizedBox(
+                                                      height: 40,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        children: [
+                                                          Text(
+                                                            message.senderName,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            maxLines: 1,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 15,
+                                                              color: Color(
+                                                                  0XFF000000),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const Spacer(),
+                                                    false
+                                                        ? Container()
+                                                        : SizedBox(
+                                                            width: 20,
+                                                            height: 20,
+                                                            child: false
+                                                                ? const SizedBox(
+                                                                    width: 20,
+                                                                    height: 20,
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      strokeWidth:
+                                                                          2.5,
+                                                                      valueColor:
+                                                                          AlwaysStoppedAnimation<Color>(
+                                                                              green),
+                                                                    ),
+                                                                  )
+                                                                : Center(
+                                                                    child: SvgPicture
+                                                                        .asset(
+                                                                      'assets/icons/export.svg',
+                                                                      package:
+                                                                          'robin_flutter',
+                                                                      width: 20,
+                                                                      height:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                 const SizedBox(
-                                  width: 3,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 3,
-                            ),
-                          ],
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            getURLPreview(message.text),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        (MediaQuery.of(context).size.width *
-                                                0.75) -
-                                            111,
-                                  ),
-                                  child: formatText(message.text),
-                                ),
-                                const SizedBox(
-                                  width: 5,
+                                  height: 5,
                                 ),
                                 Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       dateFormat.format(message.timestamp),
@@ -319,8 +276,7 @@ class TextBubble extends StatelessWidget {
                                       ),
                                     ),
                                     message.sentByMe &&
-                                            !rc.currentConversation!
-                                                .isGroup!
+                                            !rc.currentConversation!.isGroup!
                                         ? SizedBox(
                                             height: 10,
                                             child: SvgPicture.asset(
@@ -339,11 +295,75 @@ class TextBubble extends StatelessWidget {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(
+                                  height: 3,
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                      )),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                getURLPreview(message.text),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            (MediaQuery.of(context).size.width *
+                                                    0.75) -
+                                                111,
+                                      ),
+                                      child: formatText(message.text),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          dateFormat.format(message.timestamp),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0XFF7A7A7A),
+                                          ),
+                                        ),
+                                        message.sentByMe &&
+                                                !rc.currentConversation!
+                                                    .isGroup!
+                                            ? SizedBox(
+                                                height: 10,
+                                                child: SvgPicture.asset(
+                                                  message.isRead
+                                                      ? 'assets/icons/read_receipt.svg'
+                                                      : 'assets/icons/unread_receipt.svg',
+                                                  package: 'robin_flutter',
+                                                  width: 18,
+                                                  height: 18,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              )
+                                            : Container(),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                  ],
+                )),
           ],
         ),
       ),

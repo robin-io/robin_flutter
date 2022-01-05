@@ -14,6 +14,13 @@ const Color black = Color(0XFF000000);
 const Color blueGrey = Color(0XFF535F89);
 const Color green = Color(0XFF15AE73);
 
+const List<Color> groupUserColors = [
+  Color(0XFFF8863D),
+  Color(0XFF18C583),
+  Color(0XFFFF0000),
+  Color(0XFF0F0FFE)
+];
+
 const List<String> imageFormats = ['png', 'jpg', 'jpeg', 'gif', 'heic'];
 const List<String> audioFormats = [
   'mp3',

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/core.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_current_user.dart';
@@ -37,6 +38,8 @@ class RobinController extends GetxController {
   RxList forwardMessages = [].obs;
 
   RobinConversation? currentConversation;
+
+  Map userColors = {};
 
   RxMap conversationMessages = {}.obs;
 
@@ -299,9 +302,24 @@ class RobinController extends GetxController {
 
   void initChatView(RobinConversation conversation) {
     resetChatView();
+    userColors = {};
     messageController.clear();
     currentConversation = conversation;
+    if (currentConversation!.isGroup!) {
+      generateUserColors();
+    }
     getMessages();
+  }
+
+  void generateUserColors() {
+    List<Color> colors = groupUserColors.toList();
+    for (Map user in currentConversation!.participants!) {
+      if (colors.length < 2) {
+        colors = groupUserColors.toList();
+      }
+      userColors[user['user_token']] = (colors.toList()..shuffle()).first;
+      colors.remove(userColors[user['user_token']]);
+    }
   }
 
   void resetChatView() {
