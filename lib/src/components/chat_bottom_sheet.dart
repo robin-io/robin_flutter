@@ -108,7 +108,7 @@ class ChatBottomSheet extends StatelessWidget {
                                         )
                                       : Image.asset(
                                           'assets/images/fileTypes/.png',
-                                          package: 'robin',
+                                          package: 'robin_flutter',
                                           fit: BoxFit.fitHeight,
                                           height: 39,
                                           width: 49,

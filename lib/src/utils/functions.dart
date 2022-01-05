@@ -8,6 +8,7 @@ import 'package:linkify/linkify.dart';
 import 'package:robin_flutter/src/components/url-preview/url_preview.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/views/robin_create_conversation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
 
@@ -128,7 +129,8 @@ String fileType({String? path}) {
 }
 
 List<LinkifyElement> matchLinks(String str) {
-  return linkify(
+  List<LinkifyElement> x = linkify(str);
+  List<LinkifyElement> formattedStrings = linkify(
     str,
     options: const LinkifyOptions(
       looseUrl: true,
@@ -137,9 +139,78 @@ List<LinkifyElement> matchLinks(String str) {
       excludeLastPeriod: true,
     ),
   );
+  for (int i = 0; i < x.length; i++) {
+    if (x[i] is EmailElement) {
+      formattedStrings[i] = x[i];
+    }
+  }
+  return formattedStrings;
 }
 
+void _launchURL(String url, bool isMail) async {
+  if (isMail) {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: url,
+    );
+    url = params.toString();
+  }
+  await canLaunch(url) ? await launch(url) : throw 'Could not launch $url';
+}
 
+Widget formatText(String string) {
+  var formattedTexts = matchLinks(string);
+  return RichText(
+    text: TextSpan(
+      children: [
+        for (LinkifyElement formattedText in formattedTexts)
+          formattedText is EmailElement
+              ? WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () {
+                      _launchURL(formattedText.text, true);
+                    },
+                    child: Text(
+                      formattedText.text,
+                      style: const TextStyle(
+                        fontFamily: 'Raleway',
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        color: Color(0XFF4568D1),
+                      ),
+                    ),
+                  ),
+                )
+              : formattedText is UrlElement
+                  ? WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () {
+                          _launchURL(formattedText.url, false);
+                        },
+                        child: Text(
+                          formattedText.text,
+                          style: const TextStyle(
+                            fontFamily: 'Raleway',
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
+                            color: Color(0XFF4568D1),
+                          ),
+                        ),
+                      ),
+                    )
+                  : TextSpan(
+                      text: formattedText.text,
+                      style: const TextStyle(
+                        fontFamily: 'Raleway',
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        color: Color(0XFF101010),
+                      ),
+                    ),
+      ],
+    ),
+  );
+}
 
 Widget getURLPreview(String string) {
   var formattedTexts = matchLinks(string);
