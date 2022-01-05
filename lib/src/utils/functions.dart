@@ -128,6 +128,10 @@ String fileType({String? path}) {
   return 'generic';
 }
 
+String fileName(String path) {
+  return path.split('/').last;
+}
+
 List<LinkifyElement> matchLinks(String str) {
   List<LinkifyElement> x = linkify(str);
   List<LinkifyElement> formattedStrings = linkify(

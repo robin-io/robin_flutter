@@ -194,35 +194,25 @@ class TextBubble extends StatelessWidget {
                                                     const SizedBox(
                                                       width: 7,
                                                     ),
-                                                    SizedBox(
-                                                      height: 40,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: [
-                                                          Text(
-                                                            message.senderName,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 15,
-                                                              color: Color(
-                                                                  0XFF000000),
-                                                            ),
-                                                          ),
-                                                        ],
+                                                    Expanded(
+                                                      flex: 10000,
+                                                      child: Text(
+                                                        fileName(message.link),
+                                                        overflow:
+                                                            TextOverflow
+                                                                .ellipsis,
+                                                        maxLines: 1,
+                                                        style:
+                                                            const TextStyle(
+                                                          fontSize: 15,
+                                                          color: Color(
+                                                              0XFF000000),
+                                                        ),
                                                       ),
                                                     ),
-                                                    const Spacer(),
+                                                    const Spacer(
+                                                      flex: 1,
+                                                    ),
                                                     false
                                                         ? Container()
                                                         : SizedBox(
