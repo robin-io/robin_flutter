@@ -100,32 +100,36 @@ class _UrlPreviewState extends State<UrlPreview> {
   }
 
   void _getUrlData() async {
-    var response = await get(Uri.parse(widget.url));
-    if (response.statusCode != 200) {
+    try {
+      var response = await get(Uri.parse(widget.url));
+      if (response.statusCode != 200) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _urlPreviewData = null;
+        });
+      }
+
+      var document = parse(response.body);
+      Map data = {};
+      _extractOGData(document, data, 'og:title');
+      _extractOGData(document, data, 'og:description');
+      _extractOGData(document, data, 'og:site_name');
+      _extractOGData(document, data, 'og:image');
+
       if (!mounted) {
         return;
       }
-      setState(() {
-        _urlPreviewData = null;
-      });
-    }
 
-    var document = parse(response.body);
-    Map data = {};
-    _extractOGData(document, data, 'og:title');
-    _extractOGData(document, data, 'og:description');
-    _extractOGData(document, data, 'og:site_name');
-    _extractOGData(document, data, 'og:image');
-
-    if (!mounted) {
-      return;
-    }
-
-    if (data.isNotEmpty) {
-      setState(() {
-        _urlPreviewData = data;
-        _isVisible = true;
-      });
+      if (data.isNotEmpty) {
+        setState(() {
+          _urlPreviewData = data;
+          _isVisible = true;
+        });
+      }
+    } catch (e) {
+      //invalid url
     }
   }
 
