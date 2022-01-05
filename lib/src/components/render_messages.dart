@@ -22,7 +22,7 @@ class RenderMessages extends StatelessWidget {
   Widget build(BuildContext context) {
     double maxWidth = MediaQuery.of(context).size.width * 0.7;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+      padding: const EdgeInsets.only(top: 12),
       child: Obx(
         () => ListView.builder(
           itemCount: rc.conversationMessages.length,
