@@ -47,9 +47,6 @@ class RobinChat extends StatelessWidget {
                     : RenderMessages(),
               ),
             ),
-            const SizedBox(
-              height: 5,
-            ),
             ChatBottomSheet(
               bottomPadding: MediaQuery.of(context).padding.bottom,
             ),

@@ -173,7 +173,6 @@ Widget formatText(String string) {
                     child: Text(
                       formattedText.text,
                       style: const TextStyle(
-                        fontFamily: 'Raleway',
                         fontWeight: FontWeight.normal,
                         fontSize: 14,
                         color: Color(0XFF4568D1),
@@ -190,7 +189,6 @@ Widget formatText(String string) {
                         child: Text(
                           formattedText.text,
                           style: const TextStyle(
-                            fontFamily: 'Raleway',
                             fontWeight: FontWeight.normal,
                             fontSize: 14,
                             color: Color(0XFF4568D1),
@@ -201,7 +199,6 @@ Widget formatText(String string) {
                   : TextSpan(
                       text: formattedText.text,
                       style: const TextStyle(
-                        fontFamily: 'Raleway',
                         fontWeight: FontWeight.normal,
                         fontSize: 14,
                         color: Color(0XFF101010),
