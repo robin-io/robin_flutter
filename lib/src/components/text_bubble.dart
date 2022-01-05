@@ -88,7 +88,7 @@ class TextBubble extends StatelessWidget {
                       firstInSeries
                           ? Padding(
                               padding: const EdgeInsets.only(
-                                  left: 12, right: 10, top: 5),
+                                  left: 12, right: 10, top: 7),
                               child: Text(
                                 message.senderName,
                                 style: TextStyle(
