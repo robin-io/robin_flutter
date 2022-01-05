@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
@@ -34,7 +35,7 @@ class ChatBottomSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            false
+            rc.replyView.value
                 ? Padding(
                     padding: const EdgeInsets.only(
                       bottom: 5,
@@ -62,13 +63,15 @@ class ChatBottomSheet extends StatelessWidget {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   Text(
-                                    '${rc.currentConversation!.name}',
+                                    rc.replyMessage!.senderName,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0XFF15AE73),
+                                      color: rc.userColors[
+                                              rc.replyMessage!.senderToken] ??
+                                          green,
                                     ),
                                   ),
                                   const SizedBox(height: 5),
@@ -76,7 +79,7 @@ class ChatBottomSheet extends StatelessWidget {
                                     width: 72,
                                     child: Text(
                                       true
-                                          ? "Photo"
+                                          ? rc.replyMessage!.text
                                           : false
                                               ? ""
                                               : "${rc.currentConversation!.name}",
@@ -93,7 +96,7 @@ class ChatBottomSheet extends StatelessWidget {
                             ],
                           ),
                           true ? const SizedBox(width: 3) : Container(),
-                          true
+                          false
                               ? Container(
                                   width: 49,
                                   height: 49,
@@ -119,6 +122,7 @@ class ChatBottomSheet extends StatelessWidget {
                           IconButton(
                             onPressed: () {
                               rc.replyView.value = false;
+                              rc.replyMessage = RobinMessage.empty();
                             },
                             icon: Container(
                               width: 24,
@@ -232,11 +236,11 @@ class ChatBottomSheet extends StatelessWidget {
                   rc.showSendButton.value || rc.file['file'] != null
                       ? GestureDetector(
                           onTap: () {
-                            if(!rc.isFileSending.value){
-                              if(rc.file['file'] != null){
+                            if (!rc.isFileSending.value) {
+                              if (rc.file['file'] != null) {
                                 rc.sendAttachment();
                                 //todo: send file reply
-                              }else if(rc.messageController.text.isNotEmpty){
+                              } else if (rc.messageController.text.isNotEmpty) {
                                 rc.sendTextMessage();
                                 //todo: send reply
                               }

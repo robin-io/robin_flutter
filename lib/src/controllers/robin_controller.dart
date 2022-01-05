@@ -39,6 +39,8 @@ class RobinController extends GetxController {
 
   RobinConversation? currentConversation;
 
+  RobinMessage? replyMessage;
+
   Map userColors = {};
 
   RxMap conversationMessages = {}.obs;
@@ -320,6 +322,7 @@ class RobinController extends GetxController {
       userColors[user['user_token']] = (colors.toList()..shuffle()).first;
       colors.remove(userColors[user['user_token']]);
     }
+    userColors[currentUser!.robinToken] = green;
   }
 
   void resetChatView() {
