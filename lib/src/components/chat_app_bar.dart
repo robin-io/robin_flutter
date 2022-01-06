@@ -16,10 +16,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   List<String> chatOptions() {
-    List<String> options = ['Select Messages'];
+    List<String> options = ['Select Messages', 'Chat Info'];
     if (rc.currentConversation!.isGroup!) {
       options.add('Leave Group');
-      options.add('Group Info');
     }
     return options;
   }
@@ -65,7 +64,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     padding: EdgeInsets.zero,
                     width: 30,
                     child: IconButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         rc.resetChatView();
                         Navigator.pop(context);
                       },
@@ -150,7 +149,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: [
           rc.forwardView.value
               ? InkWell(
-                  onTap: rc.forwardMessages.isEmpty
+                  onTap: rc.forwardMessageIds.isEmpty
                       ? null
                       : () {
                           rc.renderForwardConversations();
@@ -164,7 +163,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           'Forward',
                           style: TextStyle(
-                            color: rc.forwardMessages.isEmpty
+                            color: rc.forwardMessageIds.isEmpty
                                 ? const Color(0XFF7A7A7A)
                                 : green,
                             fontSize: 16,
@@ -189,6 +188,8 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   onSelected: (value) async {
                     if (value == 'Select Messages') {
                       rc.forwardView.value = true;
+                    } else if (value == 'Chat Info') {
+                      //todo: conversation info
                     } else if (value == 'Leave Group') {
                       bool successful =
                           await rc.leaveGroup(rc.currentConversation!.id!);

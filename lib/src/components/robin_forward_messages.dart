@@ -57,39 +57,36 @@ class RobinForwardMessages extends StatelessWidget {
                     ),
                   ),
                 ),
-                rc.createGroup.value
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: rc.forwardConversationIds
-                                    .contains(conversation.id)
-                                ? green
-                                : null,
-                            border: Border.all(
-                              width: 2,
-                              style: rc.forwardConversationIds
-                                      .contains(conversation.id)
-                                  ? BorderStyle.none
-                                  : BorderStyle.solid,
-                              color: const Color(0xFFBBC1D6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: rc.forwardConversationIds.contains(conversation.id)
+                          ? green
+                          : null,
+                      border: Border.all(
+                        width: 2,
+                        style:
+                            rc.forwardConversationIds.contains(conversation.id)
+                                ? BorderStyle.none
+                                : BorderStyle.solid,
+                        color: const Color(0xFFBBC1D6),
+                      ),
+                    ),
+                    child: rc.forwardConversationIds.contains(conversation.id)
+                        ? const Center(
+                            child: Icon(
+                              Icons.check,
+                              size: 16,
+                              color: white,
                             ),
-                          ),
-                          child: Center(
-                            child: rc.createGroup.value
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 16,
-                                    color: Colors.white,
-                                  )
-                                : Container(),
-                          ),
-                        ),
-                      )
-                    : Container(),
+                          )
+                        : Container(),
+                  ),
+                )
               ],
             ),
           ),
@@ -128,17 +125,20 @@ class RobinForwardMessages extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      rc.createGroup.value
-                          ? const Text(
-                              'Done',
+                      rc.isForwarding.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                            )
+                          : const Text(
+                              'Forward',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.transparent,
                               ),
-                            )
-                          : Container(),
+                            ),
                       Container(
                         width: 45,
                         height: 6,
@@ -147,33 +147,37 @@ class RobinForwardMessages extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      rc.createGroup.value
-                          ? InkWell(
-                              onTap: rc.createGroupParticipants.isNotEmpty
-                                  ? () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              RobinCreateGroup(),
-                                        ),
-                                      );
+                      rc.isForwarding.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  green,
+                                ),
+                              ),
+                            )
+                          : InkWell(
+                              onTap: rc.forwardConversationIds.isNotEmpty
+                                  ? () async {
+                                      await rc.forwardMessages();
+                                      Navigator.pop(context);
                                     }
                                   : null,
                               child: Text(
-                                'Done',
+                                'Forward',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: rc.createGroupParticipants.isNotEmpty
+                                  color: rc.forwardConversationIds.isNotEmpty
                                       ? green
                                       : Colors.grey,
                                 ),
                               ),
                             )
-                          : Container(height: 19),
                     ],
                   ),
                 ),
@@ -187,7 +191,7 @@ class RobinForwardMessages extends StatelessWidget {
                       color: Color(0XFF535F89),
                       fontSize: 14,
                     ),
-                    controller: rc.allUsersSearchController,
+                    controller: rc.forwardController,
                     decoration: textFieldDecoration().copyWith(
                       prefixIcon: SizedBox(
                         width: 22,
@@ -202,108 +206,15 @@ class RobinForwardMessages extends StatelessWidget {
                           ),
                         ),
                       ),
-                      hintText: 'Search People...',
+                      hintText: 'Search People of Groups...',
                     ),
                   ),
                 ),
-                !rc.createGroup.value
-                    ? InkWell(
-                        onTap: () {
-                          rc.createGroup.value = true;
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 15, right: 15),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  style: BorderStyle.solid,
-                                  color: Color(0XFFF4F6F8),
-                                ),
-                              ),
-                            ),
-                            padding: const EdgeInsets.only(top: 12, bottom: 12),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: const Color(0XFFF4F6F8),
-                                    border: Border.all(
-                                      width: 1,
-                                      style: BorderStyle.solid,
-                                      color: const Color(0XFFCADAF8),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      'assets/icons/people.svg',
-                                      package: 'robin_flutter',
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                const Text(
-                                  'Create A New Group',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    : const SizedBox(height: 20),
-                rc.isGettingUsersLoading.value
-                    ? const UsersLoading()
-                    : rc.allUsers.isEmpty
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 35),
-                              Image.asset(
-                                'assets/images/empty.png',
-                                package: 'robin_flutter',
-                                width: 220,
-                              ),
-                              const SizedBox(height: 25),
-                              const Text(
-                                'Nobody Here Yet',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0XFF535F89),
-                                ),
-                              ),
-                              const SizedBox(height: 13),
-                            ],
-                          )
-                        : rc.isCreatingConversation.value
-                            ? const Padding(
-                                padding: EdgeInsets.only(top: 15),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      green,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Expanded(
-                                child: ListView(
-                                  children: renderConversations(),
-                                ),
-                              )
+                Expanded(
+                  child: ListView(
+                    children: renderConversations(),
+                  ),
+                )
               ],
             ),
           ),

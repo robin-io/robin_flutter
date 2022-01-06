@@ -40,7 +40,7 @@ class RobinController extends GetxController {
 
   RxBool isForwarding = false.obs;
 
-  RxList forwardMessages = [].obs;
+  RxList forwardMessageIds = [].obs;
 
   RobinConversation? currentConversation;
 
@@ -352,7 +352,10 @@ class RobinController extends GetxController {
 
   void resetChatView() {
     forwardView.value = false;
-    forwardMessages.value = [].obs;
+    forwardMessageIds.value = [].obs;
+    forwardConversations.value = [].obs;
+    forwardConversationIds.value = [].obs;
+    isForwarding.value = false;
     file['file'] = null;
     replyView.value = false;
     replyMessage = null;
@@ -455,6 +458,23 @@ class RobinController extends GetxController {
       }
     } catch (e) {
       isFileSending.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  forwardMessages() async {
+    try {
+      isForwarding.value = true;
+      Map<String, dynamic> body = {
+        'user_token': currentUser!.robinToken,
+        'message_ids': forwardMessageIds.toList(),
+        'conversation_ids': forwardConversationIds.toList(),
+      };
+      await robinCore!.forwardMessages(body);
+      resetChatView();
+    } catch (e) {
+      isForwarding.value = false;
       showErrorMessage(e.toString());
       rethrow;
     }

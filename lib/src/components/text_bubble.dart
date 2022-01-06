@@ -45,10 +45,10 @@ class TextBubble extends StatelessWidget {
           () => GestureDetector(
             onTap: rc.forwardView.value
                 ? () {
-                    if (rc.forwardMessages.contains(message.id)) {
-                      rc.forwardMessages.remove(message.id);
+                    if (rc.forwardMessageIds.contains(message.id)) {
+                      rc.forwardMessageIds.remove(message.id);
                     } else {
-                      rc.forwardMessages.add(message.id);
+                      rc.forwardMessageIds.add(message.id);
                     }
                   }
                 : null,
@@ -56,7 +56,7 @@ class TextBubble extends StatelessWidget {
                 ? () {
                     HapticFeedback.selectionClick();
                     rc.forwardView.value = true;
-                    rc.forwardMessages.add(message.id);
+                    rc.forwardMessageIds.add(message.id);
                   }
                 : null,
             child: Row(
@@ -69,7 +69,7 @@ class TextBubble extends StatelessWidget {
                 rc.forwardView.value && !message.sentByMe
                     ? Padding(
                         padding: const EdgeInsets.only(right: 5, bottom: 5),
-                        child: rc.forwardMessages.contains(message.id)
+                        child: rc.forwardMessageIds.contains(message.id)
                             ? Container(
                                 width: 22,
                                 height: 22,
@@ -92,7 +92,7 @@ class TextBubble extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     width: 2,
-                                    color: Color(0XFFBBC1D6),
+                                    color: const Color(0XFFBBC1D6),
                                   ),
                                 ),
                               ),
@@ -423,7 +423,7 @@ class TextBubble extends StatelessWidget {
                 rc.forwardView.value && message.sentByMe
                     ? Padding(
                         padding: const EdgeInsets.only(left: 5, bottom: 5),
-                        child: rc.forwardMessages.contains(message.id)
+                        child: rc.forwardMessageIds.contains(message.id)
                             ? Container(
                                 width: 22,
                                 height: 22,
@@ -446,7 +446,7 @@ class TextBubble extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     width: 2,
-                                    color: Color(0XFFBBC1D6),
+                                    color: const Color(0XFFBBC1D6),
                                   ),
                                 ),
                               ),
