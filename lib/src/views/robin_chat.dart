@@ -12,7 +12,7 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    rc.initChatView(conversation);
+    // rc.initChatView(conversation);
   }
 
   @override
@@ -25,14 +25,14 @@ class RobinChat extends StatelessWidget {
           currentFocus.unfocus();
         }
       },
-      child: Scaffold(
-        backgroundColor: white,
-        appBar: ChatAppBar(),
-        body: Column(
-          children: [
-            Expanded(
-              child: Obx(
-                () => rc.chatViewLoading.value
+      child: Obx(
+        () => Scaffold(
+          backgroundColor: white,
+          appBar: ChatAppBar(),
+          body: Column(
+            children: [
+              Expanded(
+                child: rc.chatViewLoading.value
                     ? const Padding(
                         padding: EdgeInsets.only(top: 15),
                         child: Center(
@@ -46,11 +46,32 @@ class RobinChat extends StatelessWidget {
                       )
                     : RenderMessages(),
               ),
-            ),
-            ChatBottomSheet(
-              bottomPadding: MediaQuery.of(context).padding.bottom,
-            ),
-          ],
+              ChatBottomSheet(
+                bottomPadding: MediaQuery.of(context).padding.bottom,
+              ),
+            ],
+          ),
+          floatingActionButton: rc.chatViewLoading.value || rc.atMaxScroll.value
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 75),
+                  child: SizedBox(
+                    width: 35,
+                    height: 35,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        rc.scrollToEnd();
+                      },
+                      backgroundColor: white,
+                      elevation: 5,
+                      child: const Icon(
+                        Icons.arrow_downward,
+                        size: 18,
+                        color: green,
+                      ),
+                    ),
+                  ),
+                ),
         ),
       ),
     );

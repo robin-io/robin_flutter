@@ -33,6 +33,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             ? InkWell(
                 onTap: () {
                   rc.resetChatView();
+                  rc.currentConversation = null;
                 },
                 child: const SizedBox(
                   child: Padding(

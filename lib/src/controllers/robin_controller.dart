@@ -10,6 +10,7 @@ import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_current_user.dart';
 import 'package:robin_flutter/src/models/robin_keys.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class RobinController extends GetxController {
@@ -28,12 +29,14 @@ class RobinController extends GetxController {
   RxBool createGroup = false.obs;
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
+  RxBool finishedInitialScroll = false.obs;
 
   RxBool forwardView = false.obs;
   RxBool replyView = false.obs;
   RxBool chatViewLoading = false.obs;
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
+  RxBool atMaxScroll = false.obs;
 
   RxList forwardMessages = [].obs;
 
@@ -97,7 +100,12 @@ class RobinController extends GetxController {
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
         conversationMessages[robinMessage.id] = robinMessage;
-        scrollToEnd();
+        FlutterRingtonePlayer.playNotification();
+        if (atMaxScroll.value) {
+          Future.delayed(const Duration(milliseconds: 17), () {
+            scrollToEnd();
+          });
+        }
       }
     });
   }
@@ -306,11 +314,21 @@ class RobinController extends GetxController {
     resetChatView();
     userColors = {};
     messageController.clear();
+    finishedInitialScroll.value = false;
     currentConversation = conversation;
     if (currentConversation!.isGroup!) {
       generateUserColors();
     }
     getMessages();
+  }
+
+  void resetChatView() {
+    forwardView.value = false;
+    forwardMessages.value = [].obs;
+    file['file'] = null;
+    replyView.value = false;
+    replyMessage = null;
+    chatViewLoading.value = false;
   }
 
   void generateUserColors() {
@@ -323,12 +341,6 @@ class RobinController extends GetxController {
       colors.remove(userColors[user['user_token']]);
     }
     userColors[currentUser!.robinToken] = green;
-  }
-
-  void resetChatView() {
-    forwardView.value = false;
-    file['file'] = null;
-    chatViewLoading.value = false;
   }
 
   Future<bool> leaveGroup(String groupId) async {
