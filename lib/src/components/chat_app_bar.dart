@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/components/robin_forward_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -23,6 +24,15 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     return options;
   }
 
+  void showForwardMessages(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => RobinForwardMessages(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -33,7 +43,6 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             ? InkWell(
                 onTap: () {
                   rc.resetChatView();
-                  rc.currentConversation = null;
                 },
                 child: const SizedBox(
                   child: Padding(
@@ -56,7 +65,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     padding: EdgeInsets.zero,
                     width: 30,
                     child: IconButton(
-                      onPressed: () {
+                      onPressed: () async{
                         rc.resetChatView();
                         Navigator.pop(context);
                       },
@@ -141,20 +150,23 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: [
           rc.forwardView.value
               ? InkWell(
-                  onTap: () {
-                    // if (_selectedMessages.isNotEmpty) {
-                    //   _showForwardModal(widget.getConversations());
-                    // }
-                  },
-                  child: const SizedBox(
+                  onTap: rc.forwardMessages.isEmpty
+                      ? null
+                      : () {
+                          rc.renderForwardConversations();
+                          showForwardMessages(context);
+                        },
+                  child: SizedBox(
                     width: 80,
                     child: Center(
                       child: Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: Text(
                           'Forward',
                           style: TextStyle(
-                            color: green,
+                            color: rc.forwardMessages.isEmpty
+                                ? const Color(0XFF7A7A7A)
+                                : green,
                             fontSize: 16,
                           ),
                         ),

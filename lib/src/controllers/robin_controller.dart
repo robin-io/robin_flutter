@@ -38,6 +38,8 @@ class RobinController extends GetxController {
   RxBool isFileSending = false.obs;
   RxBool atMaxScroll = false.obs;
 
+  RxBool isForwarding = false.obs;
+
   RxList forwardMessages = [].obs;
 
   RobinConversation? currentConversation;
@@ -63,9 +65,15 @@ class RobinController extends GetxController {
   RxList homeConversations = [].obs;
   RxList archivedConversations = [].obs;
 
+  RxList forwardConversations = [].obs;
+
+  RxList forwardConversationIds = [].obs;
+
   TextEditingController homeSearchController = TextEditingController();
 
   TextEditingController allUsersSearchController = TextEditingController();
+
+  TextEditingController forwardController = TextEditingController();
 
   TextEditingController messageController = TextEditingController();
 
@@ -91,6 +99,9 @@ class RobinController extends GetxController {
       messageController.addListener(() {
         showSendButton.value = messageController.text.isNotEmpty;
       });
+      forwardController.addListener(() {
+        renderForwardConversations();
+      });
     }
   }
 
@@ -100,7 +111,14 @@ class RobinController extends GetxController {
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
         conversationMessages[robinMessage.id] = robinMessage;
-        FlutterRingtonePlayer.playNotification();
+        if (!robinMessage.sentByMe) {
+          FlutterRingtonePlayer.playNotification();
+        }
+        if (currentConversation != null &&
+            robinMessage.conversationId == currentConversation!.id! &&
+            !robinMessage.sentByMe) {
+          sendReadReceipts([robinMessage.id]);
+        }
         if (atMaxScroll.value) {
           Future.delayed(const Duration(milliseconds: 17), () {
             scrollToEnd();
@@ -157,6 +175,16 @@ class RobinController extends GetxController {
         .where((RobinConversation conversation) => conversation.archived!)
         .toList();
     archivedConversations.value = conversations;
+  }
+
+  void renderForwardConversations() {
+    List<RobinConversation> conversations = [];
+    conversations = allConversations.values
+        .where((RobinConversation conversation) => conversation.name!
+            .toLowerCase()
+            .contains(forwardController.text.toLowerCase()))
+        .toList();
+    forwardConversations.value = conversations;
   }
 
   Map<String, RobinConversation> toRobinConversations(List conversations) {
@@ -359,7 +387,7 @@ class RobinController extends GetxController {
     }
   }
 
-  getMessages() async {
+  void getMessages() async {
     try {
       chatViewLoading.value = true;
       var response = await robinCore!.getConversationMessages(
@@ -384,7 +412,7 @@ class RobinController extends GetxController {
     return allMessages;
   }
 
-  sendTextMessage() {
+  void sendTextMessage() {
     try {
       if (messageController.text.isNotEmpty) {
         Map<String, String> message = {
@@ -406,7 +434,7 @@ class RobinController extends GetxController {
     }
   }
 
-  sendAttachment() async {
+  void sendAttachment() async {
     try {
       if (file['file'] != null) {
         isFileSending.value = true;
@@ -430,5 +458,10 @@ class RobinController extends GetxController {
       showErrorMessage(e.toString());
       rethrow;
     }
+  }
+
+  void sendReadReceipts(List<String> messageIds) {
+    Map<String, dynamic> body = {};
+    robinCore!.sendReadReceipts(body);
   }
 }

@@ -13,7 +13,6 @@ class RobinConversation {
   bool? archived;
   List? deletedFor;
   DateTime? updatedAt;
-  int? index;
 
   final RobinController rc = Get.find();
 
@@ -37,6 +36,5 @@ class RobinConversation {
     archived = json['archived_for'].contains(rc.currentUser?.robinToken);
     deletedFor = [];
     updatedAt = json['last_message'] == null ? DateTime.parse(json['updated_at']) : DateTime.parse(json['last_message']['timestamp']);
-    index = json['index'];
   }
 }

@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:linkify/linkify.dart';
 import 'package:robin_flutter/src/components/url-preview/url_preview.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/views/robin_create_conversation.dart';
+import 'package:robin_flutter/src/components/robin_create_conversation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';

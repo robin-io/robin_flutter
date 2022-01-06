@@ -76,7 +76,11 @@ class Conversation extends StatelessWidget {
               conversation: conversation,
             ),
           ),
-        );
+        ).then((value) {
+          Future.delayed(const Duration(milliseconds: 100), () {
+            rc.currentConversation = null;
+          });
+        });
       },
       child: Slidable(
         key: ValueKey(conversation.id),
