@@ -12,18 +12,14 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    // rc.initChatView(conversation);
+    rc.initChatView(conversation);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        //todo: reimplement remove focus
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
+        FocusScope.of(context).unfocus();
       },
       child: Obx(
         () => Scaffold(
