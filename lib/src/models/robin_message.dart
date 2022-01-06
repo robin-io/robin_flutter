@@ -41,21 +41,4 @@ class RobinMessage {
         ? DateTime.now()
         : DateTime.parse(json['created_at']);
   }
-
-  RobinMessage.empty() {
-    id = '';
-    isAttachment = false;
-    text = "";
-    link = '';
-    conversationId = '';
-    senderToken = '';
-    sentByMe = false;
-    senderName = '';
-
-    isRead = false;
-    isForwarded = false;
-    reactions = [];
-    deletedForMe = false;
-    timestamp = DateTime.now();
-  }
 }

@@ -47,53 +47,76 @@ class ChatBottomSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 49,
-                                color: const Color(0XFF8393C0),
-                              ),
-                              const SizedBox(
-                                width: 14,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    rc.replyMessage!.senderName,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: rc.userColors[
-                                              rc.replyMessage!.senderToken] ??
-                                          green,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  SizedBox(
-                                    width: 72,
-                                    child: Text(
-                                      true
-                                          ? rc.replyMessage!.text
-                                          : false
-                                              ? ""
-                                              : "${rc.currentConversation!.name}",
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0XFF101010),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 49,
+                                  color: const Color(0XFF8393C0),
+                                ),
+                                const SizedBox(
+                                  width: 14,
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              rc.replyMessage!.senderName,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: rc.userColors[rc
+                                                        .replyMessage!
+                                                        .senderToken] ??
+                                                    green,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
+                                      const SizedBox(height: 5),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              !rc.replyMessage!.isAttachment
+                                                  ? rc.replyMessage!.text
+                                                  : fileType(
+                                                            path: rc
+                                                                .replyMessage!
+                                                                .link,
+                                                          ) ==
+                                                          'image'
+                                                      ? "Photo"
+                                                      : fileName(rc
+                                                          .replyMessage!.link),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Color(0XFF101010),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                           true ? const SizedBox(width: 3) : Container(),
                           false
@@ -118,11 +141,30 @@ class ChatBottomSheet extends StatelessWidget {
                                         ),
                                 )
                               : Container(),
+                          rc.replyMessage!.isAttachment
+                              ? fileType(
+                                        path: rc.replyMessage!.link,
+                                      ) ==
+                                      'image'
+                                  ? CachedNetworkImage(
+                                      imageUrl: rc.replyMessage!.link,
+                                      fit: BoxFit.fitHeight,
+                                      height: 39,
+                                      width: 49,
+                                    )
+                                  : Image.asset(
+                                      'assets/images/fileTypes/${fileType(path: rc.replyMessage!.link)}.png',
+                                      package: 'robin_flutter',
+                                      fit: BoxFit.fitHeight,
+                                      height: 39,
+                                      width: 49,
+                                    )
+                              : Container(),
                           const SizedBox(width: 3),
                           IconButton(
                             onPressed: () {
                               rc.replyView.value = false;
-                              rc.replyMessage = RobinMessage.empty();
+                              rc.replyMessage = null;
                             },
                             icon: Container(
                               width: 24,

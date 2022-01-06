@@ -171,7 +171,7 @@ class _UrlPreviewState extends State<UrlPreview> {
   Container _buildPreviewCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(7),
+        borderRadius: BorderRadius.circular(4),
         color: const Color(0XFFFFFFFF),
       ),
       constraints: const BoxConstraints(
