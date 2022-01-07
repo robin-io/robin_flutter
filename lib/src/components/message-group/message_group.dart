@@ -109,6 +109,12 @@ class MessageGroup extends StatelessWidget {
                   height: 14,
                   decoration: const BoxDecoration(
                     color: Color(0XFF6B7491),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -271,6 +277,12 @@ class MessageGroup extends StatelessWidget {
                           height: 14,
                           decoration: const BoxDecoration(
                             color: Color(0XFF6B7491),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(4),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 3),
