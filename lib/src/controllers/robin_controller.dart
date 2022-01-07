@@ -428,6 +428,7 @@ class RobinController extends GetxController {
           currentConversation!.id!,
           message,
           currentUser!.robinToken,
+          currentUser!.fullName,
         );
         messageController.clear();
       }
@@ -446,12 +447,16 @@ class RobinController extends GetxController {
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
         };
-        robinCore!.sendTextMessage(
-          currentConversation!.id!,
+        robinCore!.replyToMessage(
           message,
+          currentConversation!.id!,
+          replyMessage!.id,
           currentUser!.robinToken,
+          currentUser!.fullName,
         );
         messageController.clear();
+        replyMessage = null;
+        replyView.value = false;
       }
     } catch (e) {
       showErrorMessage(e.toString());
