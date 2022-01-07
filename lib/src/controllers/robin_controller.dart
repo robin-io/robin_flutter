@@ -437,6 +437,28 @@ class RobinController extends GetxController {
     }
   }
 
+  void sendReplyAsTextMessage() {
+    try {
+      if (messageController.text.isNotEmpty) {
+        Map<String, String> message = {
+          'msg': messageController.text,
+          'timestamp': DateTime.now().toString(),
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        robinCore!.sendTextMessage(
+          currentConversation!.id!,
+          message,
+          currentUser!.robinToken,
+        );
+        messageController.clear();
+      }
+    } catch (e) {
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
   void sendAttachment() async {
     try {
       if (file['file'] != null) {
@@ -462,6 +484,33 @@ class RobinController extends GetxController {
       rethrow;
     }
   }
+
+  void sendReplyAsAttachment() async {
+    try {
+      if (file['file'] != null) {
+        isFileSending.value = true;
+        Map<String, String> body = {
+          'conversation_id': currentConversation!.id!,
+          'sender_token': currentUser!.robinToken,
+          'sender_name': currentUser!.fullName,
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            file['file'].path,
+          ),
+        ];
+        await robinCore!.sendAttachment(body, files);
+        file['file'] = null;
+        isFileSending.value = false;
+      }
+    } catch (e) {
+      isFileSending.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
 
   forwardMessages() async {
     try {

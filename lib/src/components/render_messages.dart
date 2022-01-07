@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:robin_flutter/src/components/text_bubble.dart';
-import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/models/robin_message.dart';
+import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
+import 'package:robin_flutter/src/models/robin_message.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/components/message-group/message_group.dart';
 
 class RenderMessages extends StatelessWidget {
   RenderMessages({
@@ -42,7 +42,7 @@ class RenderMessages extends StatelessWidget {
             itemBuilder: (context, index) {
               RobinMessage message =
                   rc.conversationMessages.values.toList()[index];
-              return TextBubble(
+              return MessageGroup(
                 message: message,
                 lastInSeries: (index < rc.conversationMessages.length - 1 &&
                         rc.conversationMessages.values

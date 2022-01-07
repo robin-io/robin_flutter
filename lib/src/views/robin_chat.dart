@@ -3,7 +3,7 @@ import 'package:robin_flutter/src/components/render_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/components/chat_app_bar.dart';
-import 'package:robin_flutter/src/components/chat_bottom_sheet.dart';
+import 'package:robin_flutter/src/components/chat_bottom_bar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
@@ -42,7 +42,7 @@ class RobinChat extends StatelessWidget {
                       )
                     : RenderMessages(),
               ),
-              ChatBottomSheet(
+              ChatBottomBar(
                 bottomPadding: MediaQuery.of(context).padding.bottom,
               ),
             ],
