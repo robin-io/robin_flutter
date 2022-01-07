@@ -10,6 +10,7 @@ class RobinMessage {
   late final bool sentByMe;
   late final String senderName;
   late final String senderToken;
+  late final String? replyTo;
   late final bool isRead;
   late final bool isForwarded;
   late final List reactions;
@@ -25,13 +26,9 @@ class RobinMessage {
     link = isAttachment ? json['content']['attachment'] : '';
     conversationId = json['conversation_id'];
     senderToken = json['sender_token'];
-    if (rc.currentUser?.robinToken == json['sender_token']) {
-      sentByMe = true;
-      senderName = 'You';
-    } else {
-      sentByMe = false;
-      senderName = json['content']['sender_name'];
-    }
+    sentByMe = rc.currentUser?.robinToken == json['sender_token'];
+    senderName = json['sender_name'];
+    replyTo = json['reply_to'];
     isRead = json['is_read'] ?? false;
     isForwarded = json['is_forwarded'] ?? false;
     reactions = json['reactions'] ?? [];

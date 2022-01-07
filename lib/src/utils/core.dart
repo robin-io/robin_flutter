@@ -28,33 +28,35 @@ class RobinCore {
     rc.robinConnection!.sink.add(json.encode(sub));
   }
 
-  void replyToMessage(
-      Map message, String conversationId, String replyTo, String senderToken) {
-    Map body = {
-      'type': 1,
-      'channel': robinChannel,
-      'content': message,
-      'sender_token': senderToken,
-      'conversation_id': conversationId,
-      'reply_to': replyTo,
-      'is_reply': true,
-    };
-    rc.robinConnection!.sink.add(json.encode(body));
-  }
-
-  void sendTextMessage(String conversationId, Map message, String senderToken) {
+  void sendTextMessage(String conversationId, Map message, String senderToken, String senderName) {
     try {
       Map body = {
         'type': 1,
         'channel': robinChannel,
         'content': message,
         'sender_token': senderToken,
+        'sender_name': senderName,
         'conversation_id': conversationId,
       };
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
       throw e.toString();
     }
+  }
+
+  void replyToMessage(
+      Map message, String conversationId, String replyTo, String senderToken, String senderName) {
+    Map body = {
+      'type': 1,
+      'channel': robinChannel,
+      'content': message,
+      'sender_token': senderToken,
+      'sender_name': senderName,
+      'conversation_id': conversationId,
+      'reply_to': replyTo,
+      'is_reply': true,
+    };
+    rc.robinConnection!.sink.add(json.encode(body));
   }
 
   void createSupportTicket(

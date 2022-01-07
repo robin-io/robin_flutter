@@ -69,7 +69,9 @@ class ChatBottomBar extends StatelessWidget {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              rc.replyMessage!.senderName,
+                                              rc.replyMessage!.sentByMe
+                                                  ? 'You'
+                                                  : rc.replyMessage!.senderName,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: TextStyle(
