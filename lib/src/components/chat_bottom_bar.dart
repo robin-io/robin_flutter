@@ -8,11 +8,11 @@ import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 
-class ChatBottomSheet extends StatelessWidget {
+class ChatBottomBar extends StatelessWidget {
   final RobinController rc = Get.find();
   final double bottomPadding;
 
-  ChatBottomSheet({Key? key, required this.bottomPadding}) : super(key: key);
+  ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -280,11 +280,17 @@ class ChatBottomSheet extends StatelessWidget {
                           onTap: () {
                             if (!rc.isFileSending.value) {
                               if (rc.file['file'] != null) {
-                                rc.sendAttachment();
-                                //todo: send file reply
+                                if (rc.replyView.value) {
+                                  rc.sendReplyAsAttachment();
+                                } else {
+                                  rc.sendAttachment();
+                                }
                               } else if (rc.messageController.text.isNotEmpty) {
-                                rc.sendTextMessage();
-                                //todo: send reply
+                                if (rc.replyView.value) {
+                                  rc.sendReplyAsTextMessage();
+                                } else {
+                                  rc.sendTextMessage();
+                                }
                               }
                             }
                           },

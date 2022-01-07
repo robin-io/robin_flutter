@@ -1,16 +1,15 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:linkify/linkify.dart';
-import 'package:robin_flutter/src/components/url-preview/url_preview.dart';
+import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/robin_create_conversation.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import 'constants.dart';
+import 'package:robin_flutter/src/components/message-group/url-preview/url_preview.dart';
 
 final RobinController rc = Get.find();
 
@@ -227,9 +226,6 @@ Widget getURLPreview(String string) {
           padding: const EdgeInsets.only(bottom: 4),
           child: UrlPreview(
             url: firstLink,
-            titleLines: 2,
-            descriptionLines: 2,
-            bgColor: black,
           ),
         )
       : Container(
