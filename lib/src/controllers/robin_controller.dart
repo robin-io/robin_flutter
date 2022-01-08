@@ -496,6 +496,7 @@ class RobinController extends GetxController {
         isFileSending.value = true;
         Map<String, String> body = {
           'conversation_id': currentConversation!.id!,
+          'message_id': replyMessage!.id,
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
         };
@@ -505,9 +506,11 @@ class RobinController extends GetxController {
             file['file'].path,
           ),
         ];
-        await robinCore!.sendAttachment(body, files);
+        await robinCore!.replyWithAttachment(body, files);
         file['file'] = null;
         isFileSending.value = false;
+        replyMessage = null;
+        replyView.value = false;
       }
     } catch (e) {
       isFileSending.value = false;
@@ -515,7 +518,6 @@ class RobinController extends GetxController {
       rethrow;
     }
   }
-
 
   forwardMessages() async {
     try {
