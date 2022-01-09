@@ -313,57 +313,51 @@ class TextBubble extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Container(
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0XFFF4F4F4),
-                                ),
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Star",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0XFF101010),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      'assets/icons/star.svg',
-                                      package: 'robin_flutter',
-                                      width: 22,
-                                      height: 22,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Container(
+                          //   decoration: const BoxDecoration(
+                          //     border: Border(
+                          //       bottom: BorderSide(
+                          //         width: 1,
+                          //         color: Color(0XFFF4F4F4),
+                          //       ),
+                          //     ),
+                          //   ),
+                          //   padding: const EdgeInsets.all(10),
+                          //   child: Row(
+                          //     crossAxisAlignment: CrossAxisAlignment.center,
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       const Text(
+                          //         "Star",
+                          //         style: TextStyle(
+                          //           fontSize: 14,
+                          //           color: Color(0XFF101010),
+                          //         ),
+                          //       ),
+                          //       const SizedBox(width: 10),
+                          //       SizedBox(
+                          //         width: 22,
+                          //         height: 22,
+                          //         child: Center(
+                          //           child: SvgPicture.asset(
+                          //             'assets/icons/star.svg',
+                          //             package: 'robin_flutter',
+                          //             width: 22,
+                          //             height: 22,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                           GestureDetector(
                             onTap: () {
+                              rc.deleteMessage(message.id);
                               entry!.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 0,
-                                    color: Color(0XFFF4F4F4),
-                                  ),
-                                ),
-                              ),
                               padding: const EdgeInsets.all(10),
+                              color: Colors.transparent,
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment:

@@ -16,10 +16,14 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   List<String> chatOptions() {
-    List<String> options = ['Select Messages', 'Chat Info'];
+    List<String> options = ['Select Messages'];
     if (rc.currentConversation!.isGroup!) {
+      options.insert(0, 'Group Info');
       options.add('Leave Group');
+    } else {
+      options.insert(0, 'Contact Info');
     }
+
     return options;
   }
 
