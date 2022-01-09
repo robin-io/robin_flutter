@@ -541,12 +541,24 @@ class RobinController extends GetxController {
     robinCore!.sendReadReceipts(body);
   }
 
-  void deleteMessage(String messageId) async {
+  void deleteMessage(String messageId){
     Map<String, dynamic> body = {
       'ids': [messageId],
       'requester_token': currentUser!.robinToken,
     };
     conversationMessages.remove(messageId);
     robinCore!.deleteMessages(body);
+  }
+
+  void sendReaction(String reactionType) async {
+    Map<String, dynamic> body = {
+      'ids': [messageId],
+      'requester_token': currentUser!.robinToken,
+    };
+
+  }
+
+  void removeReaction(String reactionId) async{
+
   }
 }
