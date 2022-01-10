@@ -557,11 +557,10 @@ class RobinController extends GetxController {
       'conversation_id': currentConversation!.id,
       'timestamp': getTimestamp(),
     };
-    Map x = await robinCore!.sendReaction(body, messageId);
-    print(x['reactions']);
+    conversationMessages[messageId] = await robinCore!.sendReaction(body, messageId);
   }
 
   void removeReaction(String messageId, String reactionId) async {
-    robinCore!.removeReaction(messageId, reactionId);
+    conversationMessages[messageId] = await  robinCore!.removeReaction(messageId, reactionId);
   }
 }

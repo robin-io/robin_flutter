@@ -115,7 +115,10 @@ getDocument() async {
 
 String fileType({String? path}) {
   String filePath = path ?? rc.file['file'].path;
-  String? ext = filePath.split('.').last.toLowerCase();
+  String? ext = filePath
+      .split('.')
+      .last
+      .toLowerCase();
 
   if (imageFormats.contains(ext)) {
     return 'image';
@@ -129,7 +132,9 @@ String fileType({String? path}) {
 }
 
 String fileName(String path) {
-  return path.split('/').last;
+  return path
+      .split('/')
+      .last;
 }
 
 List<LinkifyElement> matchLinks(String str) {
@@ -170,44 +175,44 @@ Widget formatText(String string) {
         for (LinkifyElement formattedText in formattedTexts)
           formattedText is EmailElement
               ? WidgetSpan(
-                  child: GestureDetector(
-                    onTap: () {
-                      _launchURL(formattedText.text, true);
-                    },
-                    child: Text(
-                      formattedText.text,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14,
-                        color: Color(0XFF4568D1),
-                      ),
-                    ),
-                  ),
-                )
+            child: GestureDetector(
+              onTap: () {
+                _launchURL(formattedText.text, true);
+              },
+              child: Text(
+                formattedText.text,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                  color: Color(0XFF4568D1),
+                ),
+              ),
+            ),
+          )
               : formattedText is UrlElement
-                  ? WidgetSpan(
-                      child: GestureDetector(
-                        onTap: () {
-                          _launchURL(formattedText.url, false);
-                        },
-                        child: Text(
-                          formattedText.text,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14,
-                            color: Color(0XFF4568D1),
-                          ),
-                        ),
-                      ),
-                    )
-                  : TextSpan(
-                      text: formattedText.text,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14,
-                        color: Color(0XFF101010),
-                      ),
-                    ),
+              ? WidgetSpan(
+            child: GestureDetector(
+              onTap: () {
+                _launchURL(formattedText.url, false);
+              },
+              child: Text(
+                formattedText.text,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 14,
+                  color: Color(0XFF4568D1),
+                ),
+              ),
+            ),
+          )
+              : TextSpan(
+            text: formattedText.text,
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+              color: Color(0XFF101010),
+            ),
+          ),
       ],
     ),
   );
@@ -224,14 +229,14 @@ Widget getURLPreview(String string) {
   }
   return firstLink.isNotEmpty
       ? Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: UrlPreview(
-            url: firstLink,
-          ),
-        )
+    padding: const EdgeInsets.only(bottom: 4),
+    child: UrlPreview(
+      url: firstLink,
+    ),
+  )
       : Container(
-          width: 0,
-        );
+    width: 0,
+  );
 }
 
 String getTimestamp() {
@@ -242,9 +247,11 @@ String getTimestamp() {
   return timestamp;
 }
 
-convertToReaction(List<Map> reactions) {
-  List<RobinMessageReaction> robinReactions = [];
+Map<String, RobinMessageReaction> convertToReactions(List reactions) {
+  Map<String, RobinMessageReaction> robinReactions = {};
   for (Map reaction in reactions) {
-    robinReactions.add(RobinMessageReaction.fromJson(reaction));
+    RobinMessageReaction robinReaction = RobinMessageReaction.fromJson(reaction);
+    robinReactions[robinReaction.type] = robinReaction;
   }
+  return robinReactions;
 }
