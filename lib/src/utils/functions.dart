@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -231,4 +232,19 @@ Widget getURLPreview(String string) {
       : Container(
           width: 0,
         );
+}
+
+String getTimestamp() {
+  String timestamp = DateTime.now().toString();
+  timestamp = timestamp.substring(0, timestamp.length - 3);
+  timestamp = timestamp.replaceAll(" ", 'T');
+  timestamp += 'Z';
+  return timestamp;
+}
+
+convertToReaction(List<Map> reactions) {
+  List<RobinMessageReaction> robinReactions = [];
+  for (Map reaction in reactions) {
+    robinReactions.add(RobinMessageReaction.fromJson(reaction));
+  }
 }

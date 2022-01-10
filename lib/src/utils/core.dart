@@ -28,7 +28,8 @@ class RobinCore {
     rc.robinConnection!.sink.add(json.encode(sub));
   }
 
-  void sendTextMessage(String conversationId, Map message, String senderToken, String senderName) {
+  void sendTextMessage(String conversationId, Map message, String senderToken,
+      String senderName) {
     try {
       Map body = {
         'type': 1,
@@ -44,8 +45,8 @@ class RobinCore {
     }
   }
 
-  void replyToMessage(
-      Map message, String conversationId, String replyTo, String senderToken, String senderName) {
+  void replyToMessage(Map message, String conversationId, String replyTo,
+      String senderToken, String senderName) {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -196,10 +197,9 @@ class RobinCore {
     }
   }
 
-  removeReaction(
-      Map<String, dynamic> body, String messageId, String reactionId) async {
+  removeReaction(String messageId, String reactionId) async {
     try {
-      return await api.removeReaction(body, messageId, reactionId);
+      return await api.removeReaction(messageId, reactionId);
     } catch (e) {
       throw e.toString();
     }

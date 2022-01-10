@@ -216,10 +216,9 @@ class DataSource {
     });
   }
 
-  removeReaction(
-      Map<String, dynamic> body, String messageId, String reactionId) async {
+  removeReaction(String messageId, String reactionId) async {
     return netUtil
-        .delete('$removeReactionUrl/$reactionId/$messageId', body: body)
+        .delete('$removeReactionUrl/$reactionId/$messageId')
         .then((response) {
       if (response['error']) {
         throw response['msg'];

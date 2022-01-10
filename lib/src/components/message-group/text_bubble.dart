@@ -79,6 +79,7 @@ class TextBubble extends StatelessWidget {
                         children: [
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('heart', message.id);
                               entry?.remove();
                             },
                             child: Container(
@@ -99,6 +100,7 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('thumbs_up', message.id);
                               entry?.remove();
                             },
                             child: Container(
@@ -119,6 +121,7 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('thumbs_down', message.id);
                               entry?.remove();
                             },
                             child: Container(
@@ -139,6 +142,7 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('laugh', message.id);
                               entry?.remove();
                             },
                             child: Container(
@@ -159,6 +163,7 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('exclaim', message.id);
                               entry?.remove();
                             },
                             child: Container(
@@ -179,6 +184,7 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              rc.sendReaction('question_mark', message.id);
                               entry?.remove();
                             },
                             child: Container(
