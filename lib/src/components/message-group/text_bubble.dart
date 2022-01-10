@@ -79,19 +79,28 @@ class TextBubble extends StatelessWidget {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('heart', message.id);
+                              if (message.reactions.keys.contains('heart')) {
+                                rc.removeReaction(
+                                    message.id, message.reactions['heart']!.id);
+                              } else {
+                                rc.sendReaction('heart', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color: message.reactions.keys.contains('heart')
+                                    ? const Color(0XFF4C90F7)
+                                    : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.favorite,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color: message.reactions.keys.contains('heart')
+                                    ? const Color(0XFFFFFFFF)
+                                    : const Color(0XFF808080),
                               ),
                             ),
                           ),
@@ -100,19 +109,31 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('thumbs_up', message.id);
+                              if (message.reactions.keys
+                                  .contains('thumbs_up')) {
+                                rc.removeReaction(message.id,
+                                    message.reactions['thumbs_up']!.id);
+                              } else {
+                                rc.sendReaction('thumbs_up', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color:
+                                    message.reactions.keys.contains('thumbs_up')
+                                        ? const Color(0XFF4C90F7)
+                                        : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.thumb_up,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color:
+                                    message.reactions.keys.contains('thumbs_up')
+                                        ? const Color(0XFFFFFFFF)
+                                        : const Color(0XFF808080),
                               ),
                             ),
                           ),
@@ -121,19 +142,31 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('thumbs_down', message.id);
+                              if (message.reactions.keys
+                                  .contains('thumbs_down')) {
+                                rc.removeReaction(message.id,
+                                    message.reactions['thumbs_down']!.id);
+                              } else {
+                                rc.sendReaction('thumbs_down', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color: message.reactions.keys
+                                        .contains('thumbs_down')
+                                    ? const Color(0XFF4C90F7)
+                                    : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.thumb_down,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color: message.reactions.keys
+                                        .contains('thumbs_down')
+                                    ? const Color(0XFFFFFFFF)
+                                    : const Color(0XFF808080),
                               ),
                             ),
                           ),
@@ -142,19 +175,28 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('laugh', message.id);
+                              if (message.reactions.keys.contains('laugh')) {
+                                rc.removeReaction(
+                                    message.id, message.reactions['laugh']!.id);
+                              } else {
+                                rc.sendReaction('laugh', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color: message.reactions.keys.contains('laugh')
+                                    ? const Color(0XFF4C90F7)
+                                    : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.emoji_emotions,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color: message.reactions.keys.contains('laugh')
+                                    ? const Color(0XFFFFFFFF)
+                                    : const Color(0XFF808080),
                               ),
                             ),
                           ),
@@ -163,19 +205,30 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('exclaim', message.id);
+                              if (message.reactions.keys.contains('exclaim')) {
+                                rc.removeReaction(message.id,
+                                    message.reactions['exclaim']!.id);
+                              } else {
+                                rc.sendReaction('exclaim', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color:
+                                    message.reactions.keys.contains('exclaim')
+                                        ? const Color(0XFF4C90F7)
+                                        : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.priority_high,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color:
+                                    message.reactions.keys.contains('exclaim')
+                                        ? const Color(0XFFFFFFFF)
+                                        : const Color(0XFF808080),
                               ),
                             ),
                           ),
@@ -184,19 +237,31 @@ class TextBubble extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () {
-                              rc.sendReaction('question_mark', message.id);
+                              if (message.reactions.keys
+                                  .contains('question_mark')) {
+                                rc.removeReaction(message.id,
+                                    message.reactions['question_mark']!.id);
+                              } else {
+                                rc.sendReaction('question_mark', message.id);
+                              }
                               entry?.remove();
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: null,
+                                color: message.reactions.keys
+                                        .contains('question_mark')
+                                    ? const Color(0XFF4C90F7)
+                                    : null,
                               ),
                               padding: const EdgeInsets.all(9),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.help,
                                 size: 20,
-                                color: Color(0XFF808080),
+                                color: message.reactions.keys
+                                        .contains('question_mark')
+                                    ? const Color(0XFFFFFFFF)
+                                    : const Color(0XFF808080),
                               ),
                             ),
                           ),

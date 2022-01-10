@@ -1,5 +1,7 @@
-import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 
 class RobinMessage {
   late final String id;
@@ -13,7 +15,7 @@ class RobinMessage {
   late final String? replyTo;
   late final bool isRead;
   late final bool isForwarded;
-  late final List reactions;
+  late final Map<String, RobinMessageReaction> reactions;
   late final bool deletedForMe;
   late final DateTime timestamp;
 
@@ -31,7 +33,7 @@ class RobinMessage {
     replyTo = json['reply_to'];
     isRead = json['is_read'] ?? false;
     isForwarded = json['is_forwarded'] ?? false;
-    reactions = json['reactions'] ?? [];
+    reactions =  convertToReactions(json['reactions'] ?? []);
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);
     timestamp = json['created_at'] == null
