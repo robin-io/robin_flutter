@@ -3,7 +3,6 @@ import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/views/robin_chat.dart';
-import 'package:robin_flutter/src/views/robin_home.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';

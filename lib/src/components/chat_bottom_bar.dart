@@ -1,12 +1,11 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/models/robin_message.dart';
+import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
-import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final RobinController rc = Get.find();
@@ -120,29 +119,6 @@ class ChatBottomBar extends StatelessWidget {
                               ],
                             ),
                           ),
-                          true ? const SizedBox(width: 3) : Container(),
-                          false
-                              ? Container(
-                                  width: 49,
-                                  height: 49,
-                                  padding:
-                                      const EdgeInsets.only(top: 5, bottom: 5),
-                                  child: true
-                                      ? CachedNetworkImage(
-                                          imageUrl: '',
-                                          fit: BoxFit.fitHeight,
-                                          height: 39,
-                                          width: 49,
-                                        )
-                                      : Image.asset(
-                                          'assets/images/fileTypes/.png',
-                                          package: 'robin_flutter',
-                                          fit: BoxFit.fitHeight,
-                                          height: 39,
-                                          width: 49,
-                                        ),
-                                )
-                              : Container(),
                           rc.replyMessage!.isAttachment
                               ? fileType(
                                         path: rc.replyMessage!.link,

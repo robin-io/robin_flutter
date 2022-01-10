@@ -496,6 +496,7 @@ class RobinController extends GetxController {
         isFileSending.value = true;
         Map<String, String> body = {
           'conversation_id': currentConversation!.id!,
+          'message_id': replyMessage!.id,
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
         };
@@ -505,9 +506,11 @@ class RobinController extends GetxController {
             file['file'].path,
           ),
         ];
-        await robinCore!.sendAttachment(body, files);
+        await robinCore!.replyWithAttachment(body, files);
         file['file'] = null;
         isFileSending.value = false;
+        replyMessage = null;
+        replyView.value = false;
       }
     } catch (e) {
       isFileSending.value = false;
@@ -515,7 +518,6 @@ class RobinController extends GetxController {
       rethrow;
     }
   }
-
 
   forwardMessages() async {
     try {
@@ -537,5 +539,29 @@ class RobinController extends GetxController {
   void sendReadReceipts(List<String> messageIds) {
     Map<String, dynamic> body = {};
     robinCore!.sendReadReceipts(body);
+  }
+
+  void deleteMessage(String messageId) {
+    Map<String, dynamic> body = {
+      'ids': [messageId],
+      'requester_token': currentUser!.robinToken,
+    };
+    conversationMessages.remove(messageId);
+    robinCore!.deleteMessages(body);
+  }
+
+  void sendReaction(String reaction, String messageId) async {
+    Map<String, dynamic> body = {
+      'user_token': currentUser!.robinToken,
+      'reaction': reaction,
+      'conversation_id': currentConversation!.id,
+      'timestamp': getTimestamp(),
+    };
+    Map x = await robinCore!.sendReaction(body, messageId);
+    print(x['reactions']);
+  }
+
+  void removeReaction(String messageId, String reactionId) async {
+    robinCore!.removeReaction(messageId, reactionId);
   }
 }
