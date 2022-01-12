@@ -12,7 +12,7 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    rc.initChatView(conversation);
+    // rc.initChatView(conversation);
   }
 
   @override
@@ -42,9 +42,39 @@ class RobinChat extends StatelessWidget {
                       )
                     : RenderMessages(),
               ),
-              ChatBottomBar(
-                bottomPadding: MediaQuery.of(context).padding.bottom,
-              ),
+              rc.forwardView.value
+                  ? Container(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).padding.bottom,
+                        top: 20,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 104, 255, 0.065),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: Offset(0, -2), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${rc.forwardMessageIds.length} selected',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: black,
+                          ),
+                        ),
+                      ),
+                    )
+                  : ChatBottomBar(
+                      bottomPadding: MediaQuery.of(context).padding.bottom,
+                    ),
             ],
           ),
           floatingActionButton: rc.chatViewLoading.value || rc.atMaxScroll.value
