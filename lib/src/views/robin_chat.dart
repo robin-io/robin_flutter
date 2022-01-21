@@ -12,7 +12,7 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    // rc.initChatView(conversation);
+    rc.initChatView(conversation);
   }
 
   @override
@@ -23,7 +23,7 @@ class RobinChat extends StatelessWidget {
       },
       child: Obx(
         () => Scaffold(
-          backgroundColor: white,
+          backgroundColor: const Color(0XFFF5F7FC),
           appBar: ChatAppBar(),
           body: Column(
             children: [

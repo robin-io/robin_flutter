@@ -29,6 +29,7 @@ dependencies:
   fluttertoast: ^8.0.8
   jiffy: ^5.0.0
   flutter_ringtone_player: ^3.1.1
+  focused_menu: ^1.0.5
 
 dev_dependencies:
   flutter_test:
@@ -41,6 +42,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/fileTypes/
+    - assets/images/reactions/
     - assets/icons/
 
   fonts:

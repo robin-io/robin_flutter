@@ -73,198 +73,42 @@ class TextBubble extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         color: const Color(0XFFFFFFFF),
                       ),
-                      padding: const EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(1.5),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys.contains('heart')) {
-                                rc.removeReaction(
-                                    message.id, message.reactions['heart']!.id);
-                              } else {
-                                rc.sendReaction('heart', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: message.reactions.keys.contains('heart')
-                                    ? const Color(0XFF4C90F7)
-                                    : null,
+                          for(String reaction in reactions)
+                            Padding(
+                              padding: const EdgeInsets.all(1.5),
+                              child: GestureDetector(
+                              onTap: () {
+                                if (message.reactions.keys.contains(reaction)) {
+                                  rc.removeReaction(message.id,
+                                      message.reactions[reaction]!.id);
+                                } else {
+                                  rc.sendReaction(reaction, message.id);
+                                }
+                                entry?.remove();
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color:
+                                  message.reactions.keys.contains(reaction)
+                                      ? robinOrange
+                                      : null,
+                                ),
+                                padding: const EdgeInsets.all(9),
+                                child: Image.asset(
+                                  'assets/images/reactions/$reaction.png',
+                                  package: 'robin_flutter',
+                                  width: 22,
+                                  height: 22,
+                                ),
                               ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.favorite,
-                                size: 20,
-                                color: message.reactions.keys.contains('heart')
-                                    ? const Color(0XFFFFFFFF)
-                                    : const Color(0XFF808080),
-                              ),
+                          ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys
-                                  .contains('thumbs_up')) {
-                                rc.removeReaction(message.id,
-                                    message.reactions['thumbs_up']!.id);
-                              } else {
-                                rc.sendReaction('thumbs_up', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color:
-                                    message.reactions.keys.contains('thumbs_up')
-                                        ? const Color(0XFF4C90F7)
-                                        : null,
-                              ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.thumb_up,
-                                size: 20,
-                                color:
-                                    message.reactions.keys.contains('thumbs_up')
-                                        ? const Color(0XFFFFFFFF)
-                                        : const Color(0XFF808080),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys
-                                  .contains('thumbs_down')) {
-                                rc.removeReaction(message.id,
-                                    message.reactions['thumbs_down']!.id);
-                              } else {
-                                rc.sendReaction('thumbs_down', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: message.reactions.keys
-                                        .contains('thumbs_down')
-                                    ? const Color(0XFF4C90F7)
-                                    : null,
-                              ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.thumb_down,
-                                size: 20,
-                                color: message.reactions.keys
-                                        .contains('thumbs_down')
-                                    ? const Color(0XFFFFFFFF)
-                                    : const Color(0XFF808080),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys.contains('laugh')) {
-                                rc.removeReaction(
-                                    message.id, message.reactions['laugh']!.id);
-                              } else {
-                                rc.sendReaction('laugh', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: message.reactions.keys.contains('laugh')
-                                    ? const Color(0XFF4C90F7)
-                                    : null,
-                              ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.emoji_emotions,
-                                size: 20,
-                                color: message.reactions.keys.contains('laugh')
-                                    ? const Color(0XFFFFFFFF)
-                                    : const Color(0XFF808080),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys.contains('exclaim')) {
-                                rc.removeReaction(message.id,
-                                    message.reactions['exclaim']!.id);
-                              } else {
-                                rc.sendReaction('exclaim', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color:
-                                    message.reactions.keys.contains('exclaim')
-                                        ? const Color(0XFF4C90F7)
-                                        : null,
-                              ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.priority_high,
-                                size: 20,
-                                color:
-                                    message.reactions.keys.contains('exclaim')
-                                        ? const Color(0XFFFFFFFF)
-                                        : const Color(0XFF808080),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (message.reactions.keys
-                                  .contains('question_mark')) {
-                                rc.removeReaction(message.id,
-                                    message.reactions['question_mark']!.id);
-                              } else {
-                                rc.sendReaction('question_mark', message.id);
-                              }
-                              entry?.remove();
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: message.reactions.keys
-                                        .contains('question_mark')
-                                    ? const Color(0XFF4C90F7)
-                                    : null,
-                              ),
-                              padding: const EdgeInsets.all(9),
-                              child: Icon(
-                                Icons.help,
-                                size: 20,
-                                color: message.reactions.keys
-                                        .contains('question_mark')
-                                    ? const Color(0XFFFFFFFF)
-                                    : const Color(0XFF808080),
-                              ),
-                            ),
-                          ),
+
                         ],
                       ),
                     ),
@@ -488,29 +332,24 @@ class TextBubble extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: message.sentByMe
-              ? const Color(0XFFD3D7EA)
-              : const Color(0XFFF4F6F8),
-          border: Border.all(
-            width: 1,
-            color: message.sentByMe
-                ? const Color(0XFFD3D7EA)
-                : const Color(0XFFD7E3FD),
-          ),
+              ? const Color(0XFFDBE4FF)
+              : const Color(0XFFFFFFFF),
+
           borderRadius: lastInSeries && message.sentByMe
               ? const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
                   bottomRight: Radius.circular(0),
                 )
               : lastInSeries && !message.sentByMe
                   ? const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
                       bottomLeft: Radius.circular(0),
-                      bottomRight: Radius.circular(20),
+                      bottomRight: Radius.circular(8),
                     )
-                  : BorderRadius.circular(20),
+                  : BorderRadius.circular(8),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

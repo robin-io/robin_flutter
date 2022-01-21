@@ -32,109 +32,147 @@ class Robin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0XFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: white,
-        title: const Text(
-          'Settings',
-          style: TextStyle(
-            color: blueGrey,
-            fontSize: 16,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/edit.svg',
-              semanticsLabel: 'edit',
-              package: 'robin_flutter',
-              width: 20,
-              height: 20,
-            ),
-            onPressed: () {
-              showCreateConversation(context);
-            },
-          )
-        ],
-        shadowColor: const Color.fromRGBO(0, 104, 255, 0.2),
-        bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, 80),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
-                child: TextFormField(
-                  style: const TextStyle(
-                    color: Color(0XFF535F89),
-                    fontSize: 14,
+    return GestureDetector(
+      onTap: () {
+        rc.homeSearchController.clear();
+        rc.showHomeSearch.value = false;
+      },
+      child: Obx(
+        () => Scaffold(
+          backgroundColor: const Color(0XFFFAFAFA),
+          appBar: AppBar(
+            backgroundColor: white,
+            title: !rc.showHomeSearch.value
+                ? const Text(
+                    'Robin Chat',
+                    style: TextStyle(
+                      color: black,
+                      fontSize: 16,
+                    ),
+                  )
+                : TextFormField(
+                    style: const TextStyle(
+                      color: Color(0XFF535F89),
+                      fontSize: 14,
+                    ),
+                    cursorColor: const Color(0XFF535F89),
+                    controller: rc.homeSearchController,
+                    autofocus: true,
+                    decoration: textFieldDecoration().copyWith(
+                      prefixIcon: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/icons/search.svg',
+                            semanticsLabel: 'search',
+                            package: 'robin_flutter',
+                            width: 22,
+                            height: 22,
+                          ),
+                        ),
+                      ),
+                      hintText: 'Search People...',
+                    ),
                   ),
-                  controller: rc.homeSearchController,
-                  decoration: textFieldDecoration().copyWith(
-                    prefixIcon: SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/icons/search.svg',
-                          semanticsLabel: 'search',
-                          package: 'robin_flutter',
-                          width: 22,
-                          height: 22,
+            leadingWidth: 0,
+            automaticallyImplyLeading: false,
+            actions: rc.showHomeSearch.value
+                ? null
+                : [
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/search_black.svg',
+                        semanticsLabel: 'edit',
+                        package: 'robin_flutter',
+                        width: 24,
+                        height: 24,
+                      ),
+                      onPressed: () {
+                        rc.showHomeSearch.value = true;
+                      },
+                    )
+                  ],
+            shadowColor: const Color.fromRGBO(0, 50, 201, 0.2),
+            bottom: rc.archivedConversations.isNotEmpty
+                ? PreferredSize(
+                    preferredSize: const Size(double.infinity, 45),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: InkWell(
+                        onTap: () {
+                          rc.homeSearchController.clear();
+                          rc.showHomeSearch.value = false;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RobinArchived(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 15, bottom: 15),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/archive_green.svg',
+                                semanticsLabel: 'search',
+                                package: 'robin_flutter',
+                                width: 20,
+                                height: 20,
+                              ),
+                              const SizedBox(
+                                width: 3,
+                              ),
+                              const Text(
+                                'Archived Chats',
+                                style: TextStyle(
+                                  color: green,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    hintText: 'Search Messages...',
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RobinArchived(),
-                    ),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(right: 15),
-                  child: Text(
-                    'Archived',
-                    style: TextStyle(
-                      color: green,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-        ),
-        centerTitle: false,
-      ),
-      body: Obx(
-        () {
-          if (rc.isConversationsLoading.value) {
-            return const ConversationsLoading();
-          } else if (rc.homeConversations.isEmpty) {
-            return const EmptyConversation();
-          } else {
-            return ListView(
-              children: [
-                for (RobinConversation conversation in rc.homeConversations)
-                  Conversation(
-                    conversation: conversation,
                   )
-              ],
-            );
-          }
-        },
+                : null,
+            centerTitle: false,
+          ),
+          body: Obx(
+            () {
+              if (rc.isConversationsLoading.value) {
+                return const ConversationsLoading();
+              } else if (rc.homeConversations.isEmpty) {
+                return const EmptyConversation();
+              } else {
+                return ListView(
+                  children: [
+                    for (RobinConversation conversation in rc.homeConversations)
+                      Conversation(
+                        conversation: conversation,
+                      )
+                  ],
+                );
+              }
+            },
+          ),
+          floatingActionButton: FloatingActionButton(
+              backgroundColor: green,
+              child: SvgPicture.asset(
+                'assets/icons/edit.svg',
+                semanticsLabel: 'edit',
+                package: 'robin_flutter',
+                width: 24,
+                height: 24,
+              ),
+              onPressed: () {
+                showCreateConversation(context);
+              }),
+        ),
       ),
     );
   }

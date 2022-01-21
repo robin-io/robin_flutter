@@ -1,6 +1,7 @@
+import 'dart:ui';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
@@ -58,6 +59,7 @@ class Conversation extends StatelessWidget {
       if (value == 1) {
         handleArchive(context);
       }
+      rc.selectedConversation.value = '';
     });
   }
 
@@ -66,6 +68,8 @@ class Conversation extends StatelessWidget {
     return InkWell(
       onLongPress: () async {
         HapticFeedback.selectionClick();
+        rc.selectedConversation.value = conversation.id!;
+        print(rc.selectedConversation.value);
         showPopupMenu(context);
       },
       onTap: () async {
@@ -104,77 +108,101 @@ class Conversation extends StatelessWidget {
         ),
         child: Container(
           decoration: const BoxDecoration(
+            color: white,
             border: Border(
               bottom: BorderSide(
-                width: 1,
+                width: 3,
                 style: BorderStyle.solid,
-                color: Color(0XFFF4F6F8),
+                color: Color(0XFFF5F7FC),
               ),
             ),
           ),
           padding:
               const EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
             children: [
-              UserAvatar(
-                isGroup: conversation.isGroup!,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  UserAvatar(
+                    isGroup: conversation.isGroup!,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Expanded(
-                          child: Text(
-                            conversation.name!,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0XFF000000),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                conversation.name!,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: black,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        Text(
-                          formatDate(conversation.updatedAt.toString()),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0XFF566BA0),
+                        const SizedBox(height: 3),
+                        Center(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  conversation.lastMessage!.text.isEmpty
+                                      ? 'New Conversation'
+                                      : conversation.lastMessage!.text,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight:
+                                        conversation.lastMessage!.isAttachment
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                    color: const Color(0XFF8D9091),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            conversation.lastMessage!.text,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: conversation.lastMessage!.isAttachment
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: const Color(0XFF7A7A7A),
-                            ),
-                          ),
-                        ),
-                      ],
+                  ),
+                  Text(
+                    formatDate(conversation.updatedAt.toString()),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0XFF51545C),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              SizedBox(
+                height: 45,
+                child: Obx(
+                  ()=> BackdropFilter(
+                    filter: rc.selectedConversation.value.isNotEmpty &&
+                            rc.selectedConversation.value != conversation.id!
+                        ? ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5)
+                        : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                    child: Container(
+                      height: 45,
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
