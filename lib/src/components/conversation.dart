@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,23 +34,35 @@ class Conversation extends StatelessWidget {
     double height = renderBox.localToGlobal(Offset.zero).dy;
     showMenu<int>(
       context: context,
-      position: RelativeRect.fromLTRB(width, height, 0, 0),
+      position: RelativeRect.fromLTRB(width, height + 75, 0, 0),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(24.0),
+          Radius.circular(6.0),
         ),
       ),
       items: [
         PopupMenuItem<int>(
-          child: SizedBox(
-            width: 95,
-            child: Text(
-              conversation.archived! ? 'Unarchive' : 'Archive',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0XFF101010),
+          padding: const EdgeInsets.only(left: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                conversation.archived! ? 'Unarchive' : 'Archive',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color(0XFF101010),
+                ),
               ),
-            ),
+              const SizedBox(width: 45,),
+              SvgPicture.asset(
+                'assets/icons/archive_black.svg',
+                semanticsLabel: 'search',
+                package: 'robin_flutter',
+                width: 22,
+                height: 22,
+              ),
+              const SizedBox(width: 10,),
+            ],
           ),
           value: 1,
         ),
@@ -69,7 +82,6 @@ class Conversation extends StatelessWidget {
       onLongPress: () async {
         HapticFeedback.selectionClick();
         rc.selectedConversation.value = conversation.id!;
-        print(rc.selectedConversation.value);
         showPopupMenu(context);
       },
       onTap: () async {

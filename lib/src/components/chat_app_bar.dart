@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:robin_flutter/src/components/robin_forward_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
@@ -76,7 +77,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       icon: const Icon(
                         Icons.arrow_back_ios,
                         size: 16,
-                        color: Color(0XFF535F89),
+                        color: Color(0XFF54515C),
                       ),
                     ),
                   ),
@@ -179,14 +180,15 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : PopupMenuButton(
                   icon: const Icon(
-                    Icons.more_vert,
+                    Icons.more_horiz,
                     size: 20,
-                    color: green,
+                    color: Color(0XFF54515C),
                   ),
                   enableFeedback: true,
+                  offset: const Offset(0, 60),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(24.0),
+                      Radius.circular(6.0),
                     ),
                   ),
                   onSelected: (value) async {
@@ -203,18 +205,52 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     }
                   },
                   itemBuilder: (context) {
-                    return chatOptions().map((String choice) {
-                      return PopupMenuItem(
-                        value: choice,
-                        child: Text(
-                          choice,
-                          style: const TextStyle(
-                            color: Color(0XFF101010),
-                            fontSize: 14,
+                    List<PopupMenuEntry<Object>> list = [];
+                    for (String option in chatOptions()) {
+                      list.add(
+                        PopupMenuItem(
+                          value: option,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                option,
+                                style: TextStyle(
+                                  color: option == 'Leave Group'
+                                      ? const Color(0XFFD53120)
+                                      : const Color(0XFF51545C),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 2),
+                                child: SvgPicture.asset(
+                                  option == 'Group Info' ||
+                                          option == 'Contact Info'
+                                      ? 'assets/icons/conversation_info.svg'
+                                      : option == 'Select Messages'
+                                          ? 'assets/icons/select_messages.svg'
+                                          : option == 'Leave Group'
+                                              ? 'assets/icons/leave_group.svg'
+                                              : '',
+                                  package: 'robin_flutter',
+                                  width: 22,
+                                  height: 22,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
-                    }).toList();
+                      if(option != chatOptions().last){
+                        list.add(
+                          const PopupMenuDivider(
+                            height: 2,
+                          ),
+                        );
+                      }
+                    }
+                    return list;
                   },
                 )
         ],
