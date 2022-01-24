@@ -39,13 +39,13 @@ class TextBubble extends StatelessWidget {
     if (offset.dy - 47 < 50) {
       offset = Offset(offset.dx, 100);
     }
-    if (offset.dy + size.height + 230 > MediaQuery.of(context).size.height) {
+    if (offset.dy + size.height + 240 > MediaQuery.of(context).size.height) {
       offset = Offset(
           offset.dx,
           offset.dy -
               (offset.dy +
                   size.height +
-                  230 -
+                  245 -
                   MediaQuery.of(context).size.height));
     }
     OverlayEntry? entry;
@@ -60,7 +60,7 @@ class TextBubble extends StatelessWidget {
               child: Transform.translate(
                 offset: Offset(
                   message.sentByMe ? -10 : offset.dx,
-                  offset.dy - 47,
+                  offset.dy - 49,
                 ),
                 child: Column(
                   crossAxisAlignment: message.sentByMe
@@ -125,11 +125,10 @@ class TextBubble extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Container(
-                      width: 180,
-                      padding: const EdgeInsets.all(10),
+                      width: 195,
                       decoration: BoxDecoration(
                         color: const Color(0XFFFFFFFF),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +137,6 @@ class TextBubble extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               entry?.remove();
-                              HapticFeedback.selectionClick();
                               rc.replyView.value = false;
                               rc.replyMessage = message;
                               rc.replyView.value = true;
@@ -152,31 +150,25 @@ class TextBubble extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(12),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Reply",
+                                    "Reply Message",
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Color(0XFF101010),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  SizedBox(
+                                  SvgPicture.asset(
+                                    'assets/icons/reply.svg',
+                                    package: 'robin_flutter',
                                     width: 22,
                                     height: 22,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/reply.svg',
-                                        package: 'robin_flutter',
-                                        width: 22,
-                                        height: 22,
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ),
@@ -185,9 +177,8 @@ class TextBubble extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               entry?.remove();
-                              HapticFeedback.selectionClick();
-                              rc.forwardView.value = true;
-                              rc.forwardMessageIds.add(message.id);
+                              rc.selectMessageView.value = true;
+                              rc.selectedMessageIds.add(message.id);
                             },
                             child: Container(
                               decoration: const BoxDecoration(
@@ -198,11 +189,11 @@ class TextBubble extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(12),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     "Forward",
@@ -212,66 +203,63 @@ class TextBubble extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  SizedBox(
+                                  SvgPicture.asset(
+                                    'assets/icons/forward.svg',
+                                    package: 'robin_flutter',
                                     width: 22,
                                     height: 22,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/forward.svg',
-                                        package: 'robin_flutter',
-                                        width: 22,
-                                        height: 22,
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          // Container(
-                          //   decoration: const BoxDecoration(
-                          //     border: Border(
-                          //       bottom: BorderSide(
-                          //         width: 1,
-                          //         color: Color(0XFFF4F4F4),
-                          //       ),
-                          //     ),
-                          //   ),
-                          //   padding: const EdgeInsets.all(10),
-                          //   child: Row(
-                          //     crossAxisAlignment: CrossAxisAlignment.center,
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       const Text(
-                          //         "Star",
-                          //         style: TextStyle(
-                          //           fontSize: 14,
-                          //           color: Color(0XFF101010),
-                          //         ),
-                          //       ),
-                          //       const SizedBox(width: 10),
-                          //       SizedBox(
-                          //         width: 22,
-                          //         height: 22,
-                          //         child: Center(
-                          //           child: SvgPicture.asset(
-                          //             'assets/icons/star.svg',
-                          //             package: 'robin_flutter',
-                          //             width: 22,
-                          //             height: 22,
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                           GestureDetector(
                             onTap: () {
-                              rc.deleteMessage(message.id);
-                              entry!.remove();
+                              entry?.remove();
+                              rc.selectMessageView.value = true;
+                              rc.selectedMessageIds.add(message.id);
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0XFFF4F4F4),
+                                  ),
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Select Message",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0XFF101010),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  SvgPicture.asset(
+                                    'assets/icons/select_messages.svg',
+                                    package: 'robin_flutter',
+                                    width: 22,
+                                    height: 22,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              entry?.remove();
+                              rc.selectMessageView.value = true;
+                              rc.selectedMessageIds.add(message.id);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
                               color: Colors.transparent,
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -279,24 +267,18 @@ class TextBubble extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "Delete",
+                                    "Delete Message",
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Color(0XFF101010),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  SizedBox(
+                                  SvgPicture.asset(
+                                    'assets/icons/delete.svg',
+                                    package: 'robin_flutter',
                                     width: 22,
                                     height: 22,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/delete.svg',
-                                        package: 'robin_flutter',
-                                        width: 22,
-                                        height: 22,
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ),
@@ -376,7 +358,7 @@ class TextBubble extends StatelessWidget {
                       children: [
                         fileType(path: message.link) == 'image'
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(8),
                                 child: Container(
                                   constraints: BoxConstraints(
                                     maxWidth:
@@ -386,7 +368,7 @@ class TextBubble extends StatelessWidget {
                                     maxHeight: 211,
                                   ),
                                   child: GestureDetector(
-                                    onTap: !rc.forwardView.value
+                                    onTap: !rc.selectMessageView.value
                                         ? () {
                                             //todo: nav to image screen
                                           }
@@ -443,7 +425,7 @@ class TextBubble extends StatelessWidget {
                                             width: 1,
                                           ),
                                           borderRadius:
-                                              BorderRadius.circular(16),
+                                              BorderRadius.circular(8),
                                         ),
                                         padding: const EdgeInsets.all(8),
                                         child: Row(

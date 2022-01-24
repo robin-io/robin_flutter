@@ -1,8 +1,12 @@
 import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/components/chat_options.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
+import 'package:robin_flutter/src/components/chat_options.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -13,24 +17,173 @@ class ChatBottomBar extends StatelessWidget {
 
   ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key);
 
+  void showOverLay(BuildContext context) {
+    var overlay = Overlay.of(context)!;
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Size size = renderBox.size;
+    OverlayEntry? entry;
+    entry = OverlayEntry(
+      builder: (context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  disposeChatOptions();
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.zero,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Transform.translate(
+                          offset: const Offset(12, -12),
+                          child: Container(
+                            width: 192,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: white,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    getMedia(source: 'camera');
+                                    disposeChatOptions();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Camera',
+                                          style: TextStyle(
+                                            color: Color(0XFF51545C),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 2),
+                                          child: SvgPicture.asset(
+                                            'assets/icons/camera.svg',
+                                            package: 'robin_flutter',
+                                            width: 22,
+                                            height: 22,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const PopupMenuDivider(
+                                  height: 2,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    getMedia(source: 'gallery');
+                                    disposeChatOptions();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Photos & Videos',
+                                          style: TextStyle(
+                                            color: Color(0XFF51545C),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 2),
+                                          child: SvgPicture.asset(
+                                            'assets/icons/image.svg',
+                                            package: 'robin_flutter',
+                                            width: 22,
+                                            height: 22,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const PopupMenuDivider(
+                                  height: 2,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    getDocument();
+                                    disposeChatOptions();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Document',
+                                          style: TextStyle(
+                                            color: Color(0XFF51545C),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 2),
+                                          child: SvgPicture.asset(
+                                            'assets/icons/document.svg',
+                                            package: 'robin_flutter',
+                                            width: 22,
+                                            height: 22,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: size.width,
+              height: size.height,
+            )
+          ],
+        );
+      },
+    );
+    showChatOptions(entry);
+    overlay.insert(entry);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => Container(
         padding: EdgeInsets.only(
-          bottom: bottomPadding,
+          bottom: bottomPadding + 5,
         ),
-        decoration: const BoxDecoration(
-          color: white,
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(0, 104, 255, 0.065),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, -2), // changes position of shadow
-            ),
-          ],
-        ),
+        color: white,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -238,6 +391,50 @@ class ChatBottomBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  InkWell(
+                    onTap: () {
+                      if (rc.chatOptionsOpened.value) {
+                        disposeChatOptions();
+                      } else {
+                        showOverLay(context);
+                      }
+                    },
+                    child: Container(
+                      width: 52.0,
+                      height: 52.0,
+                      decoration: const BoxDecoration(
+                        color: Color(0XFFF5F7FC),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 250),
+                          firstChild: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 250),
+                            opacity: !rc.chatOptionsOpened.value ? 0 : 1,
+                            child: const Icon(
+                              Icons.close,
+                              color: Color(0XFF51545C),
+                            ),
+                          ),
+                          secondChild: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 500),
+                            opacity: rc.chatOptionsOpened.value ? 0 : 1,
+                            child: const Icon(
+                              Icons.add,
+                              color: green,
+                            ),
+                          ),
+                          crossFadeState: rc.chatOptionsOpened.value
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
                   Expanded(
                     child: TextFormField(
                       style: const TextStyle(
@@ -245,184 +442,93 @@ class ChatBottomBar extends StatelessWidget {
                         fontSize: 14,
                       ),
                       controller: rc.messageController,
-                      decoration: textFieldDecoration(radius: 24).copyWith(
+                      textInputAction: TextInputAction.send,
+                      onFieldSubmitted: (text) {
+                        if (!rc.isFileSending.value) {
+                          if (rc.file['file'] != null) {
+                            if (rc.replyView.value) {
+                              rc.sendReplyAsAttachment();
+                            } else {
+                              rc.sendAttachment();
+                            }
+                          } else if (rc.messageController.text.isNotEmpty) {
+                            if (rc.replyView.value) {
+                              rc.sendReplyAsTextMessage();
+                            } else {
+                              rc.sendTextMessage();
+                            }
+                          }
+                        }
+                      },
+                      decoration: textFieldDecoration(radius: 24, style: 2).copyWith(
                         hintText: 'Type a message...',
+                        fillColor: const Color(0XFFFBFBFB),
                       ),
                     ),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  rc.showSendButton.value || rc.file['file'] != null
-                      ? GestureDetector(
-                          onTap: () {
-                            if (!rc.isFileSending.value) {
-                              if (rc.file['file'] != null) {
-                                if (rc.replyView.value) {
-                                  rc.sendReplyAsAttachment();
-                                } else {
-                                  rc.sendAttachment();
-                                }
-                              } else if (rc.messageController.text.isNotEmpty) {
-                                if (rc.replyView.value) {
-                                  rc.sendReplyAsTextMessage();
-                                } else {
-                                  rc.sendTextMessage();
-                                }
-                              }
+                  AnimatedCrossFade(
+                    firstChild: GestureDetector(
+                      onTap: () {
+                        if (!rc.isFileSending.value) {
+                          if (rc.file['file'] != null) {
+                            if (rc.replyView.value) {
+                              rc.sendReplyAsAttachment();
+                            } else {
+                              rc.sendAttachment();
                             }
-                          },
-                          child: Container(
-                            width: 45,
-                            height: 45,
-                            decoration: const BoxDecoration(
-                              color: Color(0XFF15AE73),
-                              shape: BoxShape.circle,
-                            ),
-                            child: rc.isFileSending.value
-                                ? const Center(
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          Color(0XFFFFFFFF),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: SvgPicture.asset(
-                                      'assets/icons/send.svg',
-                                      package: 'robin_flutter',
-                                      semanticsLabel: 'edit',
-                                      width: 22,
-                                      height: 22,
+                          } else if (rc.messageController.text.isNotEmpty) {
+                            if (rc.replyView.value) {
+                              rc.sendReplyAsTextMessage();
+                            } else {
+                              rc.sendTextMessage();
+                            }
+                          }
+                        }
+                      },
+                      child: Container(
+                        width: 45,
+                        height: 45,
+                        decoration: const BoxDecoration(
+                          color: Color(0XFF15AE73),
+                          shape: BoxShape.circle,
+                        ),
+                        child: rc.isFileSending.value
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Color(0XFFFFFFFF),
                                     ),
                                   ),
-                          ),
-                        )
-                      : SizedBox(
-                          width: 45,
-                          child: PopupMenuButton(
-                            padding: const EdgeInsets.all(0),
-                            icon: SizedBox(
-                              width: 27,
-                              height: 27,
-                              child: Center(
+                                ),
+                              )
+                            : Center(
                                 child: SvgPicture.asset(
-                                  'assets/icons/attach.svg',
+                                  'assets/icons/send.svg',
                                   package: 'robin_flutter',
-                                  width: 27,
-                                  height: 27,
+                                  semanticsLabel: 'edit',
+                                  width: 22,
+                                  height: 22,
                                 ),
                               ),
-                            ),
-                            enableFeedback: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(24.0),
-                              ),
-                            ),
-                            onSelected: (value) async {
-                              if (value == 1) {
-                                getMedia(source: 'camera');
-                              } else if (value == 2) {
-                                getMedia(source: 'gallery');
-                              } else if (value == 3) {
-                                getDocument();
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 1,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: Center(
-                                        child: SvgPicture.asset(
-                                          'assets/icons/camera.svg',
-                                          package: 'robin_flutter',
-                                          width: 22,
-                                          height: 22,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Text(
-                                      "Camera",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0XFF101010),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 2,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: Center(
-                                        child: SvgPicture.asset(
-                                          'assets/icons/image.svg',
-                                          package: 'robin_flutter',
-                                          width: 22,
-                                          height: 22,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Text(
-                                      "Photos & Videos",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0XFF101010),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 3,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: Center(
-                                        child: SvgPicture.asset(
-                                          'assets/icons/document.svg',
-                                          package: 'robin_flutter',
-                                          width: 22,
-                                          height: 22,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Text(
-                                      "Document",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0XFF101010),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      ),
+                    ),
+                    secondChild: const SizedBox(
+                      width: 0,
+                      height: 45,
+                    ),
+                    crossFadeState:
+                        rc.showSendButton.value || rc.file['file'] != null
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                    duration: const Duration(milliseconds: 200),
+                  )
                 ],
               ),
             ),

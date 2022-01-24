@@ -95,11 +95,15 @@ void showSelectGroupParticipants(BuildContext context) {
   );
 }
 
-InputDecoration textFieldDecoration({double? radius}) {
+InputDecoration textFieldDecoration({double? radius, int? style}) {
   radius = radius ?? 4;
   OutlineInputBorder border = textFieldBorder.copyWith(
     borderRadius: BorderRadius.circular(radius),
     borderSide: const BorderSide(style: BorderStyle.none),
+  );
+  OutlineInputBorder outlinedBorder = textFieldBorder.copyWith(
+    borderRadius: BorderRadius.circular(radius),
+    borderSide: const BorderSide(width: 1, color: Color(0XFF9999BC)),
   );
   return InputDecoration(
     hintStyle: const TextStyle(
@@ -109,9 +113,9 @@ InputDecoration textFieldDecoration({double? radius}) {
     contentPadding: const EdgeInsets.all(15.0),
     filled: true,
     fillColor: const Color(0XFFF5F7FC),
-    border: border,
-    focusedBorder: border,
-    enabledBorder: border,
+    border: style == null || style == 1 ? border : outlinedBorder,
+    focusedBorder: style == null || style == 1 ? border : outlinedBorder,
+    enabledBorder: style == null || style == 1 ? border : outlinedBorder,
   );
 }
 
@@ -275,4 +279,15 @@ Map<String, RobinMessageReaction> convertToReactions(List reactions) {
     robinReactions[robinReaction.type] = robinReaction;
   }
   return robinReactions;
+}
+
+void showChatOptions(OverlayEntry entry){
+rc.chatOptionsEntry = entry;
+rc.chatOptionsOpened.value = true;
+}
+
+void disposeChatOptions(){
+  rc.chatOptionsEntry?.remove();
+  rc.chatOptionsOpened.value = false;
+  rc.chatOptionsEntry = null;
 }

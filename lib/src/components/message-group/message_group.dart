@@ -392,20 +392,20 @@ class MessageGroup extends StatelessWidget {
         ),
         child: Obx(
           () => GestureDetector(
-            onTap: rc.forwardView.value
+            onTap: rc.selectMessageView.value
                 ? () {
-                    if (rc.forwardMessageIds.contains(message.id)) {
-                      rc.forwardMessageIds.remove(message.id);
+                    if (rc.selectedMessageIds.contains(message.id)) {
+                      rc.selectedMessageIds.remove(message.id);
                     } else {
-                      rc.forwardMessageIds.add(message.id);
+                      rc.selectedMessageIds.add(message.id);
                     }
                   }
                 : null,
-            onLongPress: !rc.forwardView.value
+            onLongPress: !rc.selectMessageView.value
                 ? () {
                     HapticFeedback.selectionClick();
-                    rc.forwardView.value = true;
-                    rc.forwardMessageIds.add(message.id);
+                    rc.selectMessageView.value = true;
+                    rc.selectedMessageIds.add(message.id);
                   }
                 : null,
             child: Column(
@@ -418,10 +418,10 @@ class MessageGroup extends StatelessWidget {
                       : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    rc.forwardView.value && !message.sentByMe
+                    rc.selectMessageView.value && !message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(right: 5, bottom: 5),
-                            child: rc.forwardMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds.contains(message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,
@@ -644,10 +644,10 @@ class MessageGroup extends StatelessWidget {
                             : Container(),
                       ],
                     ),
-                    rc.forwardView.value && message.sentByMe
+                    rc.selectMessageView.value && message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(left: 5, bottom: 5),
-                            child: rc.forwardMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds.contains(message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,

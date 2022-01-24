@@ -30,7 +30,7 @@ class RobinController extends GetxController {
   RxBool isCreatingGroup = false.obs;
   RxBool finishedInitialScroll = false.obs;
 
-  RxBool forwardView = false.obs;
+  RxBool selectMessageView = false.obs;
   RxBool replyView = false.obs;
   RxBool chatViewLoading = false.obs;
   RxBool showSendButton = false.obs;
@@ -39,7 +39,10 @@ class RobinController extends GetxController {
 
   RxBool isForwarding = false.obs;
 
-  RxList forwardMessageIds = [].obs;
+  OverlayEntry? chatOptionsEntry;
+  RxBool chatOptionsOpened = false.obs;
+
+  RxList selectedMessageIds = [].obs;
 
   RobinConversation? currentConversation;
 
@@ -93,8 +96,8 @@ class RobinController extends GetxController {
     getUsers ??= _getUsers;
     keys ??= _keys;
     robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
+    robinCore!.subscribe();
     if (!robinInitialized) {
-      robinCore!.subscribe();
       robinInitialized = true;
       getConversations();
       connectionStartListen();
@@ -116,13 +119,14 @@ class RobinController extends GetxController {
       groupChatNameController.addListener(() {
         groupChatNameEmpty.value = groupChatNameController.text.isEmpty;
       });
-
     }
   }
 
   connectionStartListen() {
     robinConnection!.stream.listen((data) {
       data = json.decode(data);
+
+      print(data);
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
         if (robinMessage.conversationId == currentConversation!.id!) {
@@ -146,6 +150,9 @@ class RobinController extends GetxController {
         switch (data['name']) {
           case 'message.forward':
             handleMessageForward(data['value']);
+            break;
+          case 'delete.message':
+            handleDeleteMessages(data['value']['ids']);
             break;
           case 'read.reciept':
             if (currentConversation!.id! == data['value']['conversation_id']) {
@@ -234,14 +241,14 @@ class RobinController extends GetxController {
     List<RobinConversation> conversations = [];
     conversations = allConversations.values
         .where((RobinConversation conversation) =>
-    conversation.archived! &&
-        (conversation.name!
-            .toLowerCase()
-            .contains(archiveSearchController.text.toLowerCase()) ||
-            (!conversation.lastMessage!.isAttachment &&
-                conversation.lastMessage!.text
+            conversation.archived! &&
+            (conversation.name!
                     .toLowerCase()
-                    .contains(archiveSearchController.text.toLowerCase()))))
+                    .contains(archiveSearchController.text.toLowerCase()) ||
+                (!conversation.lastMessage!.isAttachment &&
+                    conversation.lastMessage!.text
+                        .toLowerCase()
+                        .contains(archiveSearchController.text.toLowerCase()))))
         .toList();
     archivedConversations.value = conversations;
   }
@@ -423,8 +430,8 @@ class RobinController extends GetxController {
   }
 
   void resetChatView() {
-    forwardView.value = false;
-    forwardMessageIds.value = [].obs;
+    selectMessageView.value = false;
+    selectedMessageIds.value = [].obs;
     forwardConversations.value = [].obs;
     forwardConversationIds.value = [].obs;
     isForwarding.value = false;
@@ -603,7 +610,7 @@ class RobinController extends GetxController {
       isForwarding.value = true;
       Map<String, dynamic> body = {
         'user_token': currentUser!.robinToken,
-        'message_ids': forwardMessageIds.toList(),
+        'message_ids': selectedMessageIds.toList(),
         'conversation_ids': forwardConversationIds.toList(),
       };
       await robinCore!.forwardMessages(body);
@@ -623,13 +630,19 @@ class RobinController extends GetxController {
     robinCore!.sendReadReceipts(body);
   }
 
-  void deleteMessage(String messageId) {
+  void deleteMessages() {
     Map<String, dynamic> body = {
-      'ids': [messageId],
+      'ids': selectedMessageIds.toList(),
       'requester_token': currentUser!.robinToken,
     };
-    conversationMessages.remove(messageId);
+    handleDeleteMessages(selectedMessageIds.toList());
     robinCore!.deleteMessages(body);
+  }
+
+  void handleDeleteMessages(List messageIds) {
+    for (String messageId in messageIds) {
+      conversationMessages.remove(messageId);
+    }
   }
 
   void sendReaction(String reaction, String messageId) async {

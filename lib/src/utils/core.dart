@@ -26,7 +26,6 @@ class RobinCore {
       'conversation_id': "",
     };
     rc.robinConnection!.sink.add(json.encode(sub));
-    print('subbed');
   }
 
   void sendTextMessage(String conversationId, Map message, String senderToken,
