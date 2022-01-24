@@ -352,7 +352,7 @@ class TextBubble extends StatelessWidget {
                 : const SizedBox(),
             message.isAttachment
                 ? Padding(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(6),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -419,15 +419,11 @@ class TextBubble extends StatelessWidget {
                                     children: [
                                       Container(
                                         decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: const Color(0XFFECEBEB),
-                                            width: 1,
-                                          ),
+                                          color: const Color(0XFFF5F7FC),
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
-                                        padding: const EdgeInsets.all(8),
+                                        padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
