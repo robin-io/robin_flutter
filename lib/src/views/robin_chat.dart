@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/components/render_messages.dart';
+import 'package:robin_flutter/src/components/robin_forward_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/components/chat_app_bar.dart';
@@ -12,7 +13,16 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    // rc.initChatView(conversation);
+    rc.initChatView(conversation);
+  }
+
+  void showForwardMessages(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => RobinForwardMessages(),
+    );
   }
 
   @override
@@ -23,7 +33,7 @@ class RobinChat extends StatelessWidget {
       },
       child: Obx(
         () => Scaffold(
-          backgroundColor: white,
+          backgroundColor: const Color(0XFFF5F7FC),
           appBar: ChatAppBar(),
           body: Column(
             children: [
@@ -42,33 +52,54 @@ class RobinChat extends StatelessWidget {
                       )
                     : RenderMessages(),
               ),
-              rc.forwardView.value
+              rc.selectMessageView.value
                   ? Container(
                       padding: EdgeInsets.only(
                         bottom: MediaQuery.of(context).padding.bottom,
                         top: 20,
                       ),
-                      decoration: const BoxDecoration(
-                        color: white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(0, 104, 255, 0.065),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(0, -2), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${rc.forwardMessageIds.length} selected',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: black,
-                          ),
+                      color: white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              rc.selectedMessageIds.length == 1
+                                  ? '${rc.selectedMessageIds.length} Message Selected'
+                                  : '${rc.selectedMessageIds.length} Messages Selected',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0XFF51545C),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: rc.selectedMessageIds.isEmpty
+                                  ? null
+                                  : () {
+                                      rc.renderForwardConversations();
+                                      showForwardMessages(context);
+                                    },
+                              child: SizedBox(
+                                width: 80,
+                                height: 25,
+                                child: Center(
+                                  child: Text(
+                                    'Forward',
+                                    style: TextStyle(
+                                      color: rc.selectedMessageIds.isEmpty
+                                          ? const Color(0XFF7A7A7A)
+                                          : green,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     )

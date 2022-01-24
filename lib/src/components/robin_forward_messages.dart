@@ -5,7 +5,7 @@ import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
-import 'package:robin_flutter/src/views/robin_create_group.dart';
+import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 

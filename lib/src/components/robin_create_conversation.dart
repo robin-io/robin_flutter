@@ -7,7 +7,7 @@ import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/views/robin_chat.dart';
-import 'package:robin_flutter/src/views/robin_create_group.dart';
+import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 
@@ -26,8 +26,15 @@ class RobinCreateConversation extends StatelessWidget {
         currentLetter = user.displayName[0].toLowerCase();
         users.add(
           Container(
-            color: const Color(0XFFF3F3F3),
-            padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
+            padding: const EdgeInsets.fromLTRB(15, 7, 0, 7),
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color(0XFFF5F7FC),
+                  width: 1,
+                ),
+              ),
+            ),
             child: Text(
               currentLetter.toUpperCase(),
               style: const TextStyle(
@@ -41,19 +48,32 @@ class RobinCreateConversation extends StatelessWidget {
       users.add(
         InkWell(
           onTap: () async {
-            if (rc.createGroup.value) {
-              if (rc.createGroupParticipants.keys.contains(user.robinToken)) {
-                rc.createGroupParticipants.remove(user.robinToken);
-              } else {
-                rc.createGroupParticipants[user.robinToken] = user.toJson();
-              }
+            if (rc.allConversations.keys.contains(user.robinToken)) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RobinChat(
+                    conversation: rc.allConversations[user.robinToken]!,
+                  ),
+                ),
+              ).then((value) {
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  rc.currentConversation = null;
+                });
+              });
             } else {
-              if (rc.allConversations.keys.contains(user.robinToken)) {
+              Map<String, String> body = {
+                'receiver_name': user.displayName,
+                'receiver_token': user.robinToken,
+              };
+              RobinConversation conversation =
+              await rc.createConversation(body);
+              try {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => RobinChat(
-                      conversation: rc.allConversations[user.robinToken]!,
+                      conversation: conversation,
                     ),
                   ),
                 ).then((value) {
@@ -61,29 +81,8 @@ class RobinCreateConversation extends StatelessWidget {
                     rc.currentConversation = null;
                   });
                 });
-              } else {
-                Map<String, String> body = {
-                  'receiver_name': user.displayName,
-                  'receiver_token': user.robinToken,
-                };
-                RobinConversation conversation =
-                    await rc.createConversation(body);
-                try {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RobinChat(
-                        conversation: conversation,
-                      ),
-                    ),
-                  ).then((value) {
-                    Future.delayed(const Duration(milliseconds: 100), () {
-                      rc.currentConversation = null;
-                    });
-                  });
-                } finally {
-                  // widget was disposed before conversation was created
-                }
+              } finally {
+                // widget was disposed before conversation was created
               }
             }
           },
@@ -91,9 +90,9 @@ class RobinCreateConversation extends StatelessWidget {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  width: 1,
+                  width: 3,
                   style: BorderStyle.solid,
-                  color: Color(0XFFF4F6F8),
+                  color: Color(0XFFF6F8FD),
                 ),
               ),
             ),
@@ -114,43 +113,10 @@ class RobinCreateConversation extends StatelessWidget {
                     maxLines: 1,
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Color(0XFF000000),
+                      color: black,
                     ),
                   ),
                 ),
-                rc.createGroup.value
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: rc.createGroupParticipants.keys
-                                    .contains(user.robinToken)
-                                ? green
-                                : null,
-                            border: Border.all(
-                              width: 2,
-                              style: rc.createGroupParticipants.keys
-                                      .contains(user.robinToken)
-                                  ? BorderStyle.none
-                                  : BorderStyle.solid,
-                              color: const Color(0xFFBBC1D6),
-                            ),
-                          ),
-                          child: Center(
-                            child: rc.createGroup.value
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 16,
-                                    color: Colors.white,
-                                  )
-                                : Container(),
-                          ),
-                        ),
-                      )
-                    : Container(),
               ],
             ),
           ),
@@ -162,156 +128,138 @@ class RobinCreateConversation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        closeButton(context),
-        Obx(
-          () => Container(
-            height: MediaQuery.of(context).size.height - 110,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              color: white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 70,
+      child: Column(
+        children: [
+          Transform.translate(
+            offset: const Offset(0, 15),
+            child: Container(
+              height: 30,
+              width: MediaQuery.of(context).size.width * 0.93,
+              decoration: const BoxDecoration(
+                color: Color(0XFFEBF3FE),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
             ),
+          ),
+          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const SizedBox(
-                  height: 5,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      rc.createGroup.value
-                          ? const Text(
-                              'Done',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.transparent,
-                              ),
-                            )
-                          : Container(),
-                      Container(
-                        width: 45,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: const Color(0XFFF4F6F8),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                Obx(
+                  () => Container(
+                    height: MediaQuery.of(context).size.height - 100,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: const BoxDecoration(
+                      color: white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
-                      rc.createGroup.value
-                          ? InkWell(
-                              onTap: rc.createGroupParticipants.isNotEmpty
-                                  ? () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              RobinCreateGroup(),
-                                        ),
-                                      );
-                                    }
-                                  : null,
-                              child: Text(
-                                'Done',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: rc.createGroupParticipants.isNotEmpty
-                                      ? green
-                                      : Colors.grey,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 24,
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    size: 24,
+                                    color: Color(0XFF51545C),
+                                  ),
+                                  padding: const EdgeInsets.all(0),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
                                 ),
                               ),
-                            )
-                          : Container(height: 19),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: TextFormField(
-                    style: const TextStyle(
-                      color: Color(0XFF535F89),
-                      fontSize: 14,
-                    ),
-                    controller: rc.allUsersSearchController,
-                    decoration: textFieldDecoration().copyWith(
-                      prefixIcon: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            'assets/icons/search.svg',
-                            semanticsLabel: 'search',
-                            package: 'robin_flutter',
-                            width: 22,
-                            height: 22,
+                              const SizedBox(width: 5),
+                              const Text(
+                                'New Chat',
+                                style: TextStyle(
+                                  color: black,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      hintText: 'Search People...',
-                    ),
-                  ),
-                ),
-                !rc.createGroup.value
-                    ? InkWell(
-                        onTap: () {
-                          rc.createGroup.value = true;
-                        },
-                        child: Padding(
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Padding(
                           padding: const EdgeInsets.only(left: 15, right: 15),
+                          child: TextFormField(
+                            style: const TextStyle(
+                              color: Color(0XFF8D9091),
+                              fontSize: 14,
+                            ),
+                            cursorColor: const Color(0XFF8D9091),
+                            controller: rc.allUsersSearchController,
+                            decoration: textFieldDecoration().copyWith(
+                              prefixIcon: SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                    'assets/icons/search_grey.svg',
+                                    semanticsLabel: 'search',
+                                    package: 'robin_flutter',
+                                    width: 22,
+                                    height: 22,
+                                  ),
+                                ),
+                              ),
+                              hintText: 'Search People...',
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            rc.allUsersSearchController.clear();
+                            rc.createGroupParticipants.value = {};
+                            showCreateGroupChat(context);
+                          },
                           child: Container(
                             decoration: const BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
                                   width: 1,
                                   style: BorderStyle.solid,
-                                  color: Color(0XFFF4F6F8),
+                                  color: Color(0XFFEFEFEF),
                                 ),
                               ),
                             ),
-                            padding: const EdgeInsets.only(top: 12, bottom: 12),
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, top: 12, bottom: 12),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: const Color(0XFFF4F6F8),
-                                    border: Border.all(
-                                      width: 1,
-                                      style: BorderStyle.solid,
-                                      color: const Color(0XFFCADAF8),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      'assets/icons/people.svg',
-                                      package: 'robin_flutter',
-                                      width: 20,
-                                      height: 20,
-                                    ),
+                                Center(
+                                  child: SvgPicture.asset(
+                                    'assets/icons/users.svg',
+                                    package: 'robin_flutter',
+                                    width: 20,
+                                    height: 20,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 const Text(
-                                  'Create A New Group',
+                                  'Create Group Chat',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -323,53 +271,56 @@ class RobinCreateConversation extends StatelessWidget {
                             ),
                           ),
                         ),
-                      )
-                    : const SizedBox(height: 20),
-                rc.isGettingUsersLoading.value
-                    ? const UsersLoading()
-                    : rc.allUsers.isEmpty
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 35),
-                              Image.asset(
-                                'assets/images/empty.png',
-                                package: 'robin_flutter',
-                                width: 220,
-                              ),
-                              const SizedBox(height: 25),
-                              const Text(
-                                'Nobody Here Yet',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0XFF535F89),
-                                ),
-                              ),
-                              const SizedBox(height: 13),
-                            ],
-                          )
-                        : rc.isCreatingConversation.value
-                            ? const Padding(
-                                padding: EdgeInsets.only(top: 15),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      green,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Expanded(
-                                child: ListView(
-                                  children: renderUsers(context),
-                                ),
-                              )
+                        rc.isGettingUsersLoading.value
+                            ? const UsersLoading()
+                            : rc.allUsers.isEmpty
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(height: 35),
+                                      Image.asset(
+                                        'assets/images/empty.png',
+                                        package: 'robin_flutter',
+                                        width: 220,
+                                      ),
+                                      const SizedBox(height: 25),
+                                      const Text(
+                                        'Nobody Here Yet',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0XFF535F89),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 13),
+                                    ],
+                                  )
+                                : rc.isCreatingConversation.value
+                                    ? const Padding(
+                                        padding: EdgeInsets.only(top: 15),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              green,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Expanded(
+                                        child: ListView(
+                                          children: renderUsers(context),
+                                        ),
+                                      )
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

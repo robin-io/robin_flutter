@@ -13,7 +13,7 @@ class RobinMessage {
   late final String senderName;
   late final String senderToken;
   late final String? replyTo;
-  late final bool isRead;
+  bool isRead = false;
   late final bool isForwarded;
   late final Map<String, RobinMessageReaction> reactions;
   late final bool deletedForMe;
@@ -27,12 +27,12 @@ class RobinMessage {
     text = isAttachment ? "" : json['content']['msg'];
     link = isAttachment ? json['content']['attachment'] : '';
     conversationId = json['conversation_id'];
-    senderToken = json['sender_token'];
-    sentByMe = rc.currentUser?.robinToken == json['sender_token'];
+    isForwarded = json['is_forwarded'] ?? false;
+    senderToken = isForwarded ? json['content']['sender_token'] : json['sender_token'];
+    sentByMe = rc.currentUser?.robinToken == senderToken;
     senderName = json['sender_name'];
     replyTo = json['reply_to'];
     isRead = json['is_read'] ?? false;
-    isForwarded = json['is_forwarded'] ?? false;
     reactions =  convertToReactions(json['reactions'] ?? []);
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);

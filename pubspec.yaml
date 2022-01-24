@@ -41,6 +41,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/fileTypes/
+    - assets/images/reactions/
     - assets/icons/
 
   fonts:

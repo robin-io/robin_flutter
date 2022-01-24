@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
+import 'package:robin_flutter/src/components/robin_create_group.dart';
+import 'package:robin_flutter/src/views/robin_conversation_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -32,12 +35,12 @@ String formatDate(String dateString) {
   return formattedDate;
 }
 
-IconButton backButton(BuildContext context) {
+IconButton backButton(BuildContext context, {IconData? icon, double? size}) {
   return IconButton(
-    icon: const Icon(
-      Icons.arrow_back_ios,
-      size: 16,
-      color: Color(0XFF535F89),
+    icon:  Icon(
+      icon ?? Icons.arrow_back_ios,
+      size: size ?? 16,
+      color: const Color(0XFF535F89),
     ),
     onPressed: () {
       Navigator.pop(context);
@@ -75,22 +78,54 @@ void showCreateConversation(BuildContext context) {
   );
 }
 
-InputDecoration textFieldDecoration({double? radius}) {
+void showCreateGroupChat(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinCreateGroup(),
+  );
+}
+
+void showConversationInfo(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinConversationInfo(),
+  );
+}
+
+void showSelectGroupParticipants(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinSelectGroupParticipants(),
+  );
+}
+
+InputDecoration textFieldDecoration({double? radius, int? style}) {
   radius = radius ?? 4;
   OutlineInputBorder border = textFieldBorder.copyWith(
     borderRadius: BorderRadius.circular(radius),
+    borderSide: const BorderSide(style: BorderStyle.none),
+  );
+  OutlineInputBorder outlinedBorder = textFieldBorder.copyWith(
+    borderRadius: BorderRadius.circular(radius),
+    borderSide: const BorderSide(width: 1, color: Color(0XFF9999BC)),
   );
   return InputDecoration(
     hintStyle: const TextStyle(
-      color: Color(0XFFBBC1D6),
+      color: Color(0XFF8D9091),
       fontSize: 16,
     ),
     contentPadding: const EdgeInsets.all(15.0),
     filled: true,
-    fillColor: const Color(0XFFF4F6F8),
-    border: border,
-    focusedBorder: border,
-    enabledBorder: border,
+    fillColor: const Color(0XFFF5F7FC),
+    border: style == null || style == 1 ? border : outlinedBorder,
+    focusedBorder: style == null || style == 1 ? border : outlinedBorder,
+    enabledBorder: style == null || style == 1 ? border : outlinedBorder,
   );
 }
 
@@ -254,4 +289,15 @@ Map<String, RobinMessageReaction> convertToReactions(List reactions) {
     robinReactions[robinReaction.type] = robinReaction;
   }
   return robinReactions;
+}
+
+void showChatOptions(OverlayEntry entry){
+rc.chatOptionsEntry = entry;
+rc.chatOptionsOpened.value = true;
+}
+
+void disposeChatOptions(){
+  rc.chatOptionsEntry?.remove();
+  rc.chatOptionsOpened.value = false;
+  rc.chatOptionsEntry = null;
 }
