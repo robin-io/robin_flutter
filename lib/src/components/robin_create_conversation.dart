@@ -15,7 +15,7 @@ class RobinCreateConversation extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinCreateConversation({Key? key}) : super(key: key) {
-    // rc.getAllUsers();
+    rc.getAllUsers();
   }
 
   List<Widget> renderUsers(BuildContext context) {

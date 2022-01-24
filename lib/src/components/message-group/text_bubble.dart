@@ -352,7 +352,7 @@ class TextBubble extends StatelessWidget {
                 : const SizedBox(),
             message.isAttachment
                 ? Padding(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [

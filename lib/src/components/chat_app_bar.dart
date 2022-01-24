@@ -5,6 +5,8 @@ import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
+import 'package:robin_flutter/src/views/robin_conversation_info.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RobinController rc = Get.find();
@@ -169,8 +171,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   onSelected: (value) async {
                     if (value == 'Select Messages') {
                       rc.selectMessageView.value = true;
-                    } else if (value == 'Chat Info') {
-                      //todo: conversation info
+                    } else if (value == 'Contact Info' ||
+                        value == 'Group Info') {
+                      showConversationInfo(context);
                     } else if (value == 'Leave Group') {
                       bool successful =
                           await rc.leaveGroup(rc.currentConversation!.id!);

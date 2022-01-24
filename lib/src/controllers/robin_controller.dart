@@ -397,8 +397,12 @@ class RobinController extends GetxController {
       Map<String, dynamic> body = {};
       body['name'] = groupChatNameController.text;
       body['participants'] = createGroupParticipants.values.toList();
-      body['moderator'] = {'user_token': currentUser!.robinToken};
+      body['moderator'] = {
+        'user_token': currentUser!.robinToken,
+        'meta_data': {'displayName': currentUser!.fullName}
+      };
       var response = await robinCore!.createGroupChat(body);
+      print(response);
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
         conversation.token ?? conversation.id!: conversation,
@@ -490,7 +494,7 @@ class RobinController extends GetxController {
     List<String> unreadMessages = [];
     for (Map message in messages) {
       RobinMessage robinMessage = RobinMessage.fromJson(message);
-      if (!robinMessage.isRead) {
+      if (!robinMessage.isRead && !robinMessage.sentByMe) {
         unreadMessages.add(robinMessage.id);
       }
       allMessages[robinMessage.id] = robinMessage;

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'package:robin_flutter/src/components/robin_create_group.dart';
+import 'package:robin_flutter/src/views/robin_conversation_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -83,6 +84,15 @@ void showCreateGroupChat(BuildContext context) {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (_) => RobinCreateGroup(),
+  );
+}
+
+void showConversationInfo(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinConversationInfo(),
   );
 }
 
