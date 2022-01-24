@@ -421,8 +421,6 @@ class RobinController extends GetxController {
 
   void initChatView(RobinConversation conversation) {
     resetChatView();
-    rc.homeSearchController.clear();
-    rc.showHomeSearch.value = false;
     userColors = {};
     messageController.clear();
     finishedInitialScroll.value = false;

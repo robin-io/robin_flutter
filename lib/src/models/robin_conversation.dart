@@ -24,7 +24,6 @@ class RobinConversation {
     isGroup = json['is_group'];
     participants = json['participants'] ?? [];
     if (isGroup!) {
-      print(json);
       name = json['name'];
       moderatorToken = json['moderator']['user_token'];
       moderatorName = json['moderator']['meta_data'] == null

@@ -85,6 +85,8 @@ class Conversation extends StatelessWidget {
         showPopupMenu(context);
       },
       onTap: () async {
+        rc.homeSearchController.clear();
+        rc.showHomeSearch.value = false;
         Navigator.push(
           context,
           MaterialPageRoute(
