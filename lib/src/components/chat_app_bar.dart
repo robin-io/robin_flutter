@@ -73,6 +73,8 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onPressed: () async {
                         rc.resetChatView();
                         Navigator.pop(context);
+                        rc.renderHomeConversations();
+                        rc.renderArchivedConversations();
                       },
                       padding: EdgeInsets.zero,
                       icon: const Icon(

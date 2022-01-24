@@ -410,7 +410,7 @@ class MessageGroup extends StatelessWidget {
                 : null,
             child: Column(
               children: [
-                message.replyTo != null ? renderReply() : Container(),
+                // message.replyTo != null ? renderReply() : Container(),
                 Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: message.sentByMe

@@ -205,7 +205,7 @@ class ChatBottomBar extends StatelessWidget {
                                 Container(
                                   width: 5,
                                   height: 49,
-                                  color: const Color(0XFF8393C0),
+                                  color: const Color(0XFF9999BC),
                                 ),
                                 const SizedBox(
                                   width: 14,
@@ -232,7 +232,7 @@ class ChatBottomBar extends StatelessWidget {
                                                 color: rc.userColors[rc
                                                         .replyMessage!
                                                         .senderToken] ??
-                                                    green,
+                                                    const Color(0XFF9999BC),
                                               ),
                                             ),
                                           ),

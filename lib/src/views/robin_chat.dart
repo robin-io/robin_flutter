@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/components/render_messages.dart';
 import 'package:robin_flutter/src/components/robin_forward_messages.dart';
@@ -110,27 +108,27 @@ class RobinChat extends StatelessWidget {
                     ),
             ],
           ),
-          floatingActionButton: rc.chatViewLoading.value || rc.atMaxScroll.value
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(bottom: 75),
-                  child: SizedBox(
-                    width: 35,
-                    height: 35,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        rc.scrollToEnd();
-                      },
-                      backgroundColor: white,
-                      elevation: 5,
-                      child: const Icon(
-                        Icons.arrow_downward,
-                        size: 18,
-                        color: green,
-                      ),
-                    ),
-                  ),
-                ),
+          // floatingActionButton: rc.chatViewLoading.value || rc.atMaxScroll.value
+          //     ? null
+          //     : Padding(
+          //         padding: const EdgeInsets.only(bottom: 75),
+          //         child: SizedBox(
+          //           width: 35,
+          //           height: 35,
+          //           child: FloatingActionButton(
+          //             onPressed: () {
+          //               rc.scrollToEnd();
+          //             },
+          //             backgroundColor: white,
+          //             elevation: 5,
+          //             child: const Icon(
+          //               Icons.arrow_downward,
+          //               size: 18,
+          //               color: green,
+          //             ),
+          //           ),
+          //         ),
+          //       ),
         ),
       ),
     );

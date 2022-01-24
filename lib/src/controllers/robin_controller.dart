@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:robin_flutter/src/models/robin_last_message.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
@@ -125,26 +126,39 @@ class RobinController extends GetxController {
   connectionStartListen() {
     robinConnection!.stream.listen((data) {
       data = json.decode(data);
-
-      print(data);
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
-        if (robinMessage.conversationId == currentConversation!.id!) {
-          conversationMessages[robinMessage.id] = robinMessage;
+        if (allConversations[robinMessage.conversationId] != null) {
+          allConversations[robinMessage.conversationId]?.lastMessage =
+              RobinLastMessage.fromRobinMessage(robinMessage);
+          allConversations[robinMessage.conversationId]?.updatedAt =
+              DateTime.now();
+          allConversations[robinMessage.conversationId] =
+              allConversations[robinMessage.conversationId]!;
+          var sortedEntries = sortConversations();
+          allConversations =
+              Map<String, RobinConversation>.fromEntries(sortedEntries);
+          renderHomeConversations();
+          renderArchivedConversations();
         }
-        //todo: set conversation last message
         if (!robinMessage.sentByMe) {
           FlutterRingtonePlayer.playNotification();
         }
-        if (!currentConversation!.isGroup! &&
-            robinMessage.conversationId == currentConversation!.id! &&
-            !robinMessage.sentByMe) {
-          sendReadReceipts([robinMessage.id]);
+        if (robinMessage.conversationId == currentConversation?.id!) {
+          conversationMessages[robinMessage.id] = robinMessage;
         }
-        if (atMaxScroll.value) {
-          Future.delayed(const Duration(milliseconds: 17), () {
-            scrollToEnd();
-          });
+        if (currentConversation != null) {
+          if (!currentConversation!.isGroup! &&
+              robinMessage.conversationId == currentConversation!.id! &&
+              !robinMessage.sentByMe) {
+            sendReadReceipts([robinMessage.id]);
+          }
+          if (!currentConversation!.isGroup! &&
+              robinMessage.conversationId == currentConversation!.id!) {
+            Future.delayed(const Duration(milliseconds: 17), () {
+              scrollToEnd();
+            });
+          }
         }
       } else {
         switch (data['name']) {
@@ -174,8 +188,24 @@ class RobinController extends GetxController {
   }
 
   handleMessageForward(List messages) {
-    for (Map message in messages) {
+    for (int index = 0; index < messages.length; index++) {
+      Map message = messages[index];
       RobinMessage robinMessage = RobinMessage.fromJson(message);
+      if (index == messages.length - 1) {
+        if (allConversations[robinMessage.conversationId] != null) {
+          allConversations[robinMessage.conversationId]?.lastMessage =
+              RobinLastMessage.fromRobinMessage(robinMessage);
+          allConversations[robinMessage.conversationId]?.updatedAt =
+              DateTime.now();
+          allConversations[robinMessage.conversationId] =
+              allConversations[robinMessage.conversationId]!;
+          var sortedEntries = sortConversations();
+          allConversations =
+              Map<String, RobinConversation>.fromEntries(sortedEntries);
+          renderHomeConversations();
+          renderArchivedConversations();
+        }
+      }
       if (robinMessage.conversationId == currentConversation!.id!) {
         conversationMessages[robinMessage.id] = robinMessage;
       }
@@ -268,8 +298,7 @@ class RobinController extends GetxController {
     for (Map conversation in conversations) {
       RobinConversation robinConversation =
           RobinConversation.fromJson(conversation);
-      allConversations[robinConversation.token ?? robinConversation.id!] =
-          robinConversation;
+      allConversations[robinConversation.id!] = robinConversation;
     }
     var sortedEntries = allConversations.entries.toList()
       ..sort((e1, e2) {
@@ -280,6 +309,15 @@ class RobinController extends GetxController {
     Map<String, RobinConversation> sortedConversations =
         Map<String, RobinConversation>.fromEntries(sortedEntries);
     return sortedConversations;
+  }
+
+  sortConversations() {
+    return allConversations.entries.toList()
+      ..sort((e1, e2) {
+        var diff = e2.value.updatedAt!.compareTo(e1.value.updatedAt!);
+        if (diff == 0) diff = e2.key.compareTo(e1.key);
+        return diff;
+      });
   }
 
   void archiveConversation(String conversationId, String key) {
@@ -402,7 +440,6 @@ class RobinController extends GetxController {
         'meta_data': {'displayName': currentUser!.fullName}
       };
       var response = await robinCore!.createGroupChat(body);
-      print(response);
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
         conversation.token ?? conversation.id!: conversation,
