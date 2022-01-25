@@ -45,11 +45,10 @@ flutter:
     - assets/icons/
 
   fonts:
-    - family: Product Sans
+    - family: Hanken
       fonts:
-        - asset: assets/fonts/ProductSans.ttf
-          weight: 500
-        - asset: assets/fonts/ProductSans-Light.ttf
+        - asset: assets/fonts/HankenGrotesk-Bold.ttf
+        - asset: assets/fonts/HankenGrotesk-Light.ttf
           weight: 200
-        - asset: assets/fonts/ProductSans-Medium.ttf
+        - asset: assets/fonts/HankenGrotesk-Bold.ttf
           weight: 600

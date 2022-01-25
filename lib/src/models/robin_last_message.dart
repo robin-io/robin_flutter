@@ -21,11 +21,11 @@ class RobinLastMessage {
       text = isAttachment ? "Attachment" : json['msg'];
       if (rc.currentUser?.robinToken == json['sender_token']) {
         sentByMe = true;
-        senderName = '';
+        senderName = 'You: ';
       } else {
         sentByMe = false;
         senderName =
-            json['sender_token'] == null ? "" : '${json['sender_token']}: ';
+            json['sender_name'] == null ? "" : '${json['sender_name']}: ';
       }
     }
   }
@@ -35,10 +35,10 @@ class RobinLastMessage {
     text = message.isAttachment ? 'Attachment' : message.text;
     if (message.sentByMe) {
       sentByMe = true;
-      senderName = '';
+      senderName = 'You: ';
     } else {
       sentByMe = false;
-      senderName = message.senderName;
+      senderName = '${message.senderName}: ';
     }
   }
 }

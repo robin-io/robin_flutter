@@ -153,12 +153,11 @@ class RobinController extends GetxController {
               !robinMessage.sentByMe) {
             sendReadReceipts([robinMessage.id]);
           }
-          if (!currentConversation!.isGroup! &&
-              robinMessage.conversationId == currentConversation!.id!) {
-            Future.delayed(const Duration(milliseconds: 17), () {
-              scrollToEnd();
-            });
-          }
+        }
+        if (robinMessage.conversationId == currentConversation?.id!) {
+          Future.delayed(const Duration(milliseconds: 17), () {
+            scrollToEnd();
+          });
         }
       } else {
         switch (data['name']) {
@@ -169,7 +168,7 @@ class RobinController extends GetxController {
             handleDeleteMessages(data['value']['ids']);
             break;
           case 'read.reciept':
-            if (currentConversation!.id! == data['value']['conversation_id']) {
+            if (currentConversation?.id! == data['value']['conversation_id']) {
               for (String messageId in data['value']['message_ids']) {
                 if (conversationMessages[messageId] != null) {
                   conversationMessages[messageId].isRead = true;

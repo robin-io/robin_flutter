@@ -53,7 +53,9 @@ class Conversation extends StatelessWidget {
                   color: Color(0XFF101010),
                 ),
               ),
-              const SizedBox(width: 45,),
+              const SizedBox(
+                width: 45,
+              ),
               SvgPicture.asset(
                 'assets/icons/archive_black.svg',
                 semanticsLabel: 'search',
@@ -61,7 +63,9 @@ class Conversation extends StatelessWidget {
                 width: 22,
                 height: 22,
               ),
-              const SizedBox(width: 10,),
+              const SizedBox(
+                width: 10,
+              ),
             ],
           ),
           value: 1,
@@ -75,7 +79,6 @@ class Conversation extends StatelessWidget {
       rc.selectedConversation.value = '';
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +177,11 @@ class Conversation extends StatelessWidget {
                                 child: Text(
                                   conversation.lastMessage!.text.isEmpty
                                       ? 'New Conversation'
-                                      : conversation.lastMessage!.text,
+                                      : !conversation.isGroup! &&
+                                              !conversation
+                                                  .lastMessage!.sentByMe
+                                          ? conversation.lastMessage!.text
+                                              : '${conversation.lastMessage!.senderName}${conversation.lastMessage!.text}',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -207,7 +214,7 @@ class Conversation extends StatelessWidget {
               SizedBox(
                 height: 45,
                 child: Obx(
-                  ()=> BackdropFilter(
+                  () => BackdropFilter(
                     filter: rc.selectedConversation.value.isNotEmpty &&
                             rc.selectedConversation.value != conversation.id!
                         ? ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5)

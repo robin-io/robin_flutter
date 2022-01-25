@@ -38,6 +38,9 @@ class RobinConversation {
         token = json['sender_token'];
       }
     }
+    if(name == 'testtest'){
+      print(json['last_message']);
+    }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);
     unreadMessages = {};
     archived = json['archived_for'].contains(rc.currentUser?.robinToken);
