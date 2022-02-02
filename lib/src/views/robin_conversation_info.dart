@@ -19,6 +19,7 @@ class RobinConversationInfo extends StatelessWidget {
   Widget renderParticipants() {
     List<Widget> participants = [];
     for (Map participant in rc.currentConversation!.participants!) {
+      bool isCurrentUser = participant['user_token'] == rc.currentUser!.robinToken;
       participants.add(Container(
         decoration: const BoxDecoration(
           border: Border(
@@ -27,7 +28,7 @@ class RobinConversationInfo extends StatelessWidget {
             )
           )
         ),
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
         child: Row(
           children: [
             const UserAvatar(
@@ -40,7 +41,7 @@ class RobinConversationInfo extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      '${participant['meta_data']['display_name']}',
+                      isCurrentUser ? '${participant['meta_data']['display_name']} (You)' : '${participant['meta_data']['display_name']}',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: const TextStyle(
@@ -172,6 +173,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     ),
                                     UserAvatar(
                                       isGroup: rc.currentConversation!.isGroup!,
+                                      conversationIcon: rc.currentConversation!.conversationIcon!,
                                       size: 75,
                                     ),
                                     const SizedBox(
