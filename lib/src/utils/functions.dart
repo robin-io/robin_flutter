@@ -28,6 +28,17 @@ void showErrorMessage(String message) {
   );
 }
 
+void showSuccessMessage(String message) {
+  Fluttertoast.showToast(
+    msg: message,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.BOTTOM,
+    backgroundColor: green,
+    textColor: const Color(0XFFFFFFFF),
+    fontSize: 16.0,
+  );
+}
+
 String formatDate(String dateString) {
   String formattedDate = Jiffy(dateString).fromNow();
   formattedDate = formattedDate.replaceAll(' ago', '');
@@ -37,7 +48,7 @@ String formatDate(String dateString) {
 
 IconButton backButton(BuildContext context, {IconData? icon, double? size}) {
   return IconButton(
-    icon:  Icon(
+    icon: Icon(
       icon ?? Icons.arrow_back_ios,
       size: size ?? 16,
       color: const Color(0XFF535F89),
@@ -129,18 +140,27 @@ InputDecoration textFieldDecoration({double? radius, int? style}) {
   );
 }
 
-getMedia({required String source}) async {
-  ImageSource imageSource = ImageSource.camera;
-  if (source == 'gallery') {
-    imageSource = ImageSource.gallery;
-  }
+getMedia({required String source, bool? isGroup}) async {
   final ImagePicker picker = ImagePicker();
-  rc.file.value = {
-    'file': await picker.pickImage(
-      source: imageSource,
-      imageQuality: 10,
-    )
-  };
+  if (isGroup != null && isGroup == true) {
+    rc.groupIcon.value = {
+      'file': await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 10,
+      )
+    };
+  } else {
+    ImageSource imageSource = ImageSource.camera;
+    if (source == 'gallery') {
+      imageSource = ImageSource.gallery;
+    }
+    rc.file.value = {
+      'file': await picker.pickImage(
+        source: imageSource,
+        imageQuality: 10,
+      )
+    };
+  }
 }
 
 getDocument() async {
@@ -150,10 +170,7 @@ getDocument() async {
 
 String fileType({String? path}) {
   String filePath = path ?? rc.file['file'].path;
-  String? ext = filePath
-      .split('.')
-      .last
-      .toLowerCase();
+  String? ext = filePath.split('.').last.toLowerCase();
 
   if (imageFormats.contains(ext)) {
     return 'image';
@@ -167,9 +184,7 @@ String fileType({String? path}) {
 }
 
 String fileName(String path) {
-  return path
-      .split('/')
-      .last;
+  return path.split('/').last;
 }
 
 List<LinkifyElement> matchLinks(String str) {
@@ -210,44 +225,44 @@ Widget formatText(String string) {
         for (LinkifyElement formattedText in formattedTexts)
           formattedText is EmailElement
               ? WidgetSpan(
-            child: GestureDetector(
-              onTap: () {
-                _launchURL(formattedText.text, true);
-              },
-              child: Text(
-                formattedText.text,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  color: Color(0XFF4568D1),
-                ),
-              ),
-            ),
-          )
+                  child: GestureDetector(
+                    onTap: () {
+                      _launchURL(formattedText.text, true);
+                    },
+                    child: Text(
+                      formattedText.text,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        color: Color(0XFF4568D1),
+                      ),
+                    ),
+                  ),
+                )
               : formattedText is UrlElement
-              ? WidgetSpan(
-            child: GestureDetector(
-              onTap: () {
-                _launchURL(formattedText.url, false);
-              },
-              child: Text(
-                formattedText.text,
-                style: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                  color: Color(0XFF4568D1),
-                ),
-              ),
-            ),
-          )
-              : TextSpan(
-            text: formattedText.text,
-            style: const TextStyle(
-              fontWeight: FontWeight.normal,
-              fontSize: 14,
-              color: Color(0XFF101010),
-            ),
-          ),
+                  ? WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () {
+                          _launchURL(formattedText.url, false);
+                        },
+                        child: Text(
+                          formattedText.text,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
+                            color: Color(0XFF4568D1),
+                          ),
+                        ),
+                      ),
+                    )
+                  : TextSpan(
+                      text: formattedText.text,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                        color: Color(0XFF101010),
+                      ),
+                    ),
       ],
     ),
   );
@@ -264,14 +279,14 @@ Widget getURLPreview(String string) {
   }
   return firstLink.isNotEmpty
       ? Padding(
-    padding: const EdgeInsets.only(bottom: 4),
-    child: UrlPreview(
-      url: firstLink,
-    ),
-  )
+          padding: const EdgeInsets.only(bottom: 4),
+          child: UrlPreview(
+            url: firstLink,
+          ),
+        )
       : Container(
-    width: 0,
-  );
+          width: 0,
+        );
 }
 
 String getTimestamp() {
@@ -285,18 +300,19 @@ String getTimestamp() {
 Map<String, RobinMessageReaction> convertToReactions(List reactions) {
   Map<String, RobinMessageReaction> robinReactions = {};
   for (Map reaction in reactions) {
-    RobinMessageReaction robinReaction = RobinMessageReaction.fromJson(reaction);
+    RobinMessageReaction robinReaction =
+        RobinMessageReaction.fromJson(reaction);
     robinReactions[robinReaction.type] = robinReaction;
   }
   return robinReactions;
 }
 
-void showChatOptions(OverlayEntry entry){
-rc.chatOptionsEntry = entry;
-rc.chatOptionsOpened.value = true;
+void showChatOptions(OverlayEntry entry) {
+  rc.chatOptionsEntry = entry;
+  rc.chatOptionsOpened.value = true;
 }
 
-void disposeChatOptions(){
+void disposeChatOptions() {
   rc.chatOptionsEntry?.remove();
   rc.chatOptionsOpened.value = false;
   rc.chatOptionsEntry = null;

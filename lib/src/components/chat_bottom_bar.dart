@@ -442,6 +442,7 @@ class ChatBottomBar extends StatelessWidget {
                         fontSize: 14,
                       ),
                       controller: rc.messageController,
+                      focusNode: rc.messageFocus,
                       textInputAction: TextInputAction.send,
                       onFieldSubmitted: (text) {
                         if (!rc.isFileSending.value) {

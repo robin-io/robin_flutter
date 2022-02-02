@@ -234,7 +234,18 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                showCreateGroupChat(context);
+                                if (rc.createGroupParticipants.length ==
+                                    rc.allUsers.length) {
+                                  rc.createGroupParticipants.value = {};
+                                } else {
+                                  Map allUsersMap = {};
+                                  for (RobinUser user in rc.allUsers) {
+                                    allUsersMap[user.robinToken] =
+                                        user.toJson();
+                                  }
+                                  rc.createGroupParticipants.value =
+                                      allUsersMap;
+                                }
                               },
                               child: Container(
                                 decoration: const BoxDecoration(
@@ -250,23 +261,50 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                                     left: 15, right: 15, top: 12, bottom: 12),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/users.svg',
-                                        package: 'robin_flutter',
-                                        width: 20,
-                                        height: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    const Text(
-                                      'Create Group Chat',
+                                    Text(
+                                      'Select All',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: green,
+                                        color:
+                                            rc.createGroupParticipants.length ==
+                                                    rc.allUsers.length
+                                                ? green
+                                                : const Color(0xFFBBC1D6),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5.0),
+                                      child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: rc.createGroupParticipants
+                                                      .length ==
+                                                  rc.allUsers.length
+                                              ? green
+                                              : null,
+                                          border: Border.all(
+                                            width: 2,
+                                            style: rc.createGroupParticipants
+                                                        .length ==
+                                                    rc.allUsers.length
+                                                ? BorderStyle.none
+                                                : BorderStyle.solid,
+                                            color: const Color(0xFFBBC1D6),
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.check,
+                                            size: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -323,7 +361,7 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                   ],
                 ),
                 Transform.translate(
-                  offset: const Offset(0, -55),
+                  offset: const Offset(0, -50),
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Padding(
@@ -342,19 +380,37 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                               : () async {
                                   RobinConversation conversation =
                                       await rc.createGroupChat();
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          RobinChat(
-                                        conversation: conversation,
+                                  if (rc.groupIcon.isNotEmpty) {
+                                    RobinConversation newConversation = await rc
+                                        .uploadGroupIcon(conversation.id!);
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            RobinChat(
+                                          conversation: newConversation,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                  rc.groupChatNameController.clear();
-                                  rc.createGroupParticipants.value = {};
+                                    );
+                                    rc.groupChatNameController.clear();
+                                    rc.createGroupParticipants.value = {};
+                                  } else {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            RobinChat(
+                                          conversation: conversation,
+                                        ),
+                                      ),
+                                    );
+                                    rc.groupChatNameController.clear();
+                                    rc.createGroupParticipants.value = {};
+                                  }
                                 },
                           child: rc.isCreatingGroup.value
                               ? const SizedBox(

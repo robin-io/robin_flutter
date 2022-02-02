@@ -57,6 +57,8 @@ class RobinController extends GetxController {
 
   RxMap file = {}.obs;
 
+  RxMap groupIcon = {}.obs;
+
   final ScrollController messagesScrollController = ScrollController();
 
   RxMap createGroupParticipants = {}.obs;
@@ -86,6 +88,7 @@ class RobinController extends GetxController {
   TextEditingController forwardController = TextEditingController();
 
   TextEditingController messageController = TextEditingController();
+  FocusNode messageFocus = FocusNode();
 
   TextEditingController groupChatNameController = TextEditingController();
 
@@ -114,6 +117,13 @@ class RobinController extends GetxController {
       messageController.addListener(() {
         showSendButton.value = messageController.text.isNotEmpty;
       });
+      messageFocus.addListener(() {
+        if (messageFocus.hasPrimaryFocus) {
+          Future.delayed(const Duration(milliseconds: 200), () {
+            scrollToEnd();
+          });
+        }
+      });
       forwardController.addListener(() {
         renderForwardConversations();
       });
@@ -126,6 +136,8 @@ class RobinController extends GetxController {
   connectionStartListen() {
     robinConnection!.stream.listen((data) {
       data = json.decode(data);
+      print(data);
+      print(apiKey);
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
         if (allConversations[robinMessage.conversationId] != null) {
@@ -222,7 +234,6 @@ class RobinController extends GetxController {
         });
       }
     }
-    //todo: set conversation last message
   }
 
   scrollToEnd() {
@@ -414,7 +425,7 @@ class RobinController extends GetxController {
       var response = await robinCore!.createConversation(body);
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
-        conversation.token ?? conversation.id!: conversation,
+        conversation.id!: conversation,
         ...allConversations,
       };
       renderHomeConversations();
@@ -436,18 +447,49 @@ class RobinController extends GetxController {
       body['participants'] = createGroupParticipants.values.toList();
       body['moderator'] = {
         'user_token': currentUser!.robinToken,
-        'meta_data': {'displayName': currentUser!.fullName}
+        'meta_data': {'display_name': currentUser!.fullName}
       };
       var response = await robinCore!.createGroupChat(body);
       RobinConversation conversation = RobinConversation.fromJson(response);
-      allConversations = {
-        conversation.token ?? conversation.id!: conversation,
-        ...allConversations,
-      };
-      renderHomeConversations();
-      renderArchivedConversations();
-      isCreatingGroup.value = false;
+      if (groupIcon['file'] == null) {
+        isCreatingGroup.value = false;
+        allConversations = {
+          conversation.id!: conversation,
+          ...allConversations,
+        };
+        renderHomeConversations();
+        renderArchivedConversations();
+      }
       return conversation;
+    } catch (e) {
+      isCreatingGroup.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  uploadGroupIcon(String conversationId) async {
+    try {
+      if (groupIcon['file'] != null) {
+        isCreatingGroup.value = true;
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            groupIcon['file'].path,
+          ),
+        ];
+        var response = await robinCore!.uploadGroupIcon(conversationId, files);
+        RobinConversation conversation = RobinConversation.fromJson(response);
+        groupIcon.value = {};
+        isCreatingGroup.value = false;
+        allConversations = {
+          conversation.id!: conversation,
+          ...allConversations,
+        };
+        renderHomeConversations();
+        renderArchivedConversations();
+        return conversation;
+      }
     } catch (e) {
       isCreatingGroup.value = false;
       showErrorMessage(e.toString());
@@ -461,6 +503,7 @@ class RobinController extends GetxController {
     messageController.clear();
     finishedInitialScroll.value = false;
     currentConversation = conversation;
+    print(conversation.id);
     if (currentConversation!.isGroup!) {
       generateUserColors();
     }
@@ -498,6 +541,20 @@ class RobinController extends GetxController {
         'user_token': currentUser!.robinToken,
       };
       await robinCore!.removeGroupParticipant(body, groupId);
+      chatViewLoading.value = false;
+      return true;
+    } catch (e) {
+      chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteConversation() async {
+    try {
+      chatViewLoading.value = true;
+      await robinCore!.deleteConversation(
+          currentConversation!.id!, currentUser!.robinToken);
       chatViewLoading.value = false;
       return true;
     } catch (e) {

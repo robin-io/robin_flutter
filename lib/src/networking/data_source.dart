@@ -118,6 +118,22 @@ class DataSource {
     });
   }
 
+  deleteConversation(String conversationId, String userToken) async {
+    return netUtil
+        .delete(
+      '$deleteConversationUrl/$conversationId/$userToken',
+    )
+        .then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
   archiveConversation(String conversationId, String userToken) async {
     return netUtil
         .put('$archiveConversationUrl/$conversationId/$userToken')
@@ -194,6 +210,19 @@ class DataSource {
     return netUtil
         .postForm(replyWithAttachmentUrl, files, body: body)
         .then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  uploadGroupIcon(String conversationId, List<http.MultipartFile> files) async {
+    return netUtil.postForm('$uploadGroupIconUrl/$conversationId', files,
+        body: {"": ""}).then((response) {
       if (response['error']) {
         throw response['msg'];
       } else {

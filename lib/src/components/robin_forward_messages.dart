@@ -185,7 +185,7 @@ class RobinForwardMessages extends StatelessWidget {
                   ],
                 ),
                 Transform.translate(
-                  offset: const Offset(0, -55),
+                  offset: const Offset(0, -50),
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Padding(

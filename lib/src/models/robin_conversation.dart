@@ -9,6 +9,7 @@ class RobinConversation {
   String? token;
   String? moderatorName;
   String? moderatorToken;
+  String? conversationIcon;
   RobinLastMessage? lastMessage;
   List? participants;
   Map? unreadMessages;
@@ -20,6 +21,7 @@ class RobinConversation {
   final RobinController rc = Get.find();
 
   RobinConversation.fromJson(Map json) {
+    print(json);
     id = json['_id'];
     isGroup = json['is_group'];
     participants = json['participants'] ?? [];
@@ -29,6 +31,7 @@ class RobinConversation {
       moderatorName = json['moderator']['meta_data'] == null
           ? ''
           : json['moderator']['meta_data']['displayName'];
+      conversationIcon = json['group_icon'] ?? "";
     } else {
       if (rc.currentUser?.robinToken == json['sender_token']) {
         name = json['receiver_name'];
@@ -37,9 +40,6 @@ class RobinConversation {
         name = json['sender_name'];
         token = json['sender_token'];
       }
-    }
-    if(name == 'testtest'){
-      print(json['last_message']);
     }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);
     unreadMessages = {};

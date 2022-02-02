@@ -86,6 +86,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   UserAvatar(
                     isGroup: rc.currentConversation!.isGroup!,
+                    conversationIcon: rc.currentConversation!.conversationIcon,
                     size: 40,
                   ),
                   const SizedBox(width: 10),
@@ -180,6 +181,14 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       bool successful =
                           await rc.leaveGroup(rc.currentConversation!.id!);
                       if (successful) {
+                        showSuccessMessage('Group left successfully');
+                        rc.allConversations.remove(rc.currentConversation!.id!);
+                        if(rc.currentConversation!.archived!){
+                          rc.renderArchivedConversations();
+                        }
+                        else{
+                          rc.renderHomeConversations();
+                        }
                         Navigator.pop(context);
                       }
                     }

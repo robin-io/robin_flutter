@@ -145,6 +145,7 @@ class Conversation extends StatelessWidget {
                 children: [
                   UserAvatar(
                     isGroup: conversation.isGroup!,
+                    conversationIcon: conversation.conversationIcon,
                   ),
                   const SizedBox(width: 12),
                   Expanded(

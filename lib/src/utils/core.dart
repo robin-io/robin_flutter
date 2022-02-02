@@ -1,3 +1,4 @@
+import 'package:robin_flutter/src/networking/endpoints.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:robin_flutter/src/networking/data_source.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -8,6 +9,9 @@ import 'package:http/http.dart' as http;
 
 class RobinCore {
   static final DataSource api = DataSource();
+
+  /// An object for decoding json values
+  final JsonDecoder _decoder = const JsonDecoder();
 
   final RobinController rc = Get.find();
 
@@ -77,7 +81,21 @@ class RobinCore {
       String apiKey, Map<String, dynamic> body) async {
     try {
       Map<String, String> headers = {"x-api-key": apiKey};
-      return await api.createUserToken(body, headers);
+      var response = await http
+          .post(Uri.parse(createUserTokenUrl),
+              body: json.encode(body), headers: headers)
+          .then((http.Response response) {
+        final String res = response.body;
+        final int statusCode = response.statusCode;
+        var result = json.decode(res);
+        if (statusCode < 200 || statusCode > 400) throw result['msg'];
+        return result;
+      });
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data']['user_token'];
+      }
     } catch (e) {
       throw e.toString();
     }
@@ -139,6 +157,14 @@ class RobinCore {
     }
   }
 
+  deleteConversation(String conversationId, String userToken) async {
+    try {
+      return await api.deleteConversation(conversationId, userToken);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   archiveConversation(String conversationId, String userToken) async {
     try {
       return await api.archiveConversation(conversationId, userToken);
@@ -184,6 +210,14 @@ class RobinCore {
       Map<String, dynamic> body, List<http.MultipartFile> files) async {
     try {
       return await api.replyWithAttachment(body, files);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  uploadGroupIcon(String conversationId, List<http.MultipartFile> files) async {
+    try {
+      return await api.uploadGroupIcon(conversationId, files);
     } catch (e) {
       throw e.toString();
     }
