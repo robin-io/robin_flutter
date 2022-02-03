@@ -34,18 +34,21 @@ class RobinCore {
 
   void sendTextMessage(String conversationId, Map message, String senderToken,
       String senderName) {
+    Map body = {
+      'type': 1,
+      'channel': robinChannel,
+      'content': message,
+      'sender_token': senderToken,
+      'sender_name': senderName,
+      'conversation_id': conversationId,
+    };
     try {
-      Map body = {
-        'type': 1,
-        'channel': robinChannel,
-        'content': message,
-        'sender_token': senderToken,
-        'sender_name': senderName,
-        'conversation_id': conversationId,
-      };
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      throw e.toString();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        rc.robinReconnect();
+        rc.robinConnection!.sink.add(json.encode(body));
+      });
     }
   }
 
@@ -61,7 +64,14 @@ class RobinCore {
       'reply_to': replyTo,
       'is_reply': true,
     };
-    rc.robinConnection!.sink.add(json.encode(body));
+    try {
+      rc.robinConnection!.sink.add(json.encode(body));
+    } catch (e) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        rc.robinReconnect();
+        rc.robinConnection!.sink.add(json.encode(body));
+      });
+    }
   }
 
   void createSupportTicket(
@@ -242,6 +252,14 @@ class RobinCore {
   sendReadReceipts(Map<String, dynamic> body) async {
     try {
       return await api.sendReadReceipts(body);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  getConversationInfo(String conversationId) async {
+    try {
+      return await api.getConversationInfo(conversationId);
     } catch (e) {
       throw e.toString();
     }

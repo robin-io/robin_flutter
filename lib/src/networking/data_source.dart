@@ -270,4 +270,17 @@ class DataSource {
       errorHandler.handleError(e);
     });
   }
+
+  getConversationInfo(String conversationId) async {
+    return netUtil.get('$getConversationInfoUrl/$conversationId').then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
 }

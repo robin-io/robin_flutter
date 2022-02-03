@@ -38,6 +38,8 @@ class RobinController extends GetxController {
   RxBool isFileSending = false.obs;
   RxBool atMaxScroll = false.obs;
 
+  RxBool gettingConversationInfo = false.obs;
+
   RxBool isForwarding = false.obs;
 
   OverlayEntry? chatOptionsEntry;
@@ -46,6 +48,8 @@ class RobinController extends GetxController {
   RxList selectedMessageIds = [].obs;
 
   RobinConversation? currentConversation;
+
+  RxMap currentConversationInfo = {}.obs;
 
   RxString selectedConversation = ''.obs;
 
@@ -133,11 +137,14 @@ class RobinController extends GetxController {
     }
   }
 
+  void robinReconnect() {
+    robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
+    robinCore!.subscribe();
+  }
+
   connectionStartListen() {
     robinConnection!.stream.listen((data) {
       data = json.decode(data);
-      print(data);
-      print(apiKey);
       if (data['is_event'] == null || data['is_event'] == false) {
         RobinMessage robinMessage = RobinMessage.fromJson(data);
         if (allConversations[robinMessage.conversationId] != null) {
@@ -503,7 +510,6 @@ class RobinController extends GetxController {
     messageController.clear();
     finishedInitialScroll.value = false;
     currentConversation = conversation;
-    print(conversation.id);
     if (currentConversation!.isGroup!) {
       generateUserColors();
     }
@@ -754,5 +760,29 @@ class RobinController extends GetxController {
   void removeReaction(String messageId, String reactionId) async {
     conversationMessages[messageId] = RobinMessage.fromJson(
         await robinCore!.removeReaction(messageId, reactionId));
+  }
+
+  void getConversationInfo() async {
+    try {
+      gettingConversationInfo.value = true;
+      currentConversationInfo.value =
+          await robinCore!.getConversationInfo(currentConversation!.id!);
+      List docs = [];
+      List photos = [];
+      for (Map file in currentConversationInfo['documents']) {
+        if (fileType(path: file['content']['attachment']) == 'image') {
+          photos.add(file);
+        } else {
+          docs.add(file);
+        }
+      }
+      currentConversationInfo['documents'] = docs;
+      currentConversationInfo['photos'] = photos;
+      gettingConversationInfo.value = false;
+    } catch (e) {
+      gettingConversationInfo.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
   }
 }

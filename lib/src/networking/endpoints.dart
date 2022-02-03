@@ -14,6 +14,7 @@ const archiveConversationUrl = '$httpUrl/conversation/archive';
 const unarchiveConversationUrl = '$httpUrl/conversation/unarchive';
 const forwardMessagesUrl = '$httpUrl/conversation/forward_messages';
 const deleteConversationUrl = '$httpUrl/conversation/delete';
+const getConversationInfoUrl = '$httpUrl/conversation/details';
 
 const deleteMessagesUrl = '$httpUrl/chat/message';
 const sendAttachmentUrl = '$httpUrl/chat/message/send/attachment';

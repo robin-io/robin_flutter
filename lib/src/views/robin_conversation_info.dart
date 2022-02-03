@@ -1,62 +1,227 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:robin_flutter/src/components/message-group/text_bubble.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/components/conversations_loading.dart';
 import 'package:robin_flutter/src/components/empty_conversation.dart';
 import 'package:robin_flutter/src/components/conversation.dart';
+import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:robin_flutter/src/views/robin_image_preview.dart';
 
 class RobinConversationInfo extends StatelessWidget {
   final RobinController rc = Get.find();
 
-  RobinConversationInfo({Key? key}) : super(key: key);
+  RobinConversationInfo({Key? key}) : super(key: key) {
+    rc.getConversationInfo();
+  }
+
+  Widget renderPhotos(BuildContext context) {
+    if (rc.currentConversationInfo['photos'] == null ||
+        rc.currentConversationInfo['photos'].isEmpty) {
+      return const Center(
+        child: Text(
+          'No Photos',
+          style: TextStyle(
+            color: black,
+            fontSize: 16,
+          ),
+        ),
+      );
+    } else {
+      List<Widget> docs = [];
+      for (Map doc in rc.currentConversationInfo['photos']) {
+        RobinMessage message = RobinMessage.fromJson(doc);
+        docs.add(
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ImagePreview(
+                    message.link,
+                  ),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Hero(
+                tag: message.link,
+                child: CachedNetworkImage(
+                  imageUrl: message.link,
+                  width: 80,
+                  height: 63,
+                  fit: BoxFit.fitHeight,
+                  placeholder: (context, url) => const Padding(
+                    padding: EdgeInsets.fromLTRB(10, 10, 15, 10),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0XFF15AE73),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
+            ),
+          ),
+        );
+        docs.add(
+          const SizedBox(
+            width: 5,
+          ),
+        );
+      }
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: SingleChildScrollView(
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: docs,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget renderLinks() {
+    if (rc.currentConversationInfo['links'] == null ||
+        rc.currentConversationInfo['links'].isEmpty) {
+      return const Center(
+        child: Text(
+          'No Links',
+          style: TextStyle(
+            color: black,
+            fontSize: 16,
+          ),
+        ),
+      );
+    } else {
+      List<Widget> links = [];
+      for (Map link in rc.currentConversationInfo['links']) {
+        links.add(
+          TextBubble(
+            message: RobinMessage.fromJson(link),
+            lastInSeries: false,
+            firstInSeries: false,
+            maxWidth: double.infinity,
+          ),
+        );
+        links.add(
+          const SizedBox(
+            height: 5,
+          ),
+        );
+      }
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: links,
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget renderDocs() {
+    if (rc.currentConversationInfo['documents'] == null ||
+        rc.currentConversationInfo['documents'].isEmpty) {
+      return const Center(
+        child: Text(
+          'No Documents',
+          style: TextStyle(
+            color: black,
+            fontSize: 16,
+          ),
+        ),
+      );
+    } else {
+      List<Widget> docs = [];
+      for (Map doc in rc.currentConversationInfo['documents']) {
+        docs.add(
+          TextBubble(
+            message: RobinMessage.fromJson(doc),
+            lastInSeries: false,
+            firstInSeries: false,
+            maxWidth: double.infinity,
+          ),
+        );
+        docs.add(
+          const SizedBox(
+            height: 5,
+          ),
+        );
+      }
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: docs,
+          ),
+        ),
+      );
+    }
+  }
 
   Widget renderParticipants() {
     List<Widget> participants = [];
     for (Map participant in rc.currentConversation!.participants!) {
-      bool isCurrentUser = participant['user_token'] == rc.currentUser!.robinToken;
-      participants.add(Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 1, color: Color(0XFFF1F3F8)
-            )
-          )
-        ),
-        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-        child: Row(
-          children: [
-            const UserAvatar(
-              isGroup: false,
-              size: 40,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      isCurrentUser ? '${participant['meta_data']['display_name']} (You)' : '${participant['meta_data']['display_name']}',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: black,
-                        fontWeight: FontWeight.w500,
+      bool isCurrentUser =
+          participant['user_token'] == rc.currentUser!.robinToken;
+      participants.add(
+        Container(
+          decoration: const BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(width: 1, color: Color(0XFFF1F3F8)))),
+          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+          child: Row(
+            children: [
+              const UserAvatar(
+                isGroup: false,
+                size: 40,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        isCurrentUser
+                            ? '${participant['meta_data']['display_name']} (You)'
+                            : '${participant['meta_data']['display_name']}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: black,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ));
+      );
     }
     Widget allParticipants = Column(
       children: participants,
@@ -99,7 +264,8 @@ class RobinConversationInfo extends StatelessWidget {
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  child: rc.chatViewLoading.value
+                  child: rc.chatViewLoading.value ||
+                          rc.gettingConversationInfo.value
                       ? const Padding(
                           padding: EdgeInsets.only(top: 15),
                           child: Center(
@@ -142,7 +308,6 @@ class RobinConversationInfo extends StatelessWidget {
                                         ),
                                         padding: const EdgeInsets.all(0),
                                         onPressed: () {
-                                          rc.groupChatNameController.clear();
                                           Navigator.pop(context);
                                         },
                                       ),
@@ -173,7 +338,8 @@ class RobinConversationInfo extends StatelessWidget {
                                     ),
                                     UserAvatar(
                                       isGroup: rc.currentConversation!.isGroup!,
-                                      conversationIcon: rc.currentConversation!.conversationIcon!,
+                                      conversationIcon: rc.currentConversation!
+                                          .conversationIcon,
                                       size: 75,
                                     ),
                                     const SizedBox(
@@ -303,12 +469,12 @@ class RobinConversationInfo extends StatelessWidget {
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 145,
+                                              height: 215,
                                               child: TabBarView(
                                                 children: [
-                                                  Container(),
-                                                  Container(),
-                                                  Container(),
+                                                  renderPhotos(context),
+                                                  renderLinks(),
+                                                  renderDocs(),
                                                 ],
                                               ),
                                             ),
@@ -390,7 +556,7 @@ class RobinConversationInfo extends StatelessWidget {
                                                 width: 5,
                                               ),
                                               const Text(
-                                                'Starred Messages - 3',
+                                                'Starred Messages - 0',
                                                 style: TextStyle(
                                                   color: Color(0XFF51545C),
                                                   fontSize: 16,
@@ -406,50 +572,58 @@ class RobinConversationInfo extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          15, 10, 15, 12),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0XFFFBFBFB),
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            width: 1,
-                                            color: Color(0XFFF5F7FC),
-                                          ),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/users_orange.svg',
-                                                package: 'robin_flutter',
-                                                width: 24,
-                                                height: 24,
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              const Text(
-                                                'Add Group Participant',
-                                                style: TextStyle(
-                                                  color: Color(0XFF51545C),
-                                                  fontSize: 16,
+                                    rc.currentConversation!.isGroup!
+                                        ? const SizedBox(
+                                            height: 15,
+                                          )
+                                        : Container(),
+                                    rc.currentConversation!.isGroup!
+                                        ? Container(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                15, 10, 15, 12),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0XFFFBFBFB),
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                  width: 1,
+                                                  color: Color(0XFFF5F7FC),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    renderParticipants(),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      'assets/icons/add_participant.svg',
+                                                      package: 'robin_flutter',
+                                                      width: 24,
+                                                      height: 24,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    const Text(
+                                                      'Add Group Participant',
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0XFF51545C),
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Container(),
+                                    rc.currentConversation!.isGroup!
+                                        ? renderParticipants()
+                                        : Container(),
                                     const SizedBox(
                                       height: 15,
                                     ),
