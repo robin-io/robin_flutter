@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:robin_flutter/src/components/robin_forward_messages.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
+import 'package:robin_flutter/src/components/robin_conversation_info.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RobinController rc = Get.find();
@@ -27,38 +30,37 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     return options;
   }
 
-  void showForwardMessages(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => RobinForwardMessages(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Obx(
       () => AppBar(
         backgroundColor: white,
         automaticallyImplyLeading: false,
-        title: rc.forwardView.value
-            ? InkWell(
-                onTap: () {
-                  rc.resetChatView();
-                },
-                child: const SizedBox(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Color(0XFF7A7A7A),
-                        fontSize: 16,
-                      ),
+        title: rc.selectMessageView.value
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      rc.resetChatView();
+                    },
+                    child: const Icon(
+                      Icons.close,
+                      size: 24,
+                      color: black,
                     ),
                   ),
-                ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  const Text(
+                    'Select Messages',
+                    style: TextStyle(
+                      color: black,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               )
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,34 +73,20 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onPressed: () async {
                         rc.resetChatView();
                         Navigator.pop(context);
+                        rc.renderHomeConversations();
+                        rc.renderArchivedConversations();
                       },
                       padding: EdgeInsets.zero,
                       icon: const Icon(
                         Icons.arrow_back_ios,
                         size: 16,
-                        color: Color(0XFF535F89),
+                        color: Color(0XFF54515C),
                       ),
                     ),
                   ),
-                  // Container(
-                  //   padding: EdgeInsets.fromLTRB(6, 2, 6, 2),
-                  //   constraints: BoxConstraints(minWidth: 23, maxHeight: 21),
-                  //   decoration: BoxDecoration(
-                  //     color: Color(0XFF15AE73),
-                  //     borderRadius: BorderRadius.circular(10),
-                  //   ),
-                  //   child: Center(
-                  //     child: Text(
-                  //       '10',
-                  //       style: TextStyle(
-                  //         fontSize: 15,
-                  //         color: white,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   UserAvatar(
                     isGroup: rc.currentConversation!.isGroup!,
+                    conversationIcon: rc.currentConversation!.conversationIcon,
                     size: 40,
                   ),
                   const SizedBox(width: 10),
@@ -151,70 +139,107 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
         centerTitle: false,
         actions: [
-          rc.forwardView.value
+          rc.selectMessageView.value
               ? InkWell(
-                  onTap: rc.forwardMessageIds.isEmpty
+                  onTap: rc.selectedMessageIds.isEmpty
                       ? null
                       : () {
-                          rc.renderForwardConversations();
-                          showForwardMessages(context);
+                          rc.deleteMessages();
+                          rc.resetChatView();
                         },
-                  child: SizedBox(
-                    width: 80,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: Text(
-                          'Forward',
-                          style: TextStyle(
-                            color: rc.forwardMessageIds.isEmpty
-                                ? const Color(0XFF7A7A7A)
-                                : green,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 15.0, left: 15),
+                    child: SvgPicture.asset(
+                      'assets/icons/delete.svg',
+                      package: 'robin_flutter',
+                      width: 22,
+                      height: 22,
                     ),
                   ),
                 )
               : PopupMenuButton(
                   icon: const Icon(
-                    Icons.more_vert,
+                    Icons.more_horiz,
                     size: 20,
-                    color: green,
+                    color: Color(0XFF54515C),
                   ),
                   enableFeedback: true,
+                  elevation: 1,
+                  offset: const Offset(0, 60),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(24.0),
+                      Radius.circular(6.0),
                     ),
                   ),
                   onSelected: (value) async {
                     if (value == 'Select Messages') {
-                      rc.forwardView.value = true;
-                    } else if (value == 'Chat Info') {
-                      //todo: conversation info
+                      rc.selectMessageView.value = true;
+                    } else if (value == 'Contact Info' ||
+                        value == 'Group Info') {
+                      showConversationInfo(context);
                     } else if (value == 'Leave Group') {
                       bool successful =
                           await rc.leaveGroup(rc.currentConversation!.id!);
                       if (successful) {
+                        showSuccessMessage('Group left successfully');
+                        rc.allConversations.remove(rc.currentConversation!.id!);
+                        if(rc.currentConversation!.archived!){
+                          rc.renderArchivedConversations();
+                        }
+                        else{
+                          rc.renderHomeConversations();
+                        }
                         Navigator.pop(context);
                       }
                     }
                   },
                   itemBuilder: (context) {
-                    return chatOptions().map((String choice) {
-                      return PopupMenuItem(
-                        value: choice,
-                        child: Text(
-                          choice,
-                          style: const TextStyle(
-                            color: Color(0XFF101010),
-                            fontSize: 14,
+                    List<PopupMenuEntry<Object>> list = [];
+                    for (String option in chatOptions()) {
+                      list.add(
+                        PopupMenuItem(
+                          value: option,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                option,
+                                style: TextStyle(
+                                  color: option == 'Leave Group'
+                                      ? const Color(0XFFD53120)
+                                      : const Color(0XFF51545C),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: SvgPicture.asset(
+                                  option == 'Group Info' ||
+                                          option == 'Contact Info'
+                                      ? 'assets/icons/conversation_info.svg'
+                                      : option == 'Select Messages'
+                                          ? 'assets/icons/select_messages.svg'
+                                          : option == 'Leave Group'
+                                              ? 'assets/icons/leave_group.svg'
+                                              : '',
+                                  package: 'robin_flutter',
+                                  width: 22,
+                                  height: 22,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
-                    }).toList();
+                      if (option != chatOptions().last) {
+                        list.add(
+                          const PopupMenuDivider(
+                            height: 2,
+                          ),
+                        );
+                      }
+                    }
+                    return list;
                   },
                 )
         ],

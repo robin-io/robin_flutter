@@ -1,3 +1,4 @@
+import 'package:robin_flutter/src/networking/endpoints.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:robin_flutter/src/networking/data_source.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -29,24 +30,26 @@ class RobinCore {
   }
 
   void sendTextMessage(String conversationId, Map message, String senderToken,
-      String senderName) {
+      String senderName) async {
+    Map body = {
+      'type': 1,
+      'channel': robinChannel,
+      'content': message,
+      'sender_token': senderToken,
+      'sender_name': senderName,
+      'conversation_id': conversationId,
+    };
     try {
-      Map body = {
-        'type': 1,
-        'channel': robinChannel,
-        'content': message,
-        'sender_token': senderToken,
-        'sender_name': senderName,
-        'conversation_id': conversationId,
-      };
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      throw e.toString();
+      await Future.delayed(const Duration(milliseconds: 1000));
+      rc.robinConnect();
+      sendTextMessage(conversationId, message, senderToken, senderName);
     }
   }
 
   void replyToMessage(Map message, String conversationId, String replyTo,
-      String senderToken, String senderName) {
+      String senderToken, String senderName) async {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -57,7 +60,13 @@ class RobinCore {
       'reply_to': replyTo,
       'is_reply': true,
     };
-    rc.robinConnection!.sink.add(json.encode(body));
+    try {
+      rc.robinConnection!.sink.add(json.encode(body));
+    } catch (e) {
+      await Future.delayed(const Duration(milliseconds: 1000));
+      rc.robinConnect();
+      replyToMessage(message, conversationId, replyTo, senderToken, senderName);
+    }
   }
 
   void createSupportTicket(
@@ -77,7 +86,21 @@ class RobinCore {
       String apiKey, Map<String, dynamic> body) async {
     try {
       Map<String, String> headers = {"x-api-key": apiKey};
-      return await api.createUserToken(body, headers);
+      var response = await http
+          .post(Uri.parse(createUserTokenUrl),
+              body: json.encode(body), headers: headers)
+          .then((http.Response response) {
+        final String res = response.body;
+        final int statusCode = response.statusCode;
+        var result = json.decode(res);
+        if (statusCode < 200 || statusCode > 400) throw result['msg'];
+        return result;
+      });
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data']['user_token'];
+      }
     } catch (e) {
       throw e.toString();
     }
@@ -139,6 +162,14 @@ class RobinCore {
     }
   }
 
+  deleteConversation(String conversationId, String userToken) async {
+    try {
+      return await api.deleteConversation(conversationId, userToken);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   archiveConversation(String conversationId, String userToken) async {
     try {
       return await api.archiveConversation(conversationId, userToken);
@@ -189,6 +220,14 @@ class RobinCore {
     }
   }
 
+  uploadGroupIcon(String conversationId, List<http.MultipartFile> files) async {
+    try {
+      return await api.uploadGroupIcon(conversationId, files);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   sendReaction(Map<String, dynamic> body, String messageId) async {
     try {
       return await api.sendReaction(body, messageId);
@@ -208,6 +247,14 @@ class RobinCore {
   sendReadReceipts(Map<String, dynamic> body) async {
     try {
       return await api.sendReadReceipts(body);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  getConversationInfo(String conversationId) async {
+    try {
+      return await api.getConversationInfo(conversationId);
     } catch (e) {
       throw e.toString();
     }

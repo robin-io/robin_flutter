@@ -13,6 +13,7 @@ const Color white = Color(0XFFFFFFFF);
 const Color black = Color(0XFF000000);
 const Color blueGrey = Color(0XFF535F89);
 const Color green = Color(0XFF15AE73);
+const Color robinOrange = Color(0XFFEA8D51);
 
 const List<Color> groupUserColors = [
   Color(0XFFF8863D),
@@ -20,6 +21,8 @@ const List<Color> groupUserColors = [
   Color(0XFFFF0000),
   Color(0XFF0F0FFE)
 ];
+
+const List<String> reactions = ['exclaim', 'laugh', 'heart', 'thumbs_up', 'thumbs_down'];
 
 const List<String> imageFormats = ['png', 'jpg', 'jpeg', 'gif', 'heic'];
 const List<String> audioFormats = [

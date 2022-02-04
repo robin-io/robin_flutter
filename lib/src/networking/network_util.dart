@@ -29,7 +29,7 @@ class NetworkHelper {
       return http
           .get(Uri.parse(url), headers: headers)
           .then((http.Response response) {
-        final String res = response.body;
+        final String res = utf8.decode(response.bodyBytes);
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
         if (statusCode < 200 || statusCode > 400) {

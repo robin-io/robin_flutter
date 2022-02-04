@@ -1,5 +1,6 @@
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:get/get.dart';
+import 'package:robin_flutter/src/models/robin_message.dart';
 
 class RobinLastMessage {
   late final String text;
@@ -20,12 +21,24 @@ class RobinLastMessage {
       text = isAttachment ? "Attachment" : json['msg'];
       if (rc.currentUser?.robinToken == json['sender_token']) {
         sentByMe = true;
-        senderName = '';
+        senderName = 'You: ';
       } else {
         sentByMe = false;
         senderName =
-            json['sender_token'] == null ? "" : '${json['sender_token']}: ';
+            json['sender_name'] == null ? "" : '${json['sender_name']}: ';
       }
+    }
+  }
+
+  RobinLastMessage.fromRobinMessage(RobinMessage message) {
+    isAttachment = message.isAttachment;
+    text = message.isAttachment ? 'Attachment' : message.text;
+    if (message.sentByMe) {
+      sentByMe = true;
+      senderName = 'You: ';
+    } else {
+      sentByMe = false;
+      senderName = '${message.senderName}: ';
     }
   }
 }

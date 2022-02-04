@@ -29,6 +29,7 @@ dependencies:
   fluttertoast: ^8.0.8
   jiffy: ^5.0.0
   flutter_ringtone_player: ^3.1.1
+  carousel_slider: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -41,14 +42,14 @@ flutter:
   assets:
     - assets/images/
     - assets/images/fileTypes/
+    - assets/images/reactions/
     - assets/icons/
 
   fonts:
-    - family: Product Sans
+    - family: Hanken
       fonts:
-        - asset: assets/fonts/ProductSans.ttf
-          weight: 500
-        - asset: assets/fonts/ProductSans-Light.ttf
+        - asset: assets/fonts/HankenGrotesk-Bold.ttf
+        - asset: assets/fonts/HankenGrotesk-Light.ttf
           weight: 200
-        - asset: assets/fonts/ProductSans-Medium.ttf
+        - asset: assets/fonts/HankenGrotesk-Bold.ttf
           weight: 600

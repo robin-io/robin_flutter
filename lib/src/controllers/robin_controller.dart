@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:robin_flutter/src/models/robin_last_message.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
@@ -26,23 +27,31 @@ class RobinController extends GetxController {
   RxBool isConversationsLoading = true.obs;
 
   RxBool isGettingUsersLoading = false.obs;
-  RxBool createGroup = false.obs;
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
   RxBool finishedInitialScroll = false.obs;
 
-  RxBool forwardView = false.obs;
+  RxBool selectMessageView = false.obs;
   RxBool replyView = false.obs;
   RxBool chatViewLoading = false.obs;
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
   RxBool atMaxScroll = false.obs;
 
+  RxBool gettingConversationInfo = false.obs;
+
   RxBool isForwarding = false.obs;
 
-  RxList forwardMessageIds = [].obs;
+  OverlayEntry? chatOptionsEntry;
+  RxBool chatOptionsOpened = false.obs;
+
+  RxList selectedMessageIds = [].obs;
 
   RobinConversation? currentConversation;
+
+  RxMap currentConversationInfo = {}.obs;
+
+  RxString selectedConversation = ''.obs;
 
   RobinMessage? replyMessage;
 
@@ -51,6 +60,8 @@ class RobinController extends GetxController {
   RxMap conversationMessages = {}.obs;
 
   RxMap file = {}.obs;
+
+  RxMap groupIcon = {}.obs;
 
   final ScrollController messagesScrollController = ScrollController();
 
@@ -69,13 +80,21 @@ class RobinController extends GetxController {
 
   RxList forwardConversationIds = [].obs;
 
+  RxBool showHomeSearch = false.obs;
+
+  RxBool groupChatNameEmpty = true.obs;
+
   TextEditingController homeSearchController = TextEditingController();
+  TextEditingController archiveSearchController = TextEditingController();
 
   TextEditingController allUsersSearchController = TextEditingController();
 
   TextEditingController forwardController = TextEditingController();
 
   TextEditingController messageController = TextEditingController();
+  FocusNode messageFocus = FocusNode();
+
+  TextEditingController groupChatNameController = TextEditingController();
 
   void initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
@@ -84,14 +103,16 @@ class RobinController extends GetxController {
     currentUser ??= _currentUser;
     getUsers ??= _getUsers;
     keys ??= _keys;
-    robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
+    robinConnect();
     if (!robinInitialized) {
-      robinCore!.subscribe();
       robinInitialized = true;
       getConversations();
       connectionStartListen();
       homeSearchController.addListener(() {
         renderHomeConversations();
+      });
+      archiveSearchController.addListener(() {
+        renderArchivedConversations();
       });
       allUsersSearchController.addListener(() {
         renderAllUsers();
@@ -99,33 +120,135 @@ class RobinController extends GetxController {
       messageController.addListener(() {
         showSendButton.value = messageController.text.isNotEmpty;
       });
+      messageFocus.addListener(() {
+        if (messageFocus.hasPrimaryFocus) {
+          Future.delayed(const Duration(milliseconds: 200), () {
+            scrollToEnd();
+          });
+        }
+      });
       forwardController.addListener(() {
         renderForwardConversations();
+      });
+      groupChatNameController.addListener(() {
+        groupChatNameEmpty.value = groupChatNameController.text.isEmpty;
       });
     }
   }
 
+  void robinConnect() {
+    robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
+    robinCore!.subscribe();
+  }
+
   connectionStartListen() {
-    robinConnection!.stream.listen((data) {
-      data = json.decode(data);
-      if (data['is_event'] == null || data['is_event'] == false) {
-        RobinMessage robinMessage = RobinMessage.fromJson(data);
-        conversationMessages[robinMessage.id] = robinMessage;
-        if (!robinMessage.sentByMe) {
-          FlutterRingtonePlayer.playNotification();
+    robinConnection!.stream.listen(
+      (data) {
+        data = json.decode(data);
+        if (data['is_event'] == null || data['is_event'] == false) {
+          RobinMessage robinMessage = RobinMessage.fromJson(data);
+          if (allConversations[robinMessage.conversationId] != null) {
+            allConversations[robinMessage.conversationId]?.lastMessage =
+                RobinLastMessage.fromRobinMessage(robinMessage);
+            allConversations[robinMessage.conversationId]?.updatedAt =
+                DateTime.now();
+            allConversations[robinMessage.conversationId] =
+                allConversations[robinMessage.conversationId]!;
+            var sortedEntries = sortConversations();
+            allConversations =
+                Map<String, RobinConversation>.fromEntries(sortedEntries);
+            renderHomeConversations();
+            renderArchivedConversations();
+          }
+          if (!robinMessage.sentByMe) {
+            FlutterRingtonePlayer.playNotification();
+          }
+          if (robinMessage.conversationId == currentConversation?.id!) {
+            conversationMessages[robinMessage.id] = robinMessage;
+          }
+          if (currentConversation != null) {
+            if (!currentConversation!.isGroup! &&
+                robinMessage.conversationId == currentConversation!.id! &&
+                !robinMessage.sentByMe) {
+              sendReadReceipts([robinMessage.id]);
+            }
+          }
+          if (robinMessage.conversationId == currentConversation?.id!) {
+            Future.delayed(const Duration(milliseconds: 17), () {
+              scrollToEnd();
+            });
+          }
+        } else {
+          switch (data['name']) {
+            case 'message.forward':
+              handleMessageForward(data['value']);
+              break;
+            case 'delete.message':
+              handleDeleteMessages(data['value']['ids']);
+              break;
+            case 'read.reciept':
+              if (currentConversation?.id! ==
+                  data['value']['conversation_id']) {
+                for (String messageId in data['value']['message_ids']) {
+                  if (conversationMessages[messageId] != null) {
+                    conversationMessages[messageId].isRead = true;
+                    conversationMessages[messageId] =
+                        conversationMessages[messageId];
+                  }
+                }
+              }
+              break;
+            default:
+              //cannot handle event
+              break;
+          }
         }
-        if (currentConversation != null &&
-            robinMessage.conversationId == currentConversation!.id! &&
-            !robinMessage.sentByMe) {
-          sendReadReceipts([robinMessage.id]);
-        }
-        if (atMaxScroll.value) {
-          Future.delayed(const Duration(milliseconds: 17), () {
-            scrollToEnd();
-          });
+      },
+      onDone: () {
+        robinConnect();
+      },
+      onError: (error) {
+        robinConnect();
+      },
+    );
+  }
+
+  handleMessageForward(List messages) {
+    for (int index = 0; index < messages.length; index++) {
+      Map message = messages[index];
+      RobinMessage robinMessage = RobinMessage.fromJson(message);
+      if (index == messages.length - 1) {
+        if (allConversations[robinMessage.conversationId] != null) {
+          allConversations[robinMessage.conversationId]?.lastMessage =
+              RobinLastMessage.fromRobinMessage(robinMessage);
+          allConversations[robinMessage.conversationId]?.updatedAt =
+              DateTime.now();
+          allConversations[robinMessage.conversationId] =
+              allConversations[robinMessage.conversationId]!;
+          var sortedEntries = sortConversations();
+          allConversations =
+              Map<String, RobinConversation>.fromEntries(sortedEntries);
+          renderHomeConversations();
+          renderArchivedConversations();
         }
       }
-    });
+      if (robinMessage.conversationId == currentConversation!.id!) {
+        conversationMessages[robinMessage.id] = robinMessage;
+      }
+      if (!robinMessage.sentByMe) {
+        FlutterRingtonePlayer.playNotification();
+      }
+      if (!currentConversation!.isGroup! &&
+          robinMessage.conversationId == currentConversation!.id! &&
+          !robinMessage.sentByMe) {
+        sendReadReceipts([robinMessage.id]);
+      }
+      if (atMaxScroll.value) {
+        Future.delayed(const Duration(milliseconds: 17), () {
+          scrollToEnd();
+        });
+      }
+    }
   }
 
   scrollToEnd() {
@@ -172,7 +295,15 @@ class RobinController extends GetxController {
   void renderArchivedConversations() {
     List<RobinConversation> conversations = [];
     conversations = allConversations.values
-        .where((RobinConversation conversation) => conversation.archived!)
+        .where((RobinConversation conversation) =>
+            conversation.archived! &&
+            (conversation.name!
+                    .toLowerCase()
+                    .contains(archiveSearchController.text.toLowerCase()) ||
+                (!conversation.lastMessage!.isAttachment &&
+                    conversation.lastMessage!.text
+                        .toLowerCase()
+                        .contains(archiveSearchController.text.toLowerCase()))))
         .toList();
     archivedConversations.value = conversations;
   }
@@ -192,8 +323,7 @@ class RobinController extends GetxController {
     for (Map conversation in conversations) {
       RobinConversation robinConversation =
           RobinConversation.fromJson(conversation);
-      allConversations[robinConversation.token ?? robinConversation.id!] =
-          robinConversation;
+      allConversations[robinConversation.id!] = robinConversation;
     }
     var sortedEntries = allConversations.entries.toList()
       ..sort((e1, e2) {
@@ -204,6 +334,15 @@ class RobinController extends GetxController {
     Map<String, RobinConversation> sortedConversations =
         Map<String, RobinConversation>.fromEntries(sortedEntries);
     return sortedConversations;
+  }
+
+  sortConversations() {
+    return allConversations.entries.toList()
+      ..sort((e1, e2) {
+        var diff = e2.value.updatedAt!.compareTo(e1.value.updatedAt!);
+        if (diff == 0) diff = e2.key.compareTo(e1.key);
+        return diff;
+      });
   }
 
   void archiveConversation(String conversationId, String key) {
@@ -222,7 +361,6 @@ class RobinController extends GetxController {
 
   void getAllUsers() async {
     try {
-      createGroup.value = false;
       createGroupParticipants.value = {};
       isGettingUsersLoading.value = true;
       isCreatingConversation.value = false;
@@ -302,7 +440,7 @@ class RobinController extends GetxController {
       var response = await robinCore!.createConversation(body);
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
-        conversation.token ?? conversation.id!: conversation,
+        conversation.id!: conversation,
         ...allConversations,
       };
       renderHomeConversations();
@@ -316,21 +454,57 @@ class RobinController extends GetxController {
     }
   }
 
-  Future<RobinConversation> createGroupChat(Map body) async {
+  Future<RobinConversation> createGroupChat() async {
     try {
       isCreatingGroup.value = true;
+      Map<String, dynamic> body = {};
+      body['name'] = groupChatNameController.text;
       body['participants'] = createGroupParticipants.values.toList();
-      body['moderator'] = {'user_token': currentUser!.robinToken};
+      body['moderator'] = {
+        'user_token': currentUser!.robinToken,
+        'meta_data': {'display_name': currentUser!.fullName}
+      };
       var response = await robinCore!.createGroupChat(body);
       RobinConversation conversation = RobinConversation.fromJson(response);
-      allConversations = {
-        conversation.token ?? conversation.id!: conversation,
-        ...allConversations,
-      };
-      renderHomeConversations();
-      renderArchivedConversations();
-      isCreatingGroup.value = false;
+      if (groupIcon['file'] == null) {
+        isCreatingGroup.value = false;
+        allConversations = {
+          conversation.id!: conversation,
+          ...allConversations,
+        };
+        renderHomeConversations();
+        renderArchivedConversations();
+      }
       return conversation;
+    } catch (e) {
+      isCreatingGroup.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
+  uploadGroupIcon(String conversationId) async {
+    try {
+      if (groupIcon['file'] != null) {
+        isCreatingGroup.value = true;
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            groupIcon['file'].path,
+          ),
+        ];
+        var response = await robinCore!.uploadGroupIcon(conversationId, files);
+        RobinConversation conversation = RobinConversation.fromJson(response);
+        groupIcon.value = {};
+        isCreatingGroup.value = false;
+        allConversations = {
+          conversation.id!: conversation,
+          ...allConversations,
+        };
+        renderHomeConversations();
+        renderArchivedConversations();
+        return conversation;
+      }
     } catch (e) {
       isCreatingGroup.value = false;
       showErrorMessage(e.toString());
@@ -351,8 +525,8 @@ class RobinController extends GetxController {
   }
 
   void resetChatView() {
-    forwardView.value = false;
-    forwardMessageIds.value = [].obs;
+    selectMessageView.value = false;
+    selectedMessageIds.value = [].obs;
     forwardConversations.value = [].obs;
     forwardConversationIds.value = [].obs;
     isForwarding.value = false;
@@ -390,6 +564,20 @@ class RobinController extends GetxController {
     }
   }
 
+  Future<bool> deleteConversation() async {
+    try {
+      chatViewLoading.value = true;
+      await robinCore!.deleteConversation(
+          currentConversation!.id!, currentUser!.robinToken);
+      chatViewLoading.value = false;
+      return true;
+    } catch (e) {
+      chatViewLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
   void getMessages() async {
     try {
       chatViewLoading.value = true;
@@ -408,9 +596,16 @@ class RobinController extends GetxController {
 
   Map<String, RobinMessage> toRobinMessage(List messages) {
     Map<String, RobinMessage> allMessages = {};
+    List<String> unreadMessages = [];
     for (Map message in messages) {
       RobinMessage robinMessage = RobinMessage.fromJson(message);
+      if (!robinMessage.isRead && !robinMessage.sentByMe) {
+        unreadMessages.add(robinMessage.id);
+      }
       allMessages[robinMessage.id] = robinMessage;
+    }
+    if (unreadMessages.isNotEmpty && !currentConversation!.isGroup!) {
+      sendReadReceipts(unreadMessages);
     }
     return allMessages;
   }
@@ -524,7 +719,7 @@ class RobinController extends GetxController {
       isForwarding.value = true;
       Map<String, dynamic> body = {
         'user_token': currentUser!.robinToken,
-        'message_ids': forwardMessageIds.toList(),
+        'message_ids': selectedMessageIds.toList(),
         'conversation_ids': forwardConversationIds.toList(),
       };
       await robinCore!.forwardMessages(body);
@@ -536,18 +731,27 @@ class RobinController extends GetxController {
     }
   }
 
-  void sendReadReceipts(List<String> messageIds) {
-    Map<String, dynamic> body = {};
+  void sendReadReceipts(List<String> messageIds) async {
+    Map<String, dynamic> body = {
+      'conversation_id': currentConversation!.id!,
+      'message_ids': messageIds,
+    };
     robinCore!.sendReadReceipts(body);
   }
 
-  void deleteMessage(String messageId) {
+  void deleteMessages() {
     Map<String, dynamic> body = {
-      'ids': [messageId],
+      'ids': selectedMessageIds.toList(),
       'requester_token': currentUser!.robinToken,
     };
-    conversationMessages.remove(messageId);
+    handleDeleteMessages(selectedMessageIds.toList());
     robinCore!.deleteMessages(body);
+  }
+
+  void handleDeleteMessages(List messageIds) {
+    for (String messageId in messageIds) {
+      conversationMessages.remove(messageId);
+    }
   }
 
   void sendReaction(String reaction, String messageId) async {
@@ -557,10 +761,38 @@ class RobinController extends GetxController {
       'conversation_id': currentConversation!.id,
       'timestamp': getTimestamp(),
     };
-    conversationMessages[messageId] = await robinCore!.sendReaction(body, messageId);
+    conversationMessages[messageId] =
+        RobinMessage.fromJson(await robinCore!.sendReaction(body, messageId));
   }
 
   void removeReaction(String messageId, String reactionId) async {
-    conversationMessages[messageId] = await  robinCore!.removeReaction(messageId, reactionId);
+    conversationMessages[messageId] = RobinMessage.fromJson(
+        await robinCore!.removeReaction(messageId, reactionId));
+  }
+
+  void getConversationInfo() async {
+    try {
+      gettingConversationInfo.value = true;
+      currentConversationInfo.value =
+          await robinCore!.getConversationInfo(currentConversation!.id!);
+      List docs = [];
+      List photos = [];
+      if (currentConversationInfo['documents'] != null) {
+        for (Map file in currentConversationInfo['documents']) {
+          if (fileType(path: file['content']['attachment']) == 'image') {
+            photos.add(file);
+          } else {
+            docs.add(file);
+          }
+        }
+      }
+      currentConversationInfo['documents'] = docs;
+      currentConversationInfo['photos'] = photos;
+      gettingConversationInfo.value = false;
+    } catch (e) {
+      gettingConversationInfo.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
   }
 }

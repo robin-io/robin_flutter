@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -17,7 +19,7 @@ class RenderMessages extends StatelessWidget {
           );
           rc.messagesScrollController.addListener(() {
             if (rc.messagesScrollController.position.pixels <
-                rc.messagesScrollController.position.maxScrollExtent - 45) {
+                rc.messagesScrollController.position.maxScrollExtent - 120) {
               rc.atMaxScroll.value = false;
             } else if (!rc.atMaxScroll.value) {
               rc.atMaxScroll.value = true;

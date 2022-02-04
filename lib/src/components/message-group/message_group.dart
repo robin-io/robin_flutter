@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -391,25 +392,25 @@ class MessageGroup extends StatelessWidget {
         ),
         child: Obx(
           () => GestureDetector(
-            onTap: rc.forwardView.value
+            onTap: rc.selectMessageView.value
                 ? () {
-                    if (rc.forwardMessageIds.contains(message.id)) {
-                      rc.forwardMessageIds.remove(message.id);
+                    if (rc.selectedMessageIds.contains(message.id)) {
+                      rc.selectedMessageIds.remove(message.id);
                     } else {
-                      rc.forwardMessageIds.add(message.id);
+                      rc.selectedMessageIds.add(message.id);
                     }
                   }
                 : null,
-            onLongPress: !rc.forwardView.value
+            onLongPress: !rc.selectMessageView.value
                 ? () {
                     HapticFeedback.selectionClick();
-                    rc.forwardView.value = true;
-                    rc.forwardMessageIds.add(message.id);
+                    rc.selectMessageView.value = true;
+                    rc.selectedMessageIds.add(message.id);
                   }
                 : null,
             child: Column(
               children: [
-                message.replyTo != null ? renderReply() : Container(),
+                // message.replyTo != null ? renderReply() : Container(),
                 Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: message.sentByMe
@@ -417,10 +418,10 @@ class MessageGroup extends StatelessWidget {
                       : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    rc.forwardView.value && !message.sentByMe
+                    rc.selectMessageView.value && !message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(right: 5, bottom: 5),
-                            child: rc.forwardMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds.contains(message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,
@@ -449,16 +450,204 @@ class MessageGroup extends StatelessWidget {
                                   ),
                           )
                         : Container(),
-                    TextBubble(
-                      message: message,
-                      lastInSeries: lastInSeries,
-                      firstInSeries: firstInSeries,
-                      maxWidth: maxWidth,
+                    Stack(
+                      children: [
+                        TextBubble(
+                          message: message,
+                          lastInSeries: lastInSeries,
+                          firstInSeries: firstInSeries,
+                          maxWidth: maxWidth,
+                        ),
+                        message.sentByMe && message.reactions.isNotEmpty
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0XFFEFEFEF),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0XFFECEBEB),
+                                            width: 2,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: const Offset(-22, -12),
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0XFFEFEFEF),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Container(
+                                          width: 16,
+                                          height: 16,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: const Color(0XFFECEBEB),
+                                              width: 2,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: const Offset(-56, -31),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0XFFEFEFEF),
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      padding: const EdgeInsets.all(2),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0XFFECEBEB),
+                                            width: 2,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(24),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            for (String reaction in message
+                                                .reactions.keys
+                                                .toList())
+                                              reactions.contains(reaction)
+                                                  ? Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              2),
+                                                      child: Image.asset(
+                                                        'assets/images/reactions/$reaction.png',
+                                                        package:
+                                                            'robin_flutter',
+                                                        width: 22,
+                                                        height: 22,
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Container(),
+                        !message.sentByMe && message.reactions.isNotEmpty
+                            ? Positioned(
+                                right: 0,
+                                child: Transform.translate(
+                                  offset: const Offset(0, -7),
+                                  child: Row(
+                                    textDirection: ui.TextDirection.rtl,
+                                    children: [
+                                      Container(
+                                        width: 12,
+                                        height: 12,
+                                        decoration: const BoxDecoration(
+                                          color: white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0XFFFBFBFB),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Transform.translate(
+                                        offset: const Offset(20, -7),
+                                        child: Container(
+                                          width: 18,
+                                          height: 18,
+                                          decoration: const BoxDecoration(
+                                            color: white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Container(
+                                              width: 16,
+                                              height: 16,
+                                              decoration: const BoxDecoration(
+                                                color: Color(0XFFFBFBFB),
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Transform.translate(
+                                        offset: const Offset(52, -19),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:  white,
+                                            borderRadius: BorderRadius.circular(24),
+                                          ),
+                                          padding: const EdgeInsets.all(2),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: const Color(0XFFFBFBFB),
+                                              borderRadius:
+                                              BorderRadius.circular(24),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                for (String reaction in message
+                                                    .reactions.keys
+                                                    .toList())
+                                                  reactions.contains(reaction)
+                                                      ? Padding(
+                                                    padding:
+                                                    const EdgeInsets.all(
+                                                        3),
+                                                    child: Image.asset(
+                                                      'assets/images/reactions/$reaction.png',
+                                                      package:
+                                                      'robin_flutter',
+                                                      width: 22,
+                                                      height: 22,
+                                                    ),
+                                                  )
+                                                      : Container(),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
                     ),
-                    rc.forwardView.value && message.sentByMe
+                    rc.selectMessageView.value && message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(left: 5, bottom: 5),
-                            child: rc.forwardMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds.contains(message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,
