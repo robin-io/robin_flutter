@@ -16,40 +16,8 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return conversationIcon != null
-        ? ClipRRect(
-            borderRadius: BorderRadius.circular((size ?? 45) / 2),
-            child: CachedNetworkImage(
-              imageUrl: conversationIcon!,
-              fit: BoxFit.cover,
-              width: size ?? 45,
-              height: size ?? 45,
-              placeholder: (context, url){
-                return Container(
-                  width: size ?? 45,
-                  height: size ?? 45,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0XFFF4F6F8),
-                    border: Border.all(
-                      width: 1,
-                      style: BorderStyle.solid,
-                      color: const Color(0XFFCADAF8),
-                    ),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      isGroup ? 'assets/icons/people.svg' : 'assets/icons/person.svg',
-                      package: 'robin_flutter',
-                      width: (size ?? 45) / 2.5,
-                      height: (size ?? 45) / 2.5,
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        : Container(
+    return conversationIcon == null || conversationIcon!.isEmpty
+        ? Container(
             width: size ?? 45,
             height: size ?? 45,
             decoration: BoxDecoration(
@@ -68,6 +36,40 @@ class UserAvatar extends StatelessWidget {
                 width: (size ?? 45) / 2.5,
                 height: (size ?? 45) / 2.5,
               ),
+            ),
+          )
+        : ClipRRect(
+            borderRadius: BorderRadius.circular((size ?? 45) / 2),
+            child: CachedNetworkImage(
+              imageUrl: conversationIcon!,
+              fit: BoxFit.cover,
+              width: size ?? 45,
+              height: size ?? 45,
+              placeholder: (context, url) {
+                return Container(
+                  width: size ?? 45,
+                  height: size ?? 45,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0XFFF4F6F8),
+                    border: Border.all(
+                      width: 1,
+                      style: BorderStyle.solid,
+                      color: const Color(0XFFCADAF8),
+                    ),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      isGroup
+                          ? 'assets/icons/people.svg'
+                          : 'assets/icons/person.svg',
+                      package: 'robin_flutter',
+                      width: (size ?? 45) / 2.5,
+                      height: (size ?? 45) / 2.5,
+                    ),
+                  ),
+                );
+              },
             ),
           );
   }

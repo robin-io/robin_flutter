@@ -10,9 +10,6 @@ import 'package:http/http.dart' as http;
 class RobinCore {
   static final DataSource api = DataSource();
 
-  /// An object for decoding json values
-  final JsonDecoder _decoder = const JsonDecoder();
-
   final RobinController rc = Get.find();
 
   WebSocketChannel connect(String? apiKey, String? userToken) {
@@ -33,7 +30,7 @@ class RobinCore {
   }
 
   void sendTextMessage(String conversationId, Map message, String senderToken,
-      String senderName) {
+      String senderName) async {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -45,15 +42,14 @@ class RobinCore {
     try {
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      Future.delayed(const Duration(milliseconds: 200), () {
-        rc.robinReconnect();
-        rc.robinConnection!.sink.add(json.encode(body));
-      });
+      await Future.delayed(const Duration(milliseconds: 1000));
+      rc.robinConnect();
+      sendTextMessage(conversationId, message, senderToken, senderName);
     }
   }
 
   void replyToMessage(Map message, String conversationId, String replyTo,
-      String senderToken, String senderName) {
+      String senderToken, String senderName) async {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -67,10 +63,9 @@ class RobinCore {
     try {
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      Future.delayed(const Duration(milliseconds: 200), () {
-        rc.robinReconnect();
-        rc.robinConnection!.sink.add(json.encode(body));
-      });
+      await Future.delayed(const Duration(milliseconds: 1000));
+      rc.robinConnect();
+      replyToMessage(message, conversationId, replyTo, senderToken, senderName);
     }
   }
 

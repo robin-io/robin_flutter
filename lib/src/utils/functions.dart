@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:robin_flutter/src/components/robin_conversation_media.dart';
+import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'package:robin_flutter/src/components/robin_create_group.dart';
-import 'package:robin_flutter/src/views/robin_conversation_info.dart';
+import 'package:robin_flutter/src/components/robin_conversation_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
@@ -113,6 +115,24 @@ void showSelectGroupParticipants(BuildContext context) {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (_) => RobinSelectGroupParticipants(),
+  );
+}
+
+void showEncryptionDetails(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => const RobinEncryptionDetails(),
+  );
+}
+
+void showConversationMedia(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinConversationMedia(),
   );
 }
 

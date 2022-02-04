@@ -103,8 +103,7 @@ class RobinController extends GetxController {
     currentUser ??= _currentUser;
     getUsers ??= _getUsers;
     keys ??= _keys;
-    robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
-    robinCore!.subscribe();
+    robinConnect();
     if (!robinInitialized) {
       robinInitialized = true;
       getConversations();
@@ -137,72 +136,81 @@ class RobinController extends GetxController {
     }
   }
 
-  void robinReconnect() {
+  void robinConnect() {
     robinConnection ??= robinCore!.connect(apiKey, currentUser!.robinToken);
     robinCore!.subscribe();
   }
 
   connectionStartListen() {
-    robinConnection!.stream.listen((data) {
-      data = json.decode(data);
-      if (data['is_event'] == null || data['is_event'] == false) {
-        RobinMessage robinMessage = RobinMessage.fromJson(data);
-        if (allConversations[robinMessage.conversationId] != null) {
-          allConversations[robinMessage.conversationId]?.lastMessage =
-              RobinLastMessage.fromRobinMessage(robinMessage);
-          allConversations[robinMessage.conversationId]?.updatedAt =
-              DateTime.now();
-          allConversations[robinMessage.conversationId] =
-              allConversations[robinMessage.conversationId]!;
-          var sortedEntries = sortConversations();
-          allConversations =
-              Map<String, RobinConversation>.fromEntries(sortedEntries);
-          renderHomeConversations();
-          renderArchivedConversations();
-        }
-        if (!robinMessage.sentByMe) {
-          FlutterRingtonePlayer.playNotification();
-        }
-        if (robinMessage.conversationId == currentConversation?.id!) {
-          conversationMessages[robinMessage.id] = robinMessage;
-        }
-        if (currentConversation != null) {
-          if (!currentConversation!.isGroup! &&
-              robinMessage.conversationId == currentConversation!.id! &&
-              !robinMessage.sentByMe) {
-            sendReadReceipts([robinMessage.id]);
+    robinConnection!.stream.listen(
+      (data) {
+        data = json.decode(data);
+        if (data['is_event'] == null || data['is_event'] == false) {
+          RobinMessage robinMessage = RobinMessage.fromJson(data);
+          if (allConversations[robinMessage.conversationId] != null) {
+            allConversations[robinMessage.conversationId]?.lastMessage =
+                RobinLastMessage.fromRobinMessage(robinMessage);
+            allConversations[robinMessage.conversationId]?.updatedAt =
+                DateTime.now();
+            allConversations[robinMessage.conversationId] =
+                allConversations[robinMessage.conversationId]!;
+            var sortedEntries = sortConversations();
+            allConversations =
+                Map<String, RobinConversation>.fromEntries(sortedEntries);
+            renderHomeConversations();
+            renderArchivedConversations();
           }
-        }
-        if (robinMessage.conversationId == currentConversation?.id!) {
-          Future.delayed(const Duration(milliseconds: 17), () {
-            scrollToEnd();
-          });
-        }
-      } else {
-        switch (data['name']) {
-          case 'message.forward':
-            handleMessageForward(data['value']);
-            break;
-          case 'delete.message':
-            handleDeleteMessages(data['value']['ids']);
-            break;
-          case 'read.reciept':
-            if (currentConversation?.id! == data['value']['conversation_id']) {
-              for (String messageId in data['value']['message_ids']) {
-                if (conversationMessages[messageId] != null) {
-                  conversationMessages[messageId].isRead = true;
-                  conversationMessages[messageId] =
-                      conversationMessages[messageId];
+          if (!robinMessage.sentByMe) {
+            FlutterRingtonePlayer.playNotification();
+          }
+          if (robinMessage.conversationId == currentConversation?.id!) {
+            conversationMessages[robinMessage.id] = robinMessage;
+          }
+          if (currentConversation != null) {
+            if (!currentConversation!.isGroup! &&
+                robinMessage.conversationId == currentConversation!.id! &&
+                !robinMessage.sentByMe) {
+              sendReadReceipts([robinMessage.id]);
+            }
+          }
+          if (robinMessage.conversationId == currentConversation?.id!) {
+            Future.delayed(const Duration(milliseconds: 17), () {
+              scrollToEnd();
+            });
+          }
+        } else {
+          switch (data['name']) {
+            case 'message.forward':
+              handleMessageForward(data['value']);
+              break;
+            case 'delete.message':
+              handleDeleteMessages(data['value']['ids']);
+              break;
+            case 'read.reciept':
+              if (currentConversation?.id! ==
+                  data['value']['conversation_id']) {
+                for (String messageId in data['value']['message_ids']) {
+                  if (conversationMessages[messageId] != null) {
+                    conversationMessages[messageId].isRead = true;
+                    conversationMessages[messageId] =
+                        conversationMessages[messageId];
+                  }
                 }
               }
-            }
-            break;
-          default:
-            //cannot handle event
-            break;
+              break;
+            default:
+              //cannot handle event
+              break;
+          }
         }
-      }
-    });
+      },
+      onDone: () {
+        robinConnect();
+      },
+      onError: (error) {
+        robinConnect();
+      },
+    );
   }
 
   handleMessageForward(List messages) {
@@ -769,11 +777,13 @@ class RobinController extends GetxController {
           await robinCore!.getConversationInfo(currentConversation!.id!);
       List docs = [];
       List photos = [];
-      for (Map file in currentConversationInfo['documents']) {
-        if (fileType(path: file['content']['attachment']) == 'image') {
-          photos.add(file);
-        } else {
-          docs.add(file);
+      if (currentConversationInfo['documents'] != null) {
+        for (Map file in currentConversationInfo['documents']) {
+          if (fileType(path: file['content']['attachment']) == 'image') {
+            photos.add(file);
+          } else {
+            docs.add(file);
+          }
         }
       }
       currentConversationInfo['documents'] = docs;

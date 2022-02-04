@@ -1,13 +1,12 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:robin_flutter/src/components/message-group/text_bubble.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/models/robin_conversation.dart';
-import 'package:robin_flutter/src/components/conversations_loading.dart';
-import 'package:robin_flutter/src/components/empty_conversation.dart';
-import 'package:robin_flutter/src/components/conversation.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
@@ -20,6 +19,132 @@ class RobinConversationInfo extends StatelessWidget {
 
   RobinConversationInfo({Key? key}) : super(key: key) {
     rc.getConversationInfo();
+  }
+
+  void confirmRemoveGroupParticipant(BuildContext context, Map participant) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Confirm Removal',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Do you want to remove ${participant['meta_data']['display_name']} from the ${rc.currentConversation!.name} Group',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget renderPhotos(BuildContext context) {
@@ -36,18 +161,104 @@ class RobinConversationInfo extends StatelessWidget {
       );
     } else {
       List<Widget> docs = [];
-      for (Map doc in rc.currentConversationInfo['photos']) {
+      for (int i = 0; i < rc.currentConversationInfo['photos'].length; i++) {
+        Map doc = rc.currentConversationInfo['photos'][i];
         RobinMessage message = RobinMessage.fromJson(doc);
         docs.add(
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ImagePreview(
-                    message.link,
-                  ),
-                ),
+              showGeneralDialog(
+                barrierLabel: "Label",
+                barrierDismissible: false,
+                barrierColor: Colors.transparent,
+                transitionDuration: const Duration(milliseconds: 200),
+                context: context,
+                pageBuilder: (context, anim1, anim2) {
+                  return Dismissible(
+                    direction: DismissDirection.vertical,
+                    key: const Key('image_carousel'),
+                    onDismissed: (_) => Navigator.of(context).pop(),
+                    child: Material(
+                      child: Container(
+                        color: Colors.black,
+                        child: Stack(
+                          children: [
+                            CarouselSlider.builder(
+                                itemCount:
+                                rc.currentConversationInfo['photos'].length,
+                                options: CarouselOptions(
+                                  initialPage: i,
+                                  height: MediaQuery.of(context).size.height,
+                                  viewportFraction: 1,
+                                  enableInfiniteScroll: false,
+                                  autoPlay: false,
+                                  scrollDirection: Axis.horizontal,
+                                ),
+                                itemBuilder: (BuildContext context, int itemIndex,
+                                    int pageViewIndex) {
+                                  String link = RobinMessage.fromJson(
+                                      rc.currentConversationInfo['photos']
+                                      [itemIndex])
+                                      .link;
+                                  return CachedNetworkImage(
+                                    imageUrl: link,
+                                    fit: BoxFit.fitWidth,
+                                    placeholder: (context, url) => const Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Padding(
+                                        padding:
+                                        EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Color(0XFF15AE73),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                                  );
+                                }),
+                            SafeArea(
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF6B7491),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                transitionBuilder: (context, anim1, anim2, child) {
+                  return SlideTransition(
+                    position: Tween(
+                        begin: const Offset(0, 1), end: const Offset(0, 0))
+                        .animate(anim1),
+                    child: child,
+                  );
+                },
               );
             },
             child: Padding(
@@ -180,11 +391,18 @@ class RobinConversationInfo extends StatelessWidget {
     }
   }
 
-  Widget renderParticipants() {
+  Widget renderParticipants(BuildContext context) {
     List<Widget> participants = [];
+    bool isModerator = false;
+    for (Map participant in rc.currentConversation!.participants!) {
+      if (participant['user_token'] == rc.currentUser!.robinToken) {
+        isModerator = participant['is_moderator'];
+      }
+    }
     for (Map participant in rc.currentConversation!.participants!) {
       bool isCurrentUser =
           participant['user_token'] == rc.currentUser!.robinToken;
+
       participants.add(
         Container(
           decoration: const BoxDecoration(
@@ -215,6 +433,41 @@ class RobinConversationInfo extends StatelessWidget {
                         ),
                       ),
                     ),
+                    participant['is_moderator']
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 5, right: 5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: const Color(0XFFF5F7FC),
+                              ),
+                              padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
+                              child: const Text(
+                                'moderator',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0XFF8D9091),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
+                    !isCurrentUser && isModerator
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.clear,
+                              size: 16,
+                              color: Color(0XFFD53120),
+                            ),
+                            onPressed: () {
+                              confirmRemoveGroupParticipant(
+                                  context, participant);
+                            },
+                          )
+                        : Container(),
                   ],
                 ),
               ),
@@ -469,7 +722,7 @@ class RobinConversationInfo extends StatelessWidget {
                                               ),
                                             ),
                                             SizedBox(
-                                              height: 215,
+                                              height: 160,
                                               child: TabBarView(
                                                 children: [
                                                   renderPhotos(context),
@@ -478,53 +731,75 @@ class RobinConversationInfo extends StatelessWidget {
                                                 ],
                                               ),
                                             ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                showConversationMedia(context);
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        15, 7, 15, 0),
+                                                child: const Text(
+                                                  'See All Media',
+                                                  style: TextStyle(
+                                                    color: green,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
                                     ),
-                                    Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          15, 10, 15, 12),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0XFFFBFBFB),
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            width: 1,
-                                            color: Color(0XFFF5F7FC),
+                                    GestureDetector(
+                                      onTap: () {
+                                        showEncryptionDetails(context);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            15, 10, 15, 12),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0XFFFBFBFB),
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              width: 1,
+                                              color: Color(0XFFF5F7FC),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/shield.svg',
-                                                package: 'robin_flutter',
-                                                width: 24,
-                                                height: 24,
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              const Text(
-                                                'Encryption Details',
-                                                style: TextStyle(
-                                                  color: Color(0XFF51545C),
-                                                  fontSize: 16,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/icons/shield.svg',
+                                                  package: 'robin_flutter',
+                                                  width: 24,
+                                                  height: 24,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const Icon(
-                                            Icons.chevron_right,
-                                            size: 24,
-                                            color: Color(0XFF8D9091),
-                                          )
-                                        ],
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                const Text(
+                                                  'Encryption Details',
+                                                  style: TextStyle(
+                                                    color: Color(0XFF51545C),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const Icon(
+                                              Icons.chevron_right,
+                                              size: 24,
+                                              color: Color(0XFF8D9091),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -622,7 +897,7 @@ class RobinConversationInfo extends StatelessWidget {
                                           )
                                         : Container(),
                                     rc.currentConversation!.isGroup!
-                                        ? renderParticipants()
+                                        ? renderParticipants(context)
                                         : Container(),
                                     const SizedBox(
                                       height: 15,

@@ -21,7 +21,6 @@ class RobinConversation {
   final RobinController rc = Get.find();
 
   RobinConversation.fromJson(Map json) {
-    print(json);
     id = json['_id'];
     isGroup = json['is_group'];
     participants = json['participants'] ?? [];

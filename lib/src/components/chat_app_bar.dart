@@ -6,7 +6,7 @@ import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
-import 'package:robin_flutter/src/views/robin_conversation_info.dart';
+import 'package:robin_flutter/src/components/robin_conversation_info.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RobinController rc = Get.find();
