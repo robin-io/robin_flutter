@@ -20,7 +20,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   List<String> chatOptions() {
     List<String> options = ['Select Messages'];
-    if (rc.currentConversation!.isGroup!) {
+    if (rc.currentConversation.value.isGroup!) {
       options.insert(0, 'Group Info');
       options.add('Leave Group');
     } else {
@@ -85,8 +85,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   UserAvatar(
-                    isGroup: rc.currentConversation!.isGroup!,
-                    conversationIcon: rc.currentConversation!.conversationIcon,
+                    isGroup: rc.currentConversation.value.isGroup ?? false,
+                    conversationIcon:
+                        rc.currentConversation.value.conversationIcon,
                     size: 40,
                   ),
                   const SizedBox(width: 10),
@@ -99,7 +100,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                rc.currentConversation!.name!,
+                                rc.currentConversation.value.name ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
@@ -111,20 +112,22 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                           ],
                         ),
-                        rc.currentConversation!.isGroup!
+                        rc.currentConversation.value.isGroup ?? false
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 3.0),
                                 child: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        '${rc.currentConversation!.participants!.length.toString()} Members',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0XFF7A7A7A),
-                                          fontWeight: FontWeight.w400,
+                                      child: Obx(
+                                        () => Text(
+                                          '${rc.currentConversation.value.participants!.length.toString()} Members',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0XFF7A7A7A),
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -179,14 +182,14 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       showConversationInfo(context);
                     } else if (value == 'Leave Group') {
                       bool successful =
-                          await rc.leaveGroup(rc.currentConversation!.id!);
+                          await rc.leaveGroup(rc.currentConversation.value.id!);
                       if (successful) {
                         showSuccessMessage('Group left successfully');
-                        rc.allConversations.remove(rc.currentConversation!.id!);
-                        if(rc.currentConversation!.archived!){
+                        rc.allConversations
+                            .remove(rc.currentConversation.value.id!);
+                        if (rc.currentConversation.value.archived!) {
                           rc.renderArchivedConversations();
-                        }
-                        else{
+                        } else {
                           rc.renderHomeConversations();
                         }
                         Navigator.pop(context);

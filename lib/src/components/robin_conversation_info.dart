@@ -18,7 +18,17 @@ class RobinConversationInfo extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinConversationInfo({Key? key}) : super(key: key) {
-    rc.getConversationInfo();
+    // rc.getConversationInfo();
+  }
+
+  RxBool seeAllParticipants = false.obs;
+
+  List<String> getParticipantsRobinToken() {
+    List<String> participants = [];
+    for (Map user in rc.currentConversation.value.participants!) {
+      participants.add(user['user_token']);
+    }
+    return participants;
   }
 
   void confirmRemoveGroupParticipant(BuildContext context, Map participant) {
@@ -58,7 +68,7 @@ class RobinConversationInfo extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                       child: Text(
-                        'Do you want to remove ${participant['meta_data']['display_name']} from the ${rc.currentConversation!.name} Group',
+                        'Do you want to remove ${participant['meta_data']['display_name']} from the ${rc.currentConversation.value.name} Group',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Color(0XFF51545C),
@@ -111,6 +121,8 @@ class RobinConversationInfo extends StatelessWidget {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.pop(context);
+                                rc.removeGroupParticipant(
+                                    participant['user_token']);
                               },
                               child: Container(
                                 padding:
@@ -185,7 +197,7 @@ class RobinConversationInfo extends StatelessWidget {
                           children: [
                             CarouselSlider.builder(
                                 itemCount:
-                                rc.currentConversationInfo['photos'].length,
+                                    rc.currentConversationInfo['photos'].length,
                                 options: CarouselOptions(
                                   initialPage: i,
                                   height: MediaQuery.of(context).size.height,
@@ -194,27 +206,28 @@ class RobinConversationInfo extends StatelessWidget {
                                   autoPlay: false,
                                   scrollDirection: Axis.horizontal,
                                 ),
-                                itemBuilder: (BuildContext context, int itemIndex,
-                                    int pageViewIndex) {
+                                itemBuilder: (BuildContext context,
+                                    int itemIndex, int pageViewIndex) {
                                   String link = RobinMessage.fromJson(
-                                      rc.currentConversationInfo['photos']
-                                      [itemIndex])
+                                          rc.currentConversationInfo['photos']
+                                              [itemIndex])
                                       .link;
                                   return CachedNetworkImage(
                                     imageUrl: link,
                                     fit: BoxFit.fitWidth,
-                                    placeholder: (context, url) => const Padding(
+                                    placeholder: (context, url) =>
+                                        const Padding(
                                       padding: EdgeInsets.all(10),
                                       child: Padding(
                                         padding:
-                                        EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                            EdgeInsets.fromLTRB(10, 10, 15, 10),
                                         child: SizedBox(
                                           width: 24,
                                           height: 24,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.5,
                                             valueColor:
-                                            AlwaysStoppedAnimation<Color>(
+                                                AlwaysStoppedAnimation<Color>(
                                               Color(0XFF15AE73),
                                             ),
                                           ),
@@ -222,7 +235,7 @@ class RobinConversationInfo extends StatelessWidget {
                                       ),
                                     ),
                                     errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
+                                        const Icon(Icons.error),
                                   );
                                 }),
                             SafeArea(
@@ -254,7 +267,7 @@ class RobinConversationInfo extends StatelessWidget {
                 transitionBuilder: (context, anim1, anim2, child) {
                   return SlideTransition(
                     position: Tween(
-                        begin: const Offset(0, 1), end: const Offset(0, 0))
+                            begin: const Offset(0, 1), end: const Offset(0, 0))
                         .animate(anim1),
                     child: child,
                   );
@@ -394,20 +407,92 @@ class RobinConversationInfo extends StatelessWidget {
   Widget renderParticipants(BuildContext context) {
     List<Widget> participants = [];
     bool isModerator = false;
-    for (Map participant in rc.currentConversation!.participants!) {
+    rc.currentConversation.value.participants!.sort((a, b) {
+      if (b['is_moderator']) {
+        return 1;
+      }
+      return -1;
+    });
+    int currentUserIndex = 0;
+    for (Map participant in rc.currentConversation.value.participants!) {
       if (participant['user_token'] == rc.currentUser!.robinToken) {
         isModerator = participant['is_moderator'];
+        break;
       }
+      currentUserIndex += 1;
     }
-    for (Map participant in rc.currentConversation!.participants!) {
+    if (isModerator) {
+      participants.add(
+        GestureDetector(
+          onTap: () {
+            showAddGroupParticipants(
+              context,
+              getParticipantsRobinToken(),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(15, 10, 15, 12),
+            decoration: const BoxDecoration(
+              color: Color(0XFFFBFBFB),
+              border: Border(
+                bottom: BorderSide(
+                  width: 1,
+                  color: Color(0XFFF5F7FC),
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/add_participant.svg',
+                      package: 'robin_flutter',
+                      width: 24,
+                      height: 24,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text(
+                      'Add Group Participant',
+                      style: TextStyle(
+                        color: Color(0XFF51545C),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    Map currentUser =
+        rc.currentConversation.value.participants![currentUserIndex];
+    rc.currentConversation.value.participants!.removeAt(currentUserIndex);
+    rc.currentConversation.value.participants!.insert(0, currentUser);
+    int shownUsers = 0;
+    for (Map participant in rc.currentConversation.value.participants!) {
+      if (!seeAllParticipants.value && shownUsers >= 4) {
+        break;
+      }
+      shownUsers += 1;
       bool isCurrentUser =
           participant['user_token'] == rc.currentUser!.robinToken;
-
       participants.add(
         Container(
           decoration: const BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(width: 1, color: Color(0XFFF1F3F8)))),
+            border: Border(
+              bottom: BorderSide(
+                width: 1,
+                color: Color(0XFFF1F3F8),
+              ),
+            ),
+          ),
           padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
           child: Row(
             children: [
@@ -476,6 +561,31 @@ class RobinConversationInfo extends StatelessWidget {
         ),
       );
     }
+    if (!seeAllParticipants.value) {
+      participants.add(
+        GestureDetector(
+          onTap: () {
+            seeAllParticipants.value = true;
+          },
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+            color: const Color(0XFFFBFBFB),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'See All Participants',
+                  style: TextStyle(
+                    color: green,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     Widget allParticipants = Column(
       children: participants,
     );
@@ -518,7 +628,7 @@ class RobinConversationInfo extends StatelessWidget {
                     ),
                   ),
                   child: rc.chatViewLoading.value ||
-                          rc.gettingConversationInfo.value
+                          rc.conversationInfoLoading.value
                       ? const Padding(
                           padding: EdgeInsets.only(top: 15),
                           child: Center(
@@ -567,7 +677,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      rc.currentConversation!.isGroup!
+                                      rc.currentConversation.value.isGroup!
                                           ? 'Group Info'
                                           : 'Chat Info',
                                       style: const TextStyle(
@@ -590,33 +700,34 @@ class RobinConversationInfo extends StatelessWidget {
                                       height: 15,
                                     ),
                                     UserAvatar(
-                                      isGroup: rc.currentConversation!.isGroup!,
-                                      conversationIcon: rc.currentConversation!
-                                          .conversationIcon,
+                                      isGroup:
+                                          rc.currentConversation.value.isGroup!,
+                                      conversationIcon: rc.currentConversation
+                                          .value.conversationIcon,
                                       size: 75,
                                     ),
                                     const SizedBox(
                                       height: 15,
                                     ),
                                     Text(
-                                      rc.currentConversation!.name!,
+                                      rc.currentConversation.value.name!,
                                       style: const TextStyle(
                                         color: black,
                                         fontSize: 16,
                                       ),
                                     ),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? const SizedBox(
                                             height: 7,
                                           )
                                         : Container(),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? Text(
-                                            rc.currentConversation!
+                                            rc.currentConversation.value
                                                         .participants!.length ==
                                                     1
                                                 ? '1 Member'
-                                                : rc.currentConversation!
+                                                : rc.currentConversation.value
                                                         .participants!.length
                                                         .toString() +
                                                     ' Members',
@@ -626,12 +737,12 @@ class RobinConversationInfo extends StatelessWidget {
                                             ),
                                           )
                                         : Container(),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? const SizedBox(
                                             height: 7,
                                           )
                                         : Container(),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? RichText(
                                             text: TextSpan(
                                               text: 'Created ',
@@ -643,7 +754,7 @@ class RobinConversationInfo extends StatelessWidget {
                                                 TextSpan(
                                                   text: DateFormat('dd/MM/yyyy')
                                                       .format(
-                                                    rc.currentConversation!
+                                                    rc.currentConversation.value
                                                         .createdAt!,
                                                   ),
                                                   style: const TextStyle(
@@ -660,7 +771,7 @@ class RobinConversationInfo extends StatelessWidget {
                                                 ),
                                                 TextSpan(
                                                   text: rc.currentConversation
-                                                      ?.moderatorName,
+                                                      .value.moderatorName,
                                                   style: const TextStyle(
                                                     color: Color(0XFF071439),
                                                     fontSize: 12,
@@ -847,74 +958,33 @@ class RobinConversationInfo extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? const SizedBox(
                                             height: 15,
                                           )
                                         : Container(),
-                                    rc.currentConversation!.isGroup!
-                                        ? Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                15, 10, 15, 12),
-                                            decoration: const BoxDecoration(
-                                              color: Color(0XFFFBFBFB),
-                                              border: Border(
-                                                bottom: BorderSide(
-                                                  width: 1,
-                                                  color: Color(0XFFF5F7FC),
-                                                ),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    SvgPicture.asset(
-                                                      'assets/icons/add_participant.svg',
-                                                      package: 'robin_flutter',
-                                                      width: 24,
-                                                      height: 24,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    const Text(
-                                                      'Add Group Participant',
-                                                      style: TextStyle(
-                                                        color:
-                                                            Color(0XFF51545C),
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : Container(),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? renderParticipants(context)
                                         : Container(),
                                     const SizedBox(
                                       height: 15,
                                     ),
-                                    rc.currentConversation!.isGroup!
+                                    rc.currentConversation.value.isGroup!
                                         ? InkWell(
                                             onTap: () async {
                                               bool successful =
                                                   await rc.leaveGroup(rc
-                                                      .currentConversation!
+                                                      .currentConversation
+                                                      .value
                                                       .id!);
                                               if (successful) {
                                                 showSuccessMessage(
                                                     'Group left successfully');
                                                 rc.allConversations.remove(rc
-                                                    .currentConversation!.id!);
-                                                if (rc.currentConversation!
+                                                    .currentConversation
+                                                    .value
+                                                    .id!);
+                                                if (rc.currentConversation.value
                                                     .archived!) {
                                                   rc.renderArchivedConversations();
                                                 } else {
@@ -958,8 +1028,10 @@ class RobinConversationInfo extends StatelessWidget {
                                                 showSuccessMessage(
                                                     'Deleted successfully');
                                                 rc.allConversations.remove(rc
-                                                    .currentConversation!.id!);
-                                                if (rc.currentConversation!
+                                                    .currentConversation
+                                                    .value
+                                                    .id!);
+                                                if (rc.currentConversation.value
                                                     .archived!) {
                                                   rc.renderArchivedConversations();
                                                 } else {

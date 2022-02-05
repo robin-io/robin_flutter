@@ -18,9 +18,8 @@ class RobinConversation {
   DateTime? updatedAt;
   DateTime? createdAt;
 
-  final RobinController rc = Get.find();
-
   RobinConversation.fromJson(Map json) {
+    final RobinController rc = Get.find();
     id = json['_id'];
     isGroup = json['is_group'];
     participants = json['participants'] ?? [];
@@ -48,5 +47,23 @@ class RobinConversation {
         ? DateTime.parse(json['updated_at'])
         : DateTime.parse(json['last_message']['timestamp']);
     createdAt = DateTime.parse(json['created_at']);
+  }
+
+  RobinConversation.empty() {
+    id = null;
+    isGroup = null;
+    participants = null;
+    name = null;
+    moderatorToken = null;
+    moderatorName = null;
+    conversationIcon = null;
+    name = null;
+    token = null;
+    lastMessage = null;
+    unreadMessages = null;
+    archived = null;
+    deletedFor = null;
+    updatedAt = null;
+    createdAt = null;
   }
 }

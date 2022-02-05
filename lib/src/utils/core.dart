@@ -259,4 +259,24 @@ class RobinCore {
       throw e.toString();
     }
   }
+
+  starMessage(Map<String, dynamic> body, String messageId) async {
+    try {
+      return await api.starMessage(body, messageId);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+
+  getStarredMessages(String userToken) async {
+    try {
+      return await api.getStarredMessages(userToken);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+
+
 }

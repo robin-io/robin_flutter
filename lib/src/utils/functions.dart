@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:robin_flutter/src/components/robin_add_group_participants.dart';
 import 'package:robin_flutter/src/components/robin_conversation_media.dart';
 import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
@@ -115,6 +116,17 @@ void showSelectGroupParticipants(BuildContext context) {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (_) => RobinSelectGroupParticipants(),
+  );
+}
+
+void showAddGroupParticipants(BuildContext context, List<String> existingParticipants) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinAddGroupParticipants(
+      existingParticipants: existingParticipants,
+    ),
   );
 }
 

@@ -290,6 +290,43 @@ class _TextBubbleState extends State<TextBubble> {
                               ),
                             ),
                           ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     entry?.remove();
+                          //   },
+                          //   child: Container(
+                          //     decoration: const BoxDecoration(
+                          //       border: Border(
+                          //         bottom: BorderSide(
+                          //           width: 1,
+                          //           color: Color(0XFFF4F4F4),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     padding: const EdgeInsets.all(12),
+                          //     child: Row(
+                          //       crossAxisAlignment: CrossAxisAlignment.center,
+                          //       mainAxisAlignment:
+                          //           MainAxisAlignment.spaceBetween,
+                          //       children: [
+                          //         const Text(
+                          //           "Star Message",
+                          //           style: TextStyle(
+                          //             fontSize: 14,
+                          //             color: Color(0XFF101010),
+                          //           ),
+                          //         ),
+                          //         const SizedBox(width: 10),
+                          //         SvgPicture.asset(
+                          //           'assets/icons/star.svg',
+                          //           package: 'robin_flutter',
+                          //           width: 22,
+                          //           height: 22,
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                           GestureDetector(
                             onTap: () {
                               entry?.remove();
@@ -556,26 +593,34 @@ class _TextBubbleState extends State<TextBubble> {
                                     child: GestureDetector(
                                       onTap: !rc.selectMessageView.value
                                           ? () {
-                                        showGeneralDialog(
-                                          barrierLabel: "Label",
-                                          barrierDismissible: false,
-                                          barrierColor: Colors.transparent,
-                                          transitionDuration: const Duration(milliseconds: 200),
-                                          context: context,
-                                          pageBuilder: (context, anim1, anim2) {
-                                            return ImagePreview(
-                                              widget.message.link,
-                                            );
-                                          },
-                                          transitionBuilder: (context, anim1, anim2, child) {
-                                            return SlideTransition(
-                                              position: Tween(
-                                                  begin: const Offset(0, 1), end: const Offset(0, 0))
-                                                  .animate(anim1),
-                                              child: child,
-                                            );
-                                          },
-                                        );
+                                              showGeneralDialog(
+                                                barrierLabel: "Label",
+                                                barrierDismissible: false,
+                                                barrierColor:
+                                                    Colors.transparent,
+                                                transitionDuration:
+                                                    const Duration(
+                                                        milliseconds: 200),
+                                                context: context,
+                                                pageBuilder:
+                                                    (context, anim1, anim2) {
+                                                  return ImagePreview(
+                                                    widget.message.link,
+                                                  );
+                                                },
+                                                transitionBuilder: (context,
+                                                    anim1, anim2, child) {
+                                                  return SlideTransition(
+                                                    position: Tween(
+                                                            begin: const Offset(
+                                                                0, 1),
+                                                            end: const Offset(
+                                                                0, 0))
+                                                        .animate(anim1),
+                                                    child: child,
+                                                  );
+                                                },
+                                              );
                                             }
                                           : null,
                                       child: Hero(
@@ -729,7 +774,7 @@ class _TextBubbleState extends State<TextBubble> {
                                 ),
                               ),
                               widget.message.sentByMe &&
-                                      !rc.currentConversation!.isGroup!
+                                      !rc.currentConversation.value.isGroup!
                                   ? SizedBox(
                                       height: 10,
                                       child: SvgPicture.asset(
@@ -790,7 +835,7 @@ class _TextBubbleState extends State<TextBubble> {
                                     ),
                                   ),
                                   widget.message.sentByMe &&
-                                          !rc.currentConversation!.isGroup!
+                                          !rc.currentConversation.value.isGroup!
                                       ? SizedBox(
                                           height: 10,
                                           child: SvgPicture.asset(

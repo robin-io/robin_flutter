@@ -18,6 +18,8 @@ class Robin extends StatelessWidget {
   final Function getUsers;
   final RobinKeys keys;
 
+  final RobinController rc = Get.put(RobinController());
+
   Robin({
     Key? key,
     required this.apiKey,
@@ -27,8 +29,6 @@ class Robin extends StatelessWidget {
   }) : super(key: key) {
     rc.initializeController(apiKey, currentUser, getUsers, keys);
   }
-
-  final RobinController rc = Get.put(RobinController());
 
   @override
   Widget build(BuildContext context) {

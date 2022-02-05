@@ -52,7 +52,7 @@ class RenderMessages extends StatelessWidget {
                                 .senderToken !=
                             message.senderToken) ||
                     index == rc.conversationMessages.length - 1,
-                firstInSeries: !rc.currentConversation!.isGroup!
+                firstInSeries: !rc.currentConversation.value.isGroup!
                     ? false
                     : message.sentByMe
                         ? false

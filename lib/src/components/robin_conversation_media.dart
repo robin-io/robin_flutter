@@ -299,7 +299,7 @@ class RobinConversationMedia extends StatelessWidget {
                     ),
                   ),
                   child: rc.chatViewLoading.value ||
-                          rc.gettingConversationInfo.value
+                          rc.conversationInfoLoading.value
                       ? const Padding(
                           padding: EdgeInsets.only(top: 15),
                           child: Center(
@@ -348,7 +348,7 @@ class RobinConversationMedia extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      rc.currentConversation!.isGroup!
+                                      rc.currentConversation.value.isGroup!
                                           ? 'Group Media'
                                           : 'Chat Media',
                                       style: const TextStyle(

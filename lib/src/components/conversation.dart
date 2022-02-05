@@ -100,7 +100,7 @@ class Conversation extends StatelessWidget {
           ),
         ).then((value) {
           Future.delayed(const Duration(milliseconds: 100), () {
-            rc.currentConversation = null;
+            rc.currentConversation.value = RobinConversation.empty();
           });
         });
       },

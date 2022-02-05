@@ -283,4 +283,28 @@ class DataSource {
     });
   }
 
+  starMessage(Map<String, dynamic> body, String messageId) async {
+    return netUtil.post('$starMessage/$messageId', body).then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  getStarredMessages(String userToken) async {
+    return netUtil.get('$starMessage/$userToken').then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
 }
