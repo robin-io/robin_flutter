@@ -38,6 +38,8 @@ class RobinController extends GetxController {
   RxBool isFileSending = false.obs;
   RxBool atMaxScroll = false.obs;
 
+  RxBool isRecording = false.obs;
+
   RxBool conversationInfoLoading = false.obs;
 
   RxBool isForwarding = false.obs;
@@ -143,6 +145,7 @@ class RobinController extends GetxController {
     robinConnection!.stream.listen(
       (data) {
         data = json.decode(data);
+        print(data);
         if (data['is_event'] == null || data['is_event'] == false) {
           RobinMessage robinMessage = RobinMessage.fromJson(data);
           if (allConversations[robinMessage.conversationId] != null) {
@@ -184,6 +187,9 @@ class RobinController extends GetxController {
             case 'delete.message':
               handleDeleteMessages(data['value']['ids']);
               break;
+            case 'new.conversation':
+              handleNewConversation(data['value']);
+              break;
             case 'read.reciept':
               if (currentConversation.value.id! ==
                   data['value']['conversation_id']) {
@@ -209,6 +215,20 @@ class RobinController extends GetxController {
         robinConnect();
       },
     );
+  }
+
+  handleNewConversation(Map conversation) {
+    RobinConversation robinConversation =
+        RobinConversation.fromJson(conversation);
+    allConversations = {
+      robinConversation.id!: robinConversation,
+      ...allConversations,
+    };
+    if (robinConversation.archived!) {
+      renderArchivedConversations();
+    } else {
+      renderHomeConversations();
+    }
   }
 
   handleMessageForward(List messages) {
@@ -902,12 +922,10 @@ class RobinController extends GetxController {
     }
   }
 
-  void starMessage(String messageId) async{
+  void starMessage(String messageId) async {
     Map<String, dynamic> body = {
       'conversation_id': currentUser!.robinToken,
     };
     print(await robinCore!.starMessage(body, messageId));
   }
-
-
 }
