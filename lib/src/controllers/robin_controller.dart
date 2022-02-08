@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_last_message.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
+import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -186,6 +187,31 @@ class RobinController extends GetxController {
               break;
             case 'delete.message':
               handleDeleteMessages(data['value']['ids']);
+              break;
+            case 'message.reaction':
+              if (conversationMessages[data['value']['message_id']] != null) {
+                RobinMessage robinMessage =
+                conversationMessages[data['value']['message_id']];
+                if(!robinMessage.reactions.containsKey(data['value']['reaction'])){
+                  robinMessage.reactions[data['value']['reaction']] = RobinMessageReaction.fromJson(data['value']);
+                  conversationMessages[data['value']['message_id']] = robinMessage;
+                }
+              }
+              break;
+            case 'message.remove.reaction':
+              if (conversationMessages[data['value']['message_id']] != null) {
+                RobinMessage robinMessage =
+                    conversationMessages[data['value']['message_id']];
+                for (RobinMessageReaction reaction
+                    in robinMessage.reactions.values.toList()) {
+                  if (reaction.id == data['value']['_id']) {
+                    robinMessage.reactions.remove(reaction.type);
+                    conversationMessages[data['value']['message_id']] =
+                        robinMessage;
+                    break;
+                  }
+                }
+              }
               break;
             case 'new.conversation':
               handleNewConversation(data['value']);

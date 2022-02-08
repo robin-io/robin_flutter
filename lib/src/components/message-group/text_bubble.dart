@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:ui';
-
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -24,7 +22,7 @@ class TextBubble extends StatefulWidget {
   final double maxWidth;
   final bool? loadUrl;
 
-  TextBubble({
+  const TextBubble({
     Key? key,
     required this.message,
     required this.lastInSeries,

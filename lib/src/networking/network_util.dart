@@ -53,7 +53,7 @@ class NetworkHelper {
       return http
           .post(Uri.parse(url), body: json.encode(body), headers: headers)
           .then((http.Response response) {
-        final String res = response.body;
+        final String res = utf8.decode(response.bodyBytes);
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
         if (statusCode < 200 || statusCode > 400) throw result['msg'];
@@ -124,7 +124,7 @@ class NetworkHelper {
       return http
           .delete(Uri.parse(url), body: json.encode(body), headers: headers)
           .then((http.Response response) {
-        final String res = response.body;
+        final String res = utf8.decode(response.bodyBytes);
         final int statusCode = response.statusCode;
         var result = _decoder.convert(res);
         if (statusCode < 200 || statusCode > 400) throw result['msg'];

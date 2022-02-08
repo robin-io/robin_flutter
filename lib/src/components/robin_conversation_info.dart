@@ -18,7 +18,8 @@ class RobinConversationInfo extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinConversationInfo({Key? key}) : super(key: key) {
-    // rc.getConversationInfo();
+    rc.getConversationInfo();
+    print(rc.currentConversation);
   }
 
   RxBool seeAllParticipants = false.obs;

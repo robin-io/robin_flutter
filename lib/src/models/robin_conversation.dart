@@ -19,6 +19,7 @@ class RobinConversation {
   DateTime? createdAt;
 
   RobinConversation.fromJson(Map json) {
+    print(json);
     final RobinController rc = Get.find();
     id = json['_id'];
     isGroup = json['is_group'];
@@ -28,7 +29,7 @@ class RobinConversation {
       moderatorToken = json['moderator']['user_token'];
       moderatorName = json['moderator']['meta_data'] == null
           ? ''
-          : json['moderator']['meta_data']['displayName'];
+          : json['moderator']['meta_data']['display_name'];
       conversationIcon = json['group_icon'] ?? "";
     } else {
       if (rc.currentUser?.robinToken == json['sender_token']) {
