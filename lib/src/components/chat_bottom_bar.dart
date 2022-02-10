@@ -388,7 +388,7 @@ class ChatBottomBar extends StatelessWidget {
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: AnimatedSizeAndFade(
                 child: rc.isRecording.value
-                    ? const RecordingBottomBar()
+                    ? RecordingBottomBar()
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -540,7 +540,10 @@ class ChatBottomBar extends StatelessWidget {
                             //     fit: BoxFit.cover,
                             //   ),
                             // ),
-                            secondChild: const SizedBox(height: 24, width: 1,),
+                            secondChild: const SizedBox(
+                              height: 24,
+                              width: 1,
+                            ),
                             crossFadeState: rc.showSendButton.value ||
                                     rc.file['file'] != null
                                 ? CrossFadeState.showFirst

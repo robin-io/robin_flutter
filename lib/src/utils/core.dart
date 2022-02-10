@@ -19,14 +19,24 @@ class RobinCore {
     );
   }
 
-  void subscribe() {
+  void subscribe() async {
     Map sub = {
       'type': 0,
       'channel': robinChannel,
       'content': {},
       'conversation_id': "",
     };
-    rc.robinConnection!.sink.add(json.encode(sub));
+    try {
+      if (rc.robinConnection!.closeCode != null) {
+        throw "reconnect";
+      }
+      rc.robinConnection!.sink.add(json.encode(sub));
+    } catch (e) {
+      rc.robinConnect();
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        subscribe();
+      });
+    }
   }
 
   void sendTextMessage(String conversationId, Map message, String senderToken,
@@ -40,11 +50,15 @@ class RobinCore {
       'conversation_id': conversationId,
     };
     try {
+      if (rc.robinConnection!.closeCode != null) {
+        throw "reconnect";
+      }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      await Future.delayed(const Duration(milliseconds: 1000));
       rc.robinConnect();
-      sendTextMessage(conversationId, message, senderToken, senderName);
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        sendTextMessage(conversationId, message, senderToken, senderName);
+      });
     }
   }
 
@@ -61,11 +75,16 @@ class RobinCore {
       'is_reply': true,
     };
     try {
+      if (rc.robinConnection!.closeCode != null) {
+        throw "reconnect";
+      }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      await Future.delayed(const Duration(milliseconds: 1000));
       rc.robinConnect();
-      replyToMessage(message, conversationId, replyTo, senderToken, senderName);
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        replyToMessage(
+            message, conversationId, replyTo, senderToken, senderName);
+      });
     }
   }
 
@@ -268,7 +287,6 @@ class RobinCore {
     }
   }
 
-
   getStarredMessages(String userToken) async {
     try {
       return await api.getStarredMessages(userToken);
@@ -276,7 +294,4 @@ class RobinCore {
       throw e.toString();
     }
   }
-
-
-
 }

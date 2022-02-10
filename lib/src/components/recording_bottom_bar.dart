@@ -22,25 +22,32 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
 
   Timer? t;
 
-  FlutterAudioRecorder2 recorder =
-      FlutterAudioRecorder2("voice_note", audioFormat: AudioFormat.AAC);
+  Recording? recording;
 
   initialize() async {
     bool? hasPermission = await FlutterAudioRecorder2.hasPermissions;
     if (hasPermission != null && hasPermission) {
-      await recorder.initialized;
+      await rc.recorder.initialized;
       recordDuration = 0;
-      await recorder.start();
-      Timer.periodic(const Duration(milliseconds: 1000), (t) async {
-        Recording? recording = await recorder.current(channel: 0);
-        recordDuration += 1;
-        print(formatTime(recordDuration));
-      });
+      recording = await rc.recorder.current(channel: 0);
+      if (recording?.status != RecordingStatus.Recording) {
+        await rc.recorder.start();
+        Timer.periodic(const Duration(milliseconds: 1000), (t) async {
+          print(mounted);
+          if(mounted){
+            setState(() {
+              recordDuration += 1;
+              print(formatTime(recordDuration));
+              print(recording?.status);
+            });
+          }
+        });
+      }
     }
   }
 
   String formatTime(int seconds) {
-    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0').substring(3);
   }
 
   @override
@@ -50,8 +57,8 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
   }
 
   disposeRecorder() async {
+    var result = await rc.recorder.stop();
     t?.cancel();
-    var result = await recorder.stop();
   }
 
   @override
@@ -63,7 +70,6 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
         InkWell(
           onTap: () {
             disposeRecorder();
-            rc.isRecording.value = false;
           },
           child: const Icon(
             Icons.clear,
@@ -76,15 +82,15 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
         ),
         Container(
           height: 52,
-          width: 252,
+          width: 249,
           color: Colors.red,
         ),
         const SizedBox(
           width: 3,
         ),
-        const Text(
-          '10:24',
-          style: TextStyle(
+        Text(
+          formatTime(recordDuration),
+          style: const TextStyle(
             fontSize: 13,
             color: green,
           ),

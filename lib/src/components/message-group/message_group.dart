@@ -555,7 +555,7 @@ class _MessageGroupState extends State<MessageGroup> {
                                                           const EdgeInsets.all(
                                                               2),
                                                       child: Image.asset(
-                                                        'assets/images/reactions/$reaction.png',
+                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
                                                         package:
                                                             'robin_flutter',
                                                         width: 22,
@@ -643,7 +643,7 @@ class _MessageGroupState extends State<MessageGroup> {
                                                           const EdgeInsets
                                                               .all(3),
                                                       child: Image.asset(
-                                                        'assets/images/reactions/$reaction.png',
+                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
                                                         package:
                                                             'robin_flutter',
                                                         width: 22,

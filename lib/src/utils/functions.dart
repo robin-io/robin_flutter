@@ -119,7 +119,8 @@ void showSelectGroupParticipants(BuildContext context) {
   );
 }
 
-void showAddGroupParticipants(BuildContext context, List<String> existingParticipants) {
+void showAddGroupParticipants(
+    BuildContext context, List<String> existingParticipants) {
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -348,4 +349,33 @@ void disposeChatOptions() {
   rc.chatOptionsEntry?.remove();
   rc.chatOptionsOpened.value = false;
   rc.chatOptionsEntry = null;
+}
+
+String reactionToText(String value) {
+  String reaction = '';
+  switch (value) {
+    case '⁉️':
+      reaction = 'exclaim';
+      break;
+
+    case '😂':
+      reaction = 'laugh';
+      break;
+
+    case '❤️':
+      reaction = 'heart';
+      break;
+
+    case '👍':
+      reaction = 'thumbs_up';
+      break;
+
+    case '👎':
+      reaction = 'thumbs_down';
+      break;
+
+    default:
+      break;
+  }
+  return reaction;
 }

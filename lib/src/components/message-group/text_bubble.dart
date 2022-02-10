@@ -137,7 +137,7 @@ class _TextBubbleState extends State<TextBubble> {
                                   ),
                                   padding: const EdgeInsets.all(9),
                                   child: Image.asset(
-                                    'assets/images/reactions/$reaction.png',
+                                    'assets/images/reactions/${reactionToText(reaction)}.png',
                                     package: 'robin_flutter',
                                     width: 22,
                                     height: 22,
