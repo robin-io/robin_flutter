@@ -152,9 +152,13 @@ class RobinController extends GetxController {
     robinConnection?.stream.listen(
       (data) {
         data = json.decode(data);
+        print(data);
         if (data['is_event'] == null || data['is_event'] == false) {
           RobinMessage robinMessage = RobinMessage.fromJson(data);
           if (allConversations[robinMessage.conversationId] != null) {
+            if(!robinMessage.sentByMe){
+              FlutterRingtonePlayer.playNotification();
+            }
             allConversations[robinMessage.conversationId]?.lastMessage =
                 RobinLastMessage.fromRobinMessage(robinMessage);
             allConversations[robinMessage.conversationId]?.updatedAt =
@@ -167,20 +171,12 @@ class RobinController extends GetxController {
             renderHomeConversations();
             renderArchivedConversations();
           }
-          if (allConversations[robinMessage.conversationId] != null && !robinMessage.sentByMe) {
-            FlutterRingtonePlayer.playNotification();
-          }
           if (robinMessage.conversationId == currentConversation.value.id) {
             conversationMessages[robinMessage.id] = robinMessage;
-          }
-          if (currentConversation.value.id != null) {
             if (!currentConversation.value.isGroup! &&
-                robinMessage.conversationId == currentConversation.value.id &&
                 !robinMessage.sentByMe) {
               sendReadReceipts([robinMessage.id]);
             }
-          }
-          if (robinMessage.conversationId == currentConversation.value.id) {
             Future.delayed(const Duration(milliseconds: 17), () {
               scrollToEnd();
             });
@@ -251,15 +247,18 @@ class RobinController extends GetxController {
   handleNewConversation(Map conversation) {
     RobinConversation robinConversation =
         RobinConversation.fromJson(conversation);
-    allConversations = {
-      robinConversation.id!: robinConversation,
-      ...allConversations,
-    };
-    if (robinConversation.archived!) {
-      renderArchivedConversations();
-    } else {
-      renderHomeConversations();
+    if(currentUser?.robinToken == robinConversation.token){
+      allConversations = {
+        robinConversation.id!: robinConversation,
+        ...allConversations,
+      };
+      if (robinConversation.archived!) {
+        renderArchivedConversations();
+      } else {
+        renderHomeConversations();
+      }
     }
+
   }
 
   handleMessageForward(List messages) {

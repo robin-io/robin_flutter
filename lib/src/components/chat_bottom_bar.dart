@@ -398,6 +398,7 @@ class ChatBottomBar extends StatelessWidget {
                               if (rc.chatOptionsOpened.value) {
                                 disposeChatOptions();
                               } else {
+                                FocusManager.instance.primaryFocus?.unfocus();
                                 showOverLay(context);
                               }
                             },

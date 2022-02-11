@@ -391,6 +391,7 @@ class _MessageGroupState extends State<MessageGroup> {
         rc.replyView.value = false;
         rc.replyMessage = widget.message;
         rc.replyView.value = true;
+        rc.messageFocus.requestFocus();
       },
       child: Padding(
         padding: EdgeInsets.only(
