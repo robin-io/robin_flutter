@@ -55,6 +55,7 @@ class RobinCore {
       }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
+      print(e.toString());
       rc.robinConnect();
       await Future.delayed(const Duration(milliseconds: 1000), () {
         sendTextMessage(conversationId, message, senderToken, senderName);

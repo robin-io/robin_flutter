@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_recorder2/flutter_audio_recorder2.dart';
 import 'package:get/get.dart';
@@ -45,6 +47,8 @@ class RobinController extends GetxController {
   RxBool conversationInfoLoading = false.obs;
 
   RxBool isForwarding = false.obs;
+
+  StreamSubscription? robinStream;
 
   OverlayEntry? chatOptionsEntry;
   RxBool chatOptionsOpened = false.obs;
@@ -101,7 +105,7 @@ class RobinController extends GetxController {
   TextEditingController groupChatNameController = TextEditingController();
 
   FlutterAudioRecorder2 recorder =
-  FlutterAudioRecorder2("voice_note", audioFormat: AudioFormat.AAC);
+      FlutterAudioRecorder2("voice_note", audioFormat: AudioFormat.AAC);
 
   void initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
@@ -140,41 +144,55 @@ class RobinController extends GetxController {
     });
   }
 
-  Future robinConnect() async{
+  Future robinConnect() async {
     robinConnection = robinCore!.connect(apiKey, currentUser!.robinToken);
-    robinCore!.subscribe();
-    connectionStartListen();
-
+    Future.delayed(const Duration(milliseconds: 750), () {
+      robinCore!.subscribe();
+    });
+    Future.delayed(const Duration(milliseconds: 750), () {
+      connectionStartListen();
+    });
   }
 
-  connectionStartListen() {
+  connectionStartListen() async{
     print('starting stream');
-    robinConnection?.stream.listen(
+    await robinStream?.cancel();
+    robinStream = robinConnection?.stream.listen(
       (data) {
         data = json.decode(data);
         print(data);
         if (data['is_event'] == null || data['is_event'] == false) {
           RobinMessage robinMessage = RobinMessage.fromJson(data);
           if (allConversations[robinMessage.conversationId] != null) {
-            if(!robinMessage.sentByMe){
+            if (!robinMessage.sentByMe) {
               FlutterRingtonePlayer.playNotification();
             }
             allConversations[robinMessage.conversationId]?.lastMessage =
                 RobinLastMessage.fromRobinMessage(robinMessage);
             allConversations[robinMessage.conversationId]?.updatedAt =
                 DateTime.now();
+            if (robinMessage.conversationId != currentConversation.value.id) {
+              int unreadMessages = allConversations[robinMessage.conversationId]
+                      ?.unreadMessages ??
+                  0;
+              unreadMessages += 1;
+              allConversations[robinMessage.conversationId]?.unreadMessages =
+                  unreadMessages;
+            }
             allConversations[robinMessage.conversationId] =
                 allConversations[robinMessage.conversationId]!;
             var sortedEntries = sortConversations();
             allConversations =
                 Map<String, RobinConversation>.fromEntries(sortedEntries);
-            renderHomeConversations();
-            renderArchivedConversations();
+            if (allConversations[robinMessage.conversationId]!.archived!) {
+              renderArchivedConversations();
+            } else {
+              renderHomeConversations();
+            }
           }
           if (robinMessage.conversationId == currentConversation.value.id) {
             conversationMessages[robinMessage.id] = robinMessage;
-            if (!currentConversation.value.isGroup! &&
-                !robinMessage.sentByMe) {
+            if (!robinMessage.sentByMe) {
               sendReadReceipts([robinMessage.id]);
             }
             Future.delayed(const Duration(milliseconds: 17), () {
@@ -192,10 +210,13 @@ class RobinController extends GetxController {
             case 'message.reaction':
               if (conversationMessages[data['value']['message_id']] != null) {
                 RobinMessage robinMessage =
-                conversationMessages[data['value']['message_id']];
-                if(!robinMessage.reactions.containsKey(data['value']['reaction'])){
-                  robinMessage.reactions[data['value']['reaction']] = RobinMessageReaction.fromJson(data['value']);
-                  conversationMessages[data['value']['message_id']] = robinMessage;
+                    conversationMessages[data['value']['message_id']];
+                if (!robinMessage.reactions
+                    .containsKey(data['value']['reaction'])) {
+                  robinMessage.reactions[data['value']['reaction']] =
+                      RobinMessageReaction.fromJson(data['value']);
+                  conversationMessages[data['value']['message_id']] =
+                      robinMessage;
                 }
               }
               break;
@@ -218,8 +239,9 @@ class RobinController extends GetxController {
               handleNewConversation(data['value']);
               break;
             case 'read.reciept':
-              if (currentConversation.value.id! ==
-                  data['value']['conversation_id']) {
+              if (currentConversation.value.id != null &&
+                  currentConversation.value.id ==
+                      data['value']['conversation_id']) {
                 for (String messageId in data['value']['message_ids']) {
                   if (conversationMessages[messageId] != null) {
                     conversationMessages[messageId].isRead = true;
@@ -235,11 +257,12 @@ class RobinController extends GetxController {
           }
         }
       },
-      onDone: () {
-        robinConnect();
-      },
       onError: (error) {
-        robinConnect();
+        // print(error.toString());
+        // Future.delayed(const Duration(seconds: 1), () {
+        //   print('on error');
+        //   robinConnect();
+        // });
       },
     );
   }
@@ -247,7 +270,7 @@ class RobinController extends GetxController {
   handleNewConversation(Map conversation) {
     RobinConversation robinConversation =
         RobinConversation.fromJson(conversation);
-    if(currentUser?.robinToken == robinConversation.token){
+    if (currentUser?.robinToken == robinConversation.token) {
       allConversations = {
         robinConversation.id!: robinConversation,
         ...allConversations,
@@ -258,7 +281,6 @@ class RobinController extends GetxController {
         renderHomeConversations();
       }
     }
-
   }
 
   handleMessageForward(List messages) {

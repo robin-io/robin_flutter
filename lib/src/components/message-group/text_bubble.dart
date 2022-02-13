@@ -249,6 +249,50 @@ class _TextBubbleState extends State<TextBubble> {
                               ),
                             ),
                           ),
+                          !widget.message.isAttachment
+                              ? GestureDetector(
+                                  onTap: () {
+                                    entry?.remove();
+                                    Clipboard.setData(
+                                      ClipboardData(
+                                        text: widget.message.text,
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          width: 1,
+                                          color: Color(0XFFF4F4F4),
+                                        ),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: const [
+                                        Text(
+                                          "Copy",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0XFF101010),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Icon(
+                                          Icons.content_copy,
+                                          size: 22,
+                                          color: Color(0XFF51545C),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : Container(),
                           GestureDetector(
                             onTap: () {
                               entry?.remove();

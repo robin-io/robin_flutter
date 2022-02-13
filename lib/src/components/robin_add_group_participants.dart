@@ -75,8 +75,8 @@ class RobinAddGroupParticipants extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const UserAvatar(
-                  isGroup: false,
+                UserAvatar(
+                  name: user.displayName,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

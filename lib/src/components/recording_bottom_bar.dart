@@ -20,7 +20,7 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
 
   int recordDuration = 0;
 
-  Timer? t;
+  Timer? timer;
 
   Recording? recording;
 
@@ -32,22 +32,25 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
       recording = await rc.recorder.current(channel: 0);
       if (recording?.status != RecordingStatus.Recording) {
         await rc.recorder.start();
-        Timer.periodic(const Duration(milliseconds: 1000), (t) async {
-          print(mounted);
-          if(mounted){
+        timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
+          if (mounted) {
             setState(() {
               recordDuration += 1;
               print(formatTime(recordDuration));
               print(recording?.status);
             });
           }
+          print('yah');
         });
       }
     }
   }
 
   String formatTime(int seconds) {
-    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0').substring(3);
+    return '${(Duration(seconds: seconds))}'
+        .split('.')[0]
+        .padLeft(8, '0')
+        .substring(3);
   }
 
   @override
@@ -58,7 +61,14 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
 
   disposeRecorder() async {
     var result = await rc.recorder.stop();
-    t?.cancel();
+    timer?.cancel();
+    rc.isRecording.value = false;
+  }
+
+  @override
+  void dispose() {
+    disposeRecorder();
+    super.dispose();
   }
 
   @override

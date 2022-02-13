@@ -43,7 +43,7 @@ class RobinForwardMessages extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 UserAvatar(
-                  isGroup: conversation.isGroup!,
+                  name: conversation.name!,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

@@ -497,8 +497,8 @@ class RobinConversationInfo extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
           child: Row(
             children: [
-              const UserAvatar(
-                isGroup: false,
+              UserAvatar(
+                name: '${participant['meta_data']['display_name']}',
                 size: 40,
               ),
               const SizedBox(width: 10),
@@ -701,8 +701,7 @@ class RobinConversationInfo extends StatelessWidget {
                                       height: 15,
                                     ),
                                     UserAvatar(
-                                      isGroup:
-                                          rc.currentConversation.value.isGroup!,
+                                      name: rc.currentConversation.value.name!,
                                       conversationIcon: rc.currentConversation
                                           .value.conversationIcon,
                                       size: 75,

@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:robin_flutter/src/components/robin_forward_messages.dart';
-import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/components/user_avatar.dart';
-import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
-import 'package:robin_flutter/src/components/robin_conversation_info.dart';
+import 'package:robin_flutter/src/components/user_avatar.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RobinController rc = Get.find();
@@ -85,7 +83,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   UserAvatar(
-                    isGroup: rc.currentConversation.value.isGroup ?? false,
+                    name: rc.currentConversation.value.name ?? '',
                     conversationIcon:
                         rc.currentConversation.value.conversationIcon,
                     size: 40,

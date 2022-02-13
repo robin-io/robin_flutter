@@ -12,14 +12,13 @@ class RobinConversation {
   String? conversationIcon;
   RobinLastMessage? lastMessage;
   List? participants;
-  Map? unreadMessages;
+  int? unreadMessages;
   bool? archived;
   List? deletedFor;
   DateTime? updatedAt;
   DateTime? createdAt;
 
   RobinConversation.fromJson(Map json) {
-    print(json);
     final RobinController rc = Get.find();
     id = json['_id'];
     isGroup = json['is_group'];
@@ -41,7 +40,9 @@ class RobinConversation {
       }
     }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);
-    unreadMessages = {};
+    unreadMessages = json['unread_messages'] == null
+        ? 0
+        : json['unread_messages'][rc.currentUser?.robinToken] ?? 0;
     archived = json['archived_for'].contains(rc.currentUser?.robinToken);
     deletedFor = [];
     updatedAt = json['last_message'] == null
