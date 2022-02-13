@@ -30,7 +30,7 @@ class RobinMessage {
     isForwarded = json['is_forwarded'] ?? false;
     senderToken = isForwarded ? json['content']['sender_token'] : json['sender_token'];
     sentByMe = rc.currentUser?.robinToken == senderToken;
-    senderName = json['sender_name'];
+    senderName = json['sender_name'] ?? "";
     replyTo = json['reply_to'];
     isRead = json['is_read'] ?? false;
     reactions =  convertToReactions(json['reactions'] ?? []);

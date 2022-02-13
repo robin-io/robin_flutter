@@ -12,14 +12,16 @@ import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/components/message-group/reply_arc.dart';
 import 'package:robin_flutter/src/components/message-group/text_bubble.dart';
 
-class MessageGroup extends StatelessWidget {
+import '../measure_size.dart';
+
+class MessageGroup extends StatefulWidget {
   final RobinMessage message;
   final bool lastInSeries;
   final bool firstInSeries;
   final double maxWidth;
   final bool? loadUrl;
 
-  MessageGroup({
+  const MessageGroup({
     Key? key,
     required this.message,
     required this.lastInSeries,
@@ -28,16 +30,23 @@ class MessageGroup extends StatelessWidget {
     this.loadUrl,
   }) : super(key: key);
 
+  @override
+  State<MessageGroup> createState() => _MessageGroupState();
+}
+
+class _MessageGroupState extends State<MessageGroup> {
   final RobinController rc = Get.find();
 
+  double textBubbleSize = 60;
+
   Widget renderReply() {
-    RobinMessage? reply = rc.conversationMessages[message.replyTo];
+    RobinMessage? reply = rc.conversationMessages[widget.message.replyTo];
     if (reply == null) {
       return Container();
     }
     return Align(
       alignment: reply.sentByMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: reply.sentByMe && message.sentByMe
+      child: reply.sentByMe && widget.message.sentByMe
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -51,7 +60,7 @@ class MessageGroup extends StatelessWidget {
                     : Container(
                         padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
                         constraints: BoxConstraints(
-                          maxWidth: maxWidth,
+                          maxWidth: widget.maxWidth,
                         ),
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -121,7 +130,7 @@ class MessageGroup extends StatelessWidget {
                 const SizedBox(height: 3),
               ],
             )
-          : reply.sentByMe && !message.sentByMe
+          : reply.sentByMe && !widget.message.sentByMe
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -135,7 +144,7 @@ class MessageGroup extends StatelessWidget {
                         : Container(
                             padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
                             constraints: BoxConstraints(
-                              maxWidth: maxWidth,
+                              maxWidth: widget.maxWidth,
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
@@ -203,7 +212,7 @@ class MessageGroup extends StatelessWidget {
                     const SizedBox(height: 3),
                   ],
                 )
-              : !reply.sentByMe && !message.sentByMe
+              : !reply.sentByMe && !widget.message.sentByMe
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -219,7 +228,7 @@ class MessageGroup extends StatelessWidget {
                                 padding:
                                     const EdgeInsets.fromLTRB(15, 10, 15, 10),
                                 constraints: BoxConstraints(
-                                  maxWidth: maxWidth,
+                                  maxWidth: widget.maxWidth,
                                 ),
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -289,7 +298,7 @@ class MessageGroup extends StatelessWidget {
                         const SizedBox(height: 3),
                       ],
                     )
-                  : !reply.sentByMe && message.sentByMe
+                  : !reply.sentByMe && widget.message.sentByMe
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -305,7 +314,7 @@ class MessageGroup extends StatelessWidget {
                                     padding: const EdgeInsets.fromLTRB(
                                         15, 10, 15, 10),
                                     constraints: BoxConstraints(
-                                      maxWidth: maxWidth,
+                                      maxWidth: widget.maxWidth,
                                     ),
                                     decoration: BoxDecoration(
                                       border: Border.all(
@@ -380,12 +389,13 @@ class MessageGroup extends StatelessWidget {
       onSwipeRight: () {
         HapticFeedback.selectionClick();
         rc.replyView.value = false;
-        rc.replyMessage = message;
+        rc.replyMessage = widget.message;
         rc.replyView.value = true;
+        rc.messageFocus.requestFocus();
       },
       child: Padding(
         padding: EdgeInsets.only(
-          bottom: lastInSeries ? 5 : 0,
+          bottom: widget.lastInSeries ? 5 : 0,
           left: 10,
           right: 10,
           top: 5,
@@ -394,10 +404,10 @@ class MessageGroup extends StatelessWidget {
           () => GestureDetector(
             onTap: rc.selectMessageView.value
                 ? () {
-                    if (rc.selectedMessageIds.contains(message.id)) {
-                      rc.selectedMessageIds.remove(message.id);
+                    if (rc.selectedMessageIds.contains(widget.message.id)) {
+                      rc.selectedMessageIds.remove(widget.message.id);
                     } else {
-                      rc.selectedMessageIds.add(message.id);
+                      rc.selectedMessageIds.add(widget.message.id);
                     }
                   }
                 : null,
@@ -405,23 +415,24 @@ class MessageGroup extends StatelessWidget {
                 ? () {
                     HapticFeedback.selectionClick();
                     rc.selectMessageView.value = true;
-                    rc.selectedMessageIds.add(message.id);
+                    rc.selectedMessageIds.add(widget.message.id);
                   }
                 : null,
             child: Column(
               children: [
-                message.replyTo != null ? renderReply() : Container(),
+                // message.replyTo != null ? renderReply() : Container(),
                 Row(
                   mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: message.sentByMe
+                  mainAxisAlignment: widget.message.sentByMe
                       ? MainAxisAlignment.end
                       : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    rc.selectMessageView.value && !message.sentByMe
+                    rc.selectMessageView.value && !widget.message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(right: 5, bottom: 5),
-                            child: rc.selectedMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds
+                                    .contains(widget.message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,
@@ -452,13 +463,23 @@ class MessageGroup extends StatelessWidget {
                         : Container(),
                     Stack(
                       children: [
-                        TextBubble(
-                          message: message,
-                          lastInSeries: lastInSeries,
-                          firstInSeries: firstInSeries,
-                          maxWidth: maxWidth,
+                        MeasureSize(
+                          onChange: (size) {
+                            if (mounted) {
+                              setState(() {
+                                textBubbleSize = size.width;
+                              });
+                            }
+                          },
+                          child: TextBubble(
+                            message: widget.message,
+                            lastInSeries: widget.lastInSeries,
+                            firstInSeries: widget.firstInSeries,
+                            maxWidth: widget.maxWidth,
+                          ),
                         ),
-                        message.sentByMe && message.reactions.isNotEmpty
+                        widget.message.sentByMe &&
+                                widget.message.reactions.isNotEmpty
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -526,8 +547,8 @@ class MessageGroup extends StatelessWidget {
                                         ),
                                         child: Row(
                                           children: [
-                                            for (String reaction in message
-                                                .reactions.keys
+                                            for (String reaction in widget
+                                                .message.reactions.keys
                                                 .toList())
                                               reactions.contains(reaction)
                                                   ? Padding(
@@ -535,7 +556,7 @@ class MessageGroup extends StatelessWidget {
                                                           const EdgeInsets.all(
                                                               2),
                                                       child: Image.asset(
-                                                        'assets/images/reactions/$reaction.png',
+                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
                                                         package:
                                                             'robin_flutter',
                                                         width: 22,
@@ -551,103 +572,102 @@ class MessageGroup extends StatelessWidget {
                                 ],
                               )
                             : Container(),
-                        !message.sentByMe && message.reactions.isNotEmpty
-                            ? Positioned(
-                                right: 0,
-                                child: Transform.translate(
-                                  offset: const Offset(0, -7),
-                                  child: Row(
-                                    textDirection: ui.TextDirection.rtl,
-                                    children: [
-                                      Container(
-                                        width: 12,
-                                        height: 12,
+                        !widget.message.sentByMe &&
+                                widget.message.reactions.isNotEmpty
+                            ? Transform.translate(
+                              offset: Offset((textBubbleSize - 46) - (widget.message.reactions.length * 24), -7),
+                              child: Row(
+                                textDirection: ui.TextDirection.rtl,
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: const BoxDecoration(
+                                      color: white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
                                         decoration: const BoxDecoration(
-                                          color: white,
+                                          color: Color(0XFFFBFBFB),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: Center(
-                                          child: Container(
-                                            width: 8,
-                                            height: 8,
-                                            decoration: const BoxDecoration(
-                                              color: Color(0XFFFBFBFB),
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                        ),
                                       ),
-                                      Transform.translate(
-                                        offset: const Offset(20, -7),
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: const Offset(20, -7),
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: const BoxDecoration(
+                                        color: white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
                                         child: Container(
-                                          width: 18,
-                                          height: 18,
+                                          width: 16,
+                                          height: 16,
                                           decoration: const BoxDecoration(
-                                            color: white,
+                                            color: Color(0XFFFBFBFB),
                                             shape: BoxShape.circle,
                                           ),
-                                          child: Center(
-                                            child: Container(
-                                              width: 16,
-                                              height: 16,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0XFFFBFBFB),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                          ),
                                         ),
                                       ),
-                                      Transform.translate(
-                                        offset: const Offset(52, -19),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color:  white,
-                                            borderRadius: BorderRadius.circular(24),
-                                          ),
-                                          padding: const EdgeInsets.all(2),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0XFFFBFBFB),
-                                              borderRadius:
-                                              BorderRadius.circular(24),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                for (String reaction in message
-                                                    .reactions.keys
-                                                    .toList())
-                                                  reactions.contains(reaction)
-                                                      ? Padding(
-                                                    padding:
-                                                    const EdgeInsets.all(
-                                                        3),
-                                                    child: Image.asset(
-                                                      'assets/images/reactions/$reaction.png',
-                                                      package:
-                                                      'robin_flutter',
-                                                      width: 22,
-                                                      height: 22,
-                                                    ),
-                                                  )
-                                                      : Container(),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              )
+                                  Transform.translate(
+                                    offset: const Offset(52, -19),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: white,
+                                        borderRadius:
+                                            BorderRadius.circular(24),
+                                      ),
+                                      padding: const EdgeInsets.all(2),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0XFFFBFBFB),
+                                          borderRadius:
+                                              BorderRadius.circular(24),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            for (String reaction in widget
+                                                .message.reactions.keys
+                                                .toList())
+                                              reactions.contains(reaction)
+                                                  ? Padding(
+                                                      padding:
+                                                          const EdgeInsets
+                                                              .all(3),
+                                                      child: Image.asset(
+                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
+                                                        package:
+                                                            'robin_flutter',
+                                                        width: 22,
+                                                        height: 22,
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
                             : Container(),
                       ],
                     ),
-                    rc.selectMessageView.value && message.sentByMe
+                    rc.selectMessageView.value && widget.message.sentByMe
                         ? Padding(
                             padding: const EdgeInsets.only(left: 5, bottom: 5),
-                            child: rc.selectedMessageIds.contains(message.id)
+                            child: rc.selectedMessageIds
+                                    .contains(widget.message.id)
                                 ? Container(
                                     width: 22,
                                     height: 22,

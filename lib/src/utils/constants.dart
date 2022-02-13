@@ -22,7 +22,7 @@ const List<Color> groupUserColors = [
   Color(0XFF0F0FFE)
 ];
 
-const List<String> reactions = ['exclaim', 'laugh', 'heart', 'thumbs_up', 'thumbs_down'];
+const List<String> reactions = ['⁉️', '😂', '❤️', '👍', '👎'];
 
 const List<String> imageFormats = ['png', 'jpg', 'jpeg', 'gif', 'heic'];
 const List<String> audioFormats = [

@@ -5,6 +5,7 @@ import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/views/robin_chat.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 
 class RobinCreateGroup extends StatelessWidget {
@@ -97,7 +98,51 @@ class RobinCreateGroup extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(
-                            height: 45,
+                            height: 30,
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(40),
+                            child: Obx(
+                              () => Container(
+                                width: 80,
+                                height: 80,
+                                color: const Color(0XFF9999BC),
+                                child: rc.groupIcon.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                          'RG',
+                                          style: TextStyle(
+                                            color: white,
+                                            fontSize: 24,
+                                          ),
+                                        ),
+                                      )
+                                    : Image.file(
+                                        File(rc.groupIcon['file'].path),
+                                        fit: BoxFit.cover,
+                                        height: 80,
+                                        width: 80,
+                                      ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              getMedia(source: 'gallery', isGroup: true);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                              child: const Text(
+                                'Tap To Add Group Image',
+                                style: TextStyle(
+                                  color: black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 40,
                           ),
                           const Padding(
                             padding: EdgeInsets.only(left: 15),
@@ -132,7 +177,7 @@ class RobinCreateGroup extends StatelessWidget {
                   ],
                 ),
                 Transform.translate(
-                  offset: const Offset(0, -55),
+                  offset: const Offset(0, -50),
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Padding(
@@ -146,9 +191,11 @@ class RobinCreateGroup extends StatelessWidget {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          onPressed: rc.groupChatNameEmpty.value ? null : () {
-                            showSelectGroupParticipants(context);
-                          },
+                          onPressed: rc.groupChatNameEmpty.value
+                              ? null
+                              : () {
+                                  showSelectGroupParticipants(context);
+                                },
                           child: const SizedBox(
                             height: 50,
                             child: Center(

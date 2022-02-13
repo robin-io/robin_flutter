@@ -28,6 +28,7 @@ class DataSource {
     return netUtil
         .get('$getDetailsFromUserTokenUrl/$userToken')
         .then((response) {
+          print(response);
       if (response['error']) {
         throw response['msg'];
       } else {
@@ -107,6 +108,22 @@ class DataSource {
   removeGroupParticipant(Map<String, dynamic> body, String groupId) async {
     return netUtil
         .put('$removeGroupParticipantUrl/$groupId', body: body)
+        .then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  deleteConversation(String conversationId, String userToken) async {
+    return netUtil
+        .delete(
+      '$deleteConversationUrl/$conversationId/$userToken',
+    )
         .then((response) {
       if (response['error']) {
         throw response['msg'];
@@ -204,6 +221,19 @@ class DataSource {
     });
   }
 
+  uploadGroupIcon(String conversationId, List<http.MultipartFile> files) async {
+    return netUtil.postForm('$uploadGroupIconUrl/$conversationId', files,
+        body: {"": ""}).then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
   sendReaction(Map<String, dynamic> body, String messageId) async {
     return netUtil.post('$sendReactionUrl/$messageId', body).then((response) {
       if (response['error']) {
@@ -241,4 +271,41 @@ class DataSource {
       errorHandler.handleError(e);
     });
   }
+
+  getConversationInfo(String conversationId) async {
+    return netUtil.get('$getConversationInfoUrl/$conversationId').then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  starMessage(Map<String, dynamic> body, String messageId) async {
+    return netUtil.post('$starMessage/$messageId', body).then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
+  getStarredMessages(String userToken) async {
+    return netUtil.get('$starMessage/$userToken').then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
 }

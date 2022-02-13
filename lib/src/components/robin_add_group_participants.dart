@@ -11,10 +11,17 @@ import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 
-class RobinSelectGroupParticipants extends StatelessWidget {
+class RobinAddGroupParticipants extends StatelessWidget {
   final RobinController rc = Get.find();
 
-  RobinSelectGroupParticipants({Key? key}) : super(key: key);
+  final List<String> existingParticipants;
+
+  RobinAddGroupParticipants({
+    Key? key,
+    required this.existingParticipants,
+  }) : super(key: key) {
+    rc.getAddGroupUsers(existingParticipants);
+  }
 
   List<Widget> renderUsers(BuildContext context) {
     List<Widget> users = [];
@@ -129,7 +136,7 @@ class RobinSelectGroupParticipants extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height - 70,
+      height: MediaQuery.of(context).size.height - 45,
       child: Column(
         children: [
           Transform.translate(
@@ -155,7 +162,7 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                   children: [
                     Obx(
                       () => Container(
-                        height: MediaQuery.of(context).size.height - 100,
+                        height: MediaQuery.of(context).size.height - 75,
                         width: MediaQuery.of(context).size.width,
                         decoration: const BoxDecoration(
                           color: white,
@@ -192,7 +199,7 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 5),
                                   const Text(
-                                    'New Group Chat',
+                                    'Add Group Participants',
                                     style: TextStyle(
                                       color: black,
                                       fontSize: 15,
@@ -384,38 +391,10 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                           onPressed: rc.createGroupParticipants.isEmpty
                               ? null
                               : () async {
-                                  RobinConversation conversation =
-                                      await rc.createGroupChat();
-                                  if (rc.groupIcon.isNotEmpty) {
-                                    RobinConversation newConversation = await rc
-                                        .uploadGroupIcon(conversation.id!);
+                                  var successful =
+                                      await rc.addGroupParticipants();
+                                  if (successful) {
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            RobinChat(
-                                          conversation: newConversation,
-                                        ),
-                                      ),
-                                    );
-                                    rc.groupChatNameController.clear();
-                                    rc.createGroupParticipants.value = {};
-                                  } else {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            RobinChat(
-                                          conversation: conversation,
-                                        ),
-                                      ),
-                                    );
-                                    rc.groupChatNameController.clear();
-                                    rc.createGroupParticipants.value = {};
                                   }
                                 },
                           child: rc.isCreatingGroup.value
@@ -438,7 +417,7 @@ class RobinSelectGroupParticipants extends StatelessWidget {
                                   height: 50,
                                   child: Center(
                                     child: Text(
-                                      'Start Group Conversation',
+                                      'Add Group Participants',
                                       style: TextStyle(
                                         color: white,
                                         fontSize: 16,

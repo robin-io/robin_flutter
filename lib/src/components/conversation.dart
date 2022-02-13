@@ -20,11 +20,9 @@ class Conversation extends StatelessWidget {
 
   void handleArchive(BuildContext context) {
     if (conversation.archived!) {
-      rc.unarchiveConversation(
-          conversation.id!, conversation.token ?? conversation.id!);
+      rc.unarchiveConversation(conversation.id!, conversation.id!);
     } else {
-      rc.archiveConversation(
-          conversation.id!, conversation.token ?? conversation.id!);
+      rc.archiveConversation(conversation.id!, conversation.id!);
     }
   }
 
@@ -53,7 +51,9 @@ class Conversation extends StatelessWidget {
                   color: Color(0XFF101010),
                 ),
               ),
-              const SizedBox(width: 45,),
+              const SizedBox(
+                width: 45,
+              ),
               SvgPicture.asset(
                 'assets/icons/archive_black.svg',
                 semanticsLabel: 'search',
@@ -61,7 +61,9 @@ class Conversation extends StatelessWidget {
                 width: 22,
                 height: 22,
               ),
-              const SizedBox(width: 10,),
+              const SizedBox(
+                width: 10,
+              ),
             ],
           ),
           value: 1,
@@ -69,10 +71,10 @@ class Conversation extends StatelessWidget {
       ],
       elevation: 4,
     ).then((value) {
+      rc.selectedConversation.value = '';
       if (value == 1) {
         handleArchive(context);
       }
-      rc.selectedConversation.value = '';
     });
   }
 
@@ -87,6 +89,14 @@ class Conversation extends StatelessWidget {
       onTap: () async {
         rc.homeSearchController.clear();
         rc.showHomeSearch.value = false;
+        rc.allConversations[conversation.id]?.unreadMessages = 0;
+        rc.allConversations[conversation.id!] =
+            rc.allConversations[conversation.id]!;
+        if (rc.allConversations[conversation.id!]!.archived!) {
+          rc.renderArchivedConversations();
+        } else {
+          rc.renderHomeConversations();
+        }
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -96,7 +106,7 @@ class Conversation extends StatelessWidget {
           ),
         ).then((value) {
           Future.delayed(const Duration(milliseconds: 100), () {
-            rc.currentConversation = null;
+            rc.currentConversation.value = RobinConversation.empty();
           });
         });
       },
@@ -140,7 +150,8 @@ class Conversation extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   UserAvatar(
-                    isGroup: conversation.isGroup!,
+                    name: conversation.name!,
+                    conversationIcon: conversation.conversationIcon,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -173,7 +184,11 @@ class Conversation extends StatelessWidget {
                                 child: Text(
                                   conversation.lastMessage!.text.isEmpty
                                       ? 'New Conversation'
-                                      : conversation.lastMessage!.text,
+                                      : !conversation.isGroup! &&
+                                              !conversation
+                                                  .lastMessage!.sentByMe
+                                          ? conversation.lastMessage!.text
+                                          : '${conversation.lastMessage!.senderName}${conversation.lastMessage!.text}',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -192,21 +207,54 @@ class Conversation extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Text(
-                    formatDate(conversation.updatedAt.toString()),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0XFF51545C),
-                    ),
-                  ),
+                  conversation.unreadMessages! > 0
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              formatDate(conversation.updatedAt.toString()),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0XFF51545C),
+                              ),
+                            ),
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: robinOrange,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${conversation.unreadMessages}',
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          formatDate(conversation.updatedAt.toString()),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0XFF51545C),
+                          ),
+                        ),
                 ],
               ),
               SizedBox(
                 height: 45,
                 child: Obx(
-                  ()=> BackdropFilter(
+                  () => BackdropFilter(
                     filter: rc.selectedConversation.value.isNotEmpty &&
                             rc.selectedConversation.value != conversation.id!
                         ? ImageFilter.blur(sigmaX: 3.5, sigmaY: 3.5)

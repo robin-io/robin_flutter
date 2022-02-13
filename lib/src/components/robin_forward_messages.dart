@@ -43,7 +43,7 @@ class RobinForwardMessages extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 UserAvatar(
-                  isGroup: conversation.isGroup!,
+                  name: conversation.name!,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -98,128 +98,152 @@ class RobinForwardMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        closeButton(context),
-        Obx(
-          () => Container(
-            height: MediaQuery.of(context).size.height - 110,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              color: white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 70,
+      child: Column(
+        children: [
+          Transform.translate(
+            offset: const Offset(0, 15),
+            child: Container(
+              height: 30,
+              width: MediaQuery.of(context).size.width * 0.93,
+              decoration: const BoxDecoration(
+                color: Color(0XFFEBF3FE),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+          ),
+          Expanded(
+            child: Stack(
               children: [
-                const SizedBox(
-                  height: 5,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      rc.isForwarding.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                            )
-                          : const Text(
-                              'Forward',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.transparent,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height - 100,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: const BoxDecoration(
+                        color: white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.close,
+                                      size: 24,
+                                      color: Color(0XFF51545C),
+                                    ),
+                                    padding: const EdgeInsets.all(0),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                const Text(
+                                  'Forward Messages',
+                                  style: TextStyle(
+                                    color: black,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Expanded(
+                            child: Obx(
+                              () => ListView(
+                                children: renderConversations(),
                               ),
                             ),
-                      Container(
-                        width: 45,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: const Color(0XFFF4F6F8),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                          )
+                        ],
                       ),
-                      rc.isForwarding.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  green,
-                                ),
-                              ),
-                            )
-                          : InkWell(
-                              onTap: rc.forwardConversationIds.isNotEmpty
-                                  ? () async {
-                                      await rc.forwardMessages();
-                                      Navigator.pop(context);
-                                    }
-                                  : null,
-                              child: Text(
-                                'Forward',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: rc.forwardConversationIds.isNotEmpty
-                                      ? green
-                                      : Colors.grey,
-                                ),
-                              ),
-                            )
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: TextFormField(
-                    style: const TextStyle(
-                      color: Color(0XFF535F89),
-                      fontSize: 14,
                     ),
-                    controller: rc.forwardController,
-                    decoration: textFieldDecoration().copyWith(
-                      prefixIcon: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            'assets/icons/search.svg',
-                            semanticsLabel: 'search',
-                            package: 'robin_flutter',
-                            width: 22,
-                            height: 22,
+                  ],
+                ),
+                Transform.translate(
+                  offset: const Offset(0, -50),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Obx(
+                        () => ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: green,
+                            onPrimary: white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
                           ),
+                          onPressed: rc.forwardConversationIds.isEmpty
+                              ? null
+                              : () async {
+                                  await rc.forwardMessages();
+                                  Navigator.pop(context);
+                                },
+                          child: rc.isForwarding.value
+                              ? const SizedBox(
+                                  height: 50,
+                                  child: Center(
+                                    child: SizedBox(
+                                      height: 16,
+                                      width: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                white),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(
+                                  height: 50,
+                                  child: Center(
+                                    child: Text(
+                                      'Forward',
+                                      style: TextStyle(
+                                        color: white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
-                      hintText: 'Search People of Groups...',
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: renderConversations(),
                   ),
                 )
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

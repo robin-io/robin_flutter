@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
-import 'package:robin_flutter/src/components/chat_options.dart';
+import 'package:robin_flutter/src/components/recording_bottom_bar.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
-import 'package:robin_flutter/src/components/chat_options.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:animated_size_and_fade/animated_size_and_fade.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -205,7 +204,7 @@ class ChatBottomBar extends StatelessWidget {
                                 Container(
                                   width: 5,
                                   height: 49,
-                                  color: const Color(0XFF8393C0),
+                                  color: const Color(0XFF9999BC),
                                 ),
                                 const SizedBox(
                                   width: 14,
@@ -232,7 +231,7 @@ class ChatBottomBar extends StatelessWidget {
                                                 color: rc.userColors[rc
                                                         .replyMessage!
                                                         .senderToken] ??
-                                                    green,
+                                                    const Color(0XFF9999BC),
                                               ),
                                             ),
                                           ),
@@ -387,149 +386,173 @@ class ChatBottomBar extends StatelessWidget {
                 : Container(height: 15),
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (rc.chatOptionsOpened.value) {
-                        disposeChatOptions();
-                      } else {
-                        showOverLay(context);
-                      }
-                    },
-                    child: Container(
-                      width: 52.0,
-                      height: 52.0,
-                      decoration: const BoxDecoration(
-                        color: Color(0XFFF5F7FC),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 250),
-                          firstChild: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 250),
-                            opacity: !rc.chatOptionsOpened.value ? 0 : 1,
-                            child: const Icon(
-                              Icons.close,
-                              color: Color(0XFF51545C),
-                            ),
-                          ),
-                          secondChild: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 500),
-                            opacity: rc.chatOptionsOpened.value ? 0 : 1,
-                            child: const Icon(
-                              Icons.add,
-                              color: green,
-                            ),
-                          ),
-                          crossFadeState: rc.chatOptionsOpened.value
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      style: const TextStyle(
-                        color: Color(0XFF535F89),
-                        fontSize: 14,
-                      ),
-                      controller: rc.messageController,
-                      textInputAction: TextInputAction.send,
-                      onFieldSubmitted: (text) {
-                        if (!rc.isFileSending.value) {
-                          if (rc.file['file'] != null) {
-                            if (rc.replyView.value) {
-                              rc.sendReplyAsAttachment();
-                            } else {
-                              rc.sendAttachment();
-                            }
-                          } else if (rc.messageController.text.isNotEmpty) {
-                            if (rc.replyView.value) {
-                              rc.sendReplyAsTextMessage();
-                            } else {
-                              rc.sendTextMessage();
-                            }
-                          }
-                        }
-                      },
-                      decoration: textFieldDecoration(radius: 24, style: 2).copyWith(
-                        hintText: 'Type a message...',
-                        fillColor: const Color(0XFFFBFBFB),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  AnimatedCrossFade(
-                    firstChild: GestureDetector(
-                      onTap: () {
-                        if (!rc.isFileSending.value) {
-                          if (rc.file['file'] != null) {
-                            if (rc.replyView.value) {
-                              rc.sendReplyAsAttachment();
-                            } else {
-                              rc.sendAttachment();
-                            }
-                          } else if (rc.messageController.text.isNotEmpty) {
-                            if (rc.replyView.value) {
-                              rc.sendReplyAsTextMessage();
-                            } else {
-                              rc.sendTextMessage();
-                            }
-                          }
-                        }
-                      },
-                      child: Container(
-                        width: 45,
-                        height: 45,
-                        decoration: const BoxDecoration(
-                          color: Color(0XFF15AE73),
-                          shape: BoxShape.circle,
-                        ),
-                        child: rc.isFileSending.value
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0XFFFFFFFF),
+              child: AnimatedSizeAndFade(
+                child: rc.isRecording.value
+                    ? RecordingBottomBar()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (rc.chatOptionsOpened.value) {
+                                disposeChatOptions();
+                              } else {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                showOverLay(context);
+                              }
+                            },
+                            child: Container(
+                              width: 52.0,
+                              height: 52.0,
+                              decoration: const BoxDecoration(
+                                color: Color(0XFFF5F7FC),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: AnimatedCrossFade(
+                                  duration: const Duration(milliseconds: 250),
+                                  firstChild: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 250),
+                                    opacity:
+                                        !rc.chatOptionsOpened.value ? 0 : 1,
+                                    child: const Icon(
+                                      Icons.close,
+                                      color: Color(0XFF51545C),
                                     ),
                                   ),
-                                ),
-                              )
-                            : Center(
-                                child: SvgPicture.asset(
-                                  'assets/icons/send.svg',
-                                  package: 'robin_flutter',
-                                  semanticsLabel: 'edit',
-                                  width: 22,
-                                  height: 22,
+                                  secondChild: AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 500),
+                                    opacity: rc.chatOptionsOpened.value ? 0 : 1,
+                                    child: const Icon(
+                                      Icons.add,
+                                      color: green,
+                                    ),
+                                  ),
+                                  crossFadeState: rc.chatOptionsOpened.value
+                                      ? CrossFadeState.showFirst
+                                      : CrossFadeState.showSecond,
                                 ),
                               ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Color(0XFF535F89),
+                                fontSize: 14,
+                              ),
+                              controller: rc.messageController,
+                              focusNode: rc.messageFocus,
+                              textInputAction: TextInputAction.send,
+                              onFieldSubmitted: (text) {
+                                if (!rc.isFileSending.value) {
+                                  if (rc.file['file'] != null) {
+                                    if (rc.replyView.value) {
+                                      rc.sendReplyAsAttachment();
+                                    } else {
+                                      rc.sendAttachment();
+                                    }
+                                  } else if (rc
+                                      .messageController.text.isNotEmpty) {
+                                    if (rc.replyView.value) {
+                                      rc.sendReplyAsTextMessage();
+                                    } else {
+                                      rc.sendTextMessage();
+                                    }
+                                  }
+                                }
+                              },
+                              decoration:
+                                  textFieldDecoration(radius: 24, style: 2)
+                                      .copyWith(
+                                hintText: 'Type a message...',
+                                fillColor: const Color(0XFFFBFBFB),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          AnimatedCrossFade(
+                            firstChild: GestureDetector(
+                              onTap: () {
+                                if (!rc.isFileSending.value) {
+                                  if (rc.file['file'] != null) {
+                                    if (rc.replyView.value) {
+                                      rc.sendReplyAsAttachment();
+                                    } else {
+                                      rc.sendAttachment();
+                                    }
+                                  } else if (rc
+                                      .messageController.text.isNotEmpty) {
+                                    if (rc.replyView.value) {
+                                      rc.sendReplyAsTextMessage();
+                                    } else {
+                                      rc.sendTextMessage();
+                                    }
+                                  }
+                                }
+                              },
+                              child: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: const BoxDecoration(
+                                  color: Color(0XFF15AE73),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: rc.isFileSending.value
+                                    ? const Center(
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              Color(0XFFFFFFFF),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Center(
+                                        child: SvgPicture.asset(
+                                          'assets/icons/send.svg',
+                                          package: 'robin_flutter',
+                                          semanticsLabel: 'edit',
+                                          width: 22,
+                                          height: 22,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            // secondChild: InkWell(
+                            //   onTap: () {
+                            //     rc.isRecording.value = true;
+                            //   },
+                            //   child: SvgPicture.asset(
+                            //     'assets/icons/microphone.svg',
+                            //     package: 'robin_flutter',
+                            //     width: 24,
+                            //     height: 24,
+                            //     fit: BoxFit.cover,
+                            //   ),
+                            // ),
+                            secondChild: const SizedBox(
+                              height: 24,
+                              width: 1,
+                            ),
+                            crossFadeState: rc.showSendButton.value ||
+                                    rc.file['file'] != null
+                                ? CrossFadeState.showFirst
+                                : CrossFadeState.showSecond,
+                            duration: const Duration(milliseconds: 200),
+                          )
+                        ],
                       ),
-                    ),
-                    secondChild: const SizedBox(
-                      width: 0,
-                      height: 45,
-                    ),
-                    crossFadeState:
-                        rc.showSendButton.value || rc.file['file'] != null
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                    duration: const Duration(milliseconds: 200),
-                  )
-                ],
               ),
             ),
           ],
