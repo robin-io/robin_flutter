@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/components/measure_size.dart';
+import 'package:robin_flutter/src/components/robin_audio_player.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
@@ -704,102 +705,107 @@ class _TextBubbleState extends State<TextBubble> {
                                     ),
                                   ),
                                 )
-                              : Obx(
-                                  () => InkWell(
-                                    onTap: () {
-                                      if (fileDownloaded.value) {
-                                        OpenFile.open(filePath['path']);
-                                      } else {
-                                        if (!fileDownloading.value) {
-                                          downloadFile(widget.message.link);
-                                        }
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0XFFF5F7FC),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 15, 10, 15),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Image.asset(
-                                                  'assets/images/fileTypes/${fileType(path: widget.message.link)}.png',
-                                                  package: 'robin_flutter',
-                                                  fit: BoxFit.fitHeight,
-                                                  width: 34,
-                                                  height: 40,
+                              : fileType(path: widget.message.link) == 'audio'
+                                  ? RobinAudioPlayer(url: widget.message.link)
+                                  : Obx(
+                                      () => InkWell(
+                                        onTap: () {
+                                          if (fileDownloaded.value) {
+                                            OpenFile.open(filePath['path']);
+                                          } else {
+                                            if (!fileDownloading.value) {
+                                              downloadFile(widget.message.link);
+                                            }
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0XFFF5F7FC),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                 ),
-                                                const SizedBox(
-                                                  width: 7,
-                                                ),
-                                                Expanded(
-                                                  flex: 10000,
-                                                  child: Text(
-                                                    fileName(
-                                                        widget.message.link),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    style: const TextStyle(
-                                                      fontSize: 15,
-                                                      color: Color(0XFF000000),
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 15, 10, 15),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/fileTypes/${fileType(path: widget.message.link)}.png',
+                                                      package: 'robin_flutter',
+                                                      fit: BoxFit.fitHeight,
+                                                      width: 34,
+                                                      height: 40,
                                                     ),
-                                                  ),
-                                                ),
-                                                const Spacer(
-                                                  flex: 1,
-                                                ),
-                                                fileDownloaded.value
-                                                    ? Container()
-                                                    : SizedBox(
-                                                        width: 20,
-                                                        height: 20,
-                                                        child: fileDownloading
-                                                                .value
-                                                            ? const SizedBox(
-                                                                width: 20,
-                                                                height: 20,
-                                                                child:
-                                                                    CircularProgressIndicator(
-                                                                  strokeWidth:
-                                                                      2.5,
-                                                                  valueColor:
-                                                                      AlwaysStoppedAnimation(
-                                                                    green,
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Center(
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/export.svg',
-                                                                  package:
-                                                                      'robin_flutter',
-                                                                  width: 20,
-                                                                  height: 20,
-                                                                ),
-                                                              ),
+                                                    const SizedBox(
+                                                      width: 7,
+                                                    ),
+                                                    Expanded(
+                                                      flex: 10000,
+                                                      child: Text(
+                                                        fileName(widget
+                                                            .message.link),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        maxLines: 1,
+                                                        style: const TextStyle(
+                                                          fontSize: 15,
+                                                          color:
+                                                              Color(0XFF000000),
+                                                        ),
                                                       ),
-                                              ],
-                                            ),
+                                                    ),
+                                                    const Spacer(
+                                                      flex: 1,
+                                                    ),
+                                                    fileDownloaded.value
+                                                        ? Container()
+                                                        : SizedBox(
+                                                            width: 20,
+                                                            height: 20,
+                                                            child: fileDownloading
+                                                                    .value
+                                                                ? const SizedBox(
+                                                                    width: 20,
+                                                                    height: 20,
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      strokeWidth:
+                                                                          2.5,
+                                                                      valueColor:
+                                                                          AlwaysStoppedAnimation(
+                                                                        green,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                : Center(
+                                                                    child: SvgPicture
+                                                                        .asset(
+                                                                      'assets/icons/export.svg',
+                                                                      package:
+                                                                          'robin_flutter',
+                                                                      width: 20,
+                                                                      height:
+                                                                          20,
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
                           const SizedBox(
                             height: 5,
                           ),

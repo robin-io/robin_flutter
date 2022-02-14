@@ -217,7 +217,11 @@ String fileType({String? path}) {
 }
 
 String fileName(String path) {
-  return path.split('/').last;
+  String name = path.split('/').last;
+  if (name == 'voice_note.m4a') {
+    return 'Voice Note';
+  }
+  return name;
 }
 
 List<LinkifyElement> matchLinks(String str) {

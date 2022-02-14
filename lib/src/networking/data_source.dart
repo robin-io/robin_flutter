@@ -28,7 +28,6 @@ class DataSource {
     return netUtil
         .get('$getDetailsFromUserTokenUrl/$userToken')
         .then((response) {
-          print(response);
       if (response['error']) {
         throw response['msg'];
       } else {

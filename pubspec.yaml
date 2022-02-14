@@ -29,7 +29,9 @@ dependencies:
   fluttertoast: ^8.0.8
   jiffy: ^5.0.0
   flutter_ringtone_player: ^3.1.1
+  path_provider: ^2.0.9
   record: ^3.0.2
+  audioplayers: ^0.20.1
   animated_size_and_fade: ^3.0.0
   carousel_slider: ^4.0.0
 

@@ -389,7 +389,7 @@ class ChatBottomBar extends StatelessWidget {
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: AnimatedSizeAndFade(
                 child: rc.isRecording.value
-                    ? RecordingBottomBar()
+                    ? const RecordingBottomBar()
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
