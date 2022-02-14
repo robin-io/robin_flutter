@@ -13,7 +13,7 @@ class RobinChat extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    // rc.initChatView(conversation);
+    rc.initChatView(conversation);
   }
 
   void showForwardMessages(BuildContext context) {
