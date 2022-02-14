@@ -1,6 +1,5 @@
 # This is a generated file; do not edit or check into version control.
 file_picker=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/file_picker-4.3.0/
-flutter_audio_recorder2=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_audio_recorder2-0.0.2/
 flutter_plugin_android_lifecycle=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.5/
 flutter_ringtone_player=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_ringtone_player-3.1.1/
 fluttertoast=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/fluttertoast-8.0.8/
@@ -13,6 +12,8 @@ path_provider_ios=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.o
 path_provider_linux=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.4/
 path_provider_macos=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.4/
 path_provider_windows=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.0.4/
+record=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/record-3.0.2/
+record_web=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/record_web-0.2.1/
 shared_preferences=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-2.0.11/
 shared_preferences_android=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_android-2.0.9/
 shared_preferences_ios=/Users/heyt0pe/source/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_ios-2.0.8/

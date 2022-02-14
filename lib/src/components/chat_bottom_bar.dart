@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -529,22 +530,23 @@ class ChatBottomBar extends StatelessWidget {
                                       ),
                               ),
                             ),
-                            // secondChild: InkWell(
-                            //   onTap: () {
-                            //     rc.isRecording.value = true;
-                            //   },
-                            //   child: SvgPicture.asset(
-                            //     'assets/icons/microphone.svg',
-                            //     package: 'robin_flutter',
-                            //     width: 24,
-                            //     height: 24,
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            // ),
-                            secondChild: const SizedBox(
-                              height: 24,
-                              width: 1,
+                            secondChild: InkWell(
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                rc.isRecording.value = true;
+                              },
+                              child: SvgPicture.asset(
+                                'assets/icons/microphone.svg',
+                                package: 'robin_flutter',
+                                width: 24,
+                                height: 24,
+                                fit: BoxFit.cover,
+                              ),
                             ),
+                            // secondChild: const SizedBox(
+                            //   height: 24,
+                            //   width: 1,
+                            // ),
                             crossFadeState: rc.showSendButton.value ||
                                     rc.file['file'] != null
                                 ? CrossFadeState.showFirst

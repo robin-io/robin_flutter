@@ -40,9 +40,7 @@ class RobinConversation {
       }
     }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);
-    unreadMessages = json['unread_messages'] == null
-        ? 0
-        : json['unread_messages'][rc.currentUser?.robinToken] ?? 0;
+    unreadMessages = getUnreadCount(json['unread_messages'] ?? {}, '${rc.currentUser?.robinToken}');
     archived = json['archived_for'].contains(rc.currentUser?.robinToken);
     deletedFor = [];
     updatedAt = json['last_message'] == null
@@ -67,5 +65,15 @@ class RobinConversation {
     deletedFor = null;
     updatedAt = null;
     createdAt = null;
+  }
+
+  int getUnreadCount(Map value, String userToken){
+    int unread = 0;
+    try{
+      unread = value[userToken]['unread_count'];
+      return unread;
+    }catch(e){
+      return unread;
+    }
   }
 }

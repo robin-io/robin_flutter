@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_audio_recorder2/flutter_audio_recorder2.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_last_message.dart';
@@ -104,9 +103,6 @@ class RobinController extends GetxController {
 
   TextEditingController groupChatNameController = TextEditingController();
 
-  FlutterAudioRecorder2 recorder =
-      FlutterAudioRecorder2("voice_note", audioFormat: AudioFormat.AAC);
-
   void initializeController(String _apiKey, RobinCurrentUser _currentUser,
       Function _getUsers, RobinKeys _keys) {
     robinCore = RobinCore();
@@ -155,7 +151,6 @@ class RobinController extends GetxController {
   }
 
   connectionStartListen() async{
-    print('starting stream');
     await robinStream?.cancel();
     robinStream = robinConnection?.stream.listen(
       (data) {
@@ -837,9 +832,9 @@ class RobinController extends GetxController {
     }
   }
 
-  void sendAttachment() async {
+  Future sendAttachment({String? path}) async {
     try {
-      if (file['file'] != null) {
+      if (file['file'] != null || path != null) {
         isFileSending.value = true;
         Map<String, String> body = {
           'conversation_id': currentConversation.value.id!,
@@ -849,7 +844,7 @@ class RobinController extends GetxController {
         List<http.MultipartFile> files = [
           await http.MultipartFile.fromPath(
             'file',
-            file['file'].path,
+            path ?? file['file'].path,
           ),
         ];
         await robinCore!.sendAttachment(body, files);
@@ -863,9 +858,9 @@ class RobinController extends GetxController {
     }
   }
 
-  void sendReplyAsAttachment() async {
+  Future sendReplyAsAttachment({String? path}) async {
     try {
-      if (file['file'] != null) {
+      if (file['file'] != null || path != null) {
         isFileSending.value = true;
         Map<String, String> body = {
           'conversation_id': currentConversation.value.id!,
@@ -876,7 +871,7 @@ class RobinController extends GetxController {
         List<http.MultipartFile> files = [
           await http.MultipartFile.fromPath(
             'file',
-            file['file'].path,
+            path ?? file['file'].path,
           ),
         ];
         await robinCore!.replyWithAttachment(body, files);
