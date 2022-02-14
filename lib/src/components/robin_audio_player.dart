@@ -146,7 +146,7 @@ class _RobinAudioPlayerState extends State<RobinAudioPlayer> {
           ),
         ),
         Transform.translate(
-          offset: const Offset(15, 17),
+          offset: const Offset(45, 17),
           child: Text(
             currentPosLabel,
             style: const TextStyle(
