@@ -23,6 +23,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       options.add('Leave Group');
     } else {
       options.insert(0, 'Contact Info');
+      options.add('Delete Conversation');
     }
 
     return options;
@@ -197,6 +198,19 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                         }
                         Navigator.pop(context);
                       }
+                    } else if (value == 'Delete Conversation') {
+                      bool successful = await rc.deleteConversation();
+                      if (successful) {
+                        showSuccessMessage('Deleted successfully');
+                        rc.allConversations
+                            .remove(rc.currentConversation.value.id!);
+                        if (rc.currentConversation.value.archived!) {
+                          rc.renderArchivedConversations();
+                        } else {
+                          rc.renderHomeConversations();
+                        }
+                        Navigator.pop(context);
+                      }
                     }
                   },
                   itemBuilder: (context) {
@@ -211,7 +225,8 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                               Text(
                                 option,
                                 style: TextStyle(
-                                  color: option == 'Leave Group'
+                                  color: option == 'Leave Group' ||
+                                          option == 'Delete Conversation'
                                       ? const Color(0XFFD53120)
                                       : const Color(0XFF51545C),
                                   fontSize: 14,
@@ -225,7 +240,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                       ? 'assets/icons/conversation_info.svg'
                                       : option == 'Select Messages'
                                           ? 'assets/icons/select_messages.svg'
-                                          : option == 'Leave Group'
+                                          : option == 'Leave Group' ||
+                                                  option ==
+                                                      'Delete Conversation'
                                               ? 'assets/icons/leave_group.svg'
                                               : '',
                                   package: 'robin_flutter',

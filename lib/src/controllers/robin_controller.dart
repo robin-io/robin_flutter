@@ -60,6 +60,8 @@ class RobinController extends GetxController {
 
   RxString selectedConversation = ''.obs;
 
+  String allUsersSearchControllerPrevious = '';
+
   RobinMessage? replyMessage;
 
   Map userColors = {};
@@ -120,14 +122,18 @@ class RobinController extends GetxController {
       renderArchivedConversations();
     });
     allUsersSearchController.addListener(() {
-      renderAllUsers();
+      print(allUsersSearchControllerPrevious != allUsersSearchController.text);
+      if (allUsersSearchControllerPrevious != allUsersSearchController.text) {
+        renderAllUsers();
+        allUsersSearchControllerPrevious = allUsersSearchController.text;
+      }
     });
     messageController.addListener(() {
       showSendButton.value = messageController.text.isNotEmpty;
     });
     messageFocus.addListener(() {
       if (messageFocus.hasPrimaryFocus) {
-        Future.delayed(const Duration(milliseconds: 200), () {
+        Future.delayed(const Duration(milliseconds: 700), () {
           scrollToEnd();
         });
       }
@@ -150,7 +156,7 @@ class RobinController extends GetxController {
     });
   }
 
-  connectionStartListen() async{
+  connectionStartListen() async {
     await robinStream?.cancel();
     robinStream = robinConnection?.stream.listen(
       (data) {
@@ -191,7 +197,7 @@ class RobinController extends GetxController {
               sendReadReceipts([robinMessage.id]);
             }
             Future.delayed(const Duration(milliseconds: 17), () {
-              scrollToEnd();
+              // scrollToEnd();
             });
           }
         } else {
@@ -265,7 +271,23 @@ class RobinController extends GetxController {
   handleNewConversation(Map conversation) {
     RobinConversation robinConversation =
         RobinConversation.fromJson(conversation);
-    if (currentUser?.robinToken == robinConversation.token) {
+    if (robinConversation.isGroup!) {
+      for (Map user in robinConversation.participants!) {
+        if (user['user_token'] == currentUser?.robinToken) {
+          allConversations = {
+            robinConversation.id!: robinConversation,
+            ...allConversations,
+          };
+          if (robinConversation.archived!) {
+            renderArchivedConversations();
+          } else {
+            renderHomeConversations();
+          }
+          FlutterRingtonePlayer.playNotification();
+          break;
+        }
+      }
+    } else if (currentUser?.robinToken == robinConversation.token) {
       allConversations = {
         robinConversation.id!: robinConversation,
         ...allConversations,
@@ -275,6 +297,7 @@ class RobinController extends GetxController {
       } else {
         renderHomeConversations();
       }
+      FlutterRingtonePlayer.playNotification();
     }
   }
 
@@ -721,9 +744,9 @@ class RobinController extends GetxController {
     userColors[currentUser!.robinToken] = green;
   }
 
-  Future<bool> leaveGroup(String groupId) async {
+  Future<bool> leaveGroup(String groupId, {bool? showLoader}) async {
     try {
-      chatViewLoading.value = true;
+      chatViewLoading.value = showLoader ?? true;
       Map<String, String> body = {
         'user_token': currentUser!.robinToken,
       };
@@ -732,21 +755,25 @@ class RobinController extends GetxController {
       return true;
     } catch (e) {
       chatViewLoading.value = false;
-      showErrorMessage(e.toString());
+      if (showLoader ?? true) {
+        showErrorMessage(e.toString());
+      }
       rethrow;
     }
   }
 
-  Future<bool> deleteConversation() async {
+  Future<bool> deleteConversation({bool? showLoader, String? conversationId}) async {
     try {
-      chatViewLoading.value = true;
+      chatViewLoading.value = showLoader ?? true;
       await robinCore!.deleteConversation(
-          currentConversation.value.id!, currentUser!.robinToken);
+    conversationId ?? currentConversation.value.id!, currentUser!.robinToken);
       chatViewLoading.value = false;
       return true;
     } catch (e) {
       chatViewLoading.value = false;
-      showErrorMessage(e.toString());
+      if (showLoader ?? true) {
+        showErrorMessage(e.toString());
+      }
       rethrow;
     }
   }

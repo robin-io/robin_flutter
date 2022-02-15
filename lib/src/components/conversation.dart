@@ -26,6 +26,28 @@ class Conversation extends StatelessWidget {
     }
   }
 
+  void deleteConversation(BuildContext context){
+    rc.allConversations
+        .remove(conversation.id);
+    if (conversation.archived!) {
+      rc.renderArchivedConversations();
+    } else {
+      rc.renderHomeConversations();
+    }
+    rc.deleteConversation(conversationId: conversation.id, showLoader: false);
+  }
+
+  void leaveGroup(BuildContext context){
+    rc.allConversations
+        .remove(conversation.id);
+    if (conversation.archived!) {
+      rc.renderArchivedConversations();
+    } else {
+      rc.renderHomeConversations();
+    }
+    rc.leaveGroup(conversation.id!, showLoader: false);
+  }
+
   void showPopupMenu(BuildContext context) {
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     double width = renderBox.size.width;
@@ -51,12 +73,12 @@ class Conversation extends StatelessWidget {
                   color: Color(0XFF101010),
                 ),
               ),
-              const SizedBox(
-                width: 45,
+              SizedBox(
+                width:  conversation.isGroup! ?45 : 90,
               ),
               SvgPicture.asset(
                 'assets/icons/archive_black.svg',
-                semanticsLabel: 'search',
+                semanticsLabel: 'archive',
                 package: 'robin_flutter',
                 width: 22,
                 height: 22,
@@ -68,12 +90,47 @@ class Conversation extends StatelessWidget {
           ),
           value: 1,
         ),
+        PopupMenuItem<int>(
+          padding: const EdgeInsets.only(left: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                conversation.isGroup! ? 'Leave Group' : 'Delete Conversation',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0XFF101010),
+                ),
+              ),
+              const SizedBox(
+                width:  23,
+              ),
+              SvgPicture.asset(
+                'assets/icons/delete.svg',
+                semanticsLabel: 'delete',
+                package: 'robin_flutter',
+                width: 22,
+                height: 22,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+          value: 2,
+        ),
       ],
       elevation: 4,
     ).then((value) {
       rc.selectedConversation.value = '';
       if (value == 1) {
         handleArchive(context);
+      }else if(value == 2){
+        if(conversation.isGroup!){
+          leaveGroup(context);
+        }else{
+          deleteConversation(context);
+        }
       }
     });
   }
@@ -130,6 +187,20 @@ class Conversation extends StatelessWidget {
             )
           ],
         ),
+        startActionPane: ActionPane(
+          extentRatio: 0.23,
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: conversation.isGroup! ? leaveGroup : deleteConversation,
+              backgroundColor: const Color(0XFFD53120),
+              autoClose: true,
+              foregroundColor: white,
+              icon: Icons.delete,
+            )
+          ],
+        ),
+        closeOnScroll: true,
         child: Container(
           decoration: const BoxDecoration(
             color: white,

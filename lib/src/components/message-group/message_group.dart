@@ -398,7 +398,7 @@ class _MessageGroupState extends State<MessageGroup> {
           bottom: widget.lastInSeries ? 5 : 0,
           left: 10,
           right: 10,
-          top: 5,
+          top: widget.message.reactions.isNotEmpty ? 28 : 5,
         ),
         child: Obx(
           () => GestureDetector(
@@ -484,16 +484,16 @@ class _MessageGroupState extends State<MessageGroup> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    width: 12,
-                                    height: 12,
+                                    width: 8.7,
+                                    height: 8.7,
                                     decoration: const BoxDecoration(
                                       color: Color(0XFFEFEFEF),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Center(
                                       child: Container(
-                                        width: 8,
-                                        height: 8,
+                                        width: 5.8,
+                                        height: 5.8,
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             color: const Color(0XFFECEBEB),
@@ -505,18 +505,18 @@ class _MessageGroupState extends State<MessageGroup> {
                                     ),
                                   ),
                                   Transform.translate(
-                                    offset: const Offset(-22, -12),
+                                    offset: const Offset(-16, -7),
                                     child: Container(
-                                      width: 18,
-                                      height: 18,
+                                      width: 13,
+                                      height: 13,
                                       decoration: const BoxDecoration(
                                         color: Color(0XFFEFEFEF),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
                                         child: Container(
-                                          width: 16,
-                                          height: 16,
+                                          width: 11.6,
+                                          height: 11.6,
                                           decoration: BoxDecoration(
                                             border: Border.all(
                                               color: const Color(0XFFECEBEB),
@@ -529,7 +529,7 @@ class _MessageGroupState extends State<MessageGroup> {
                                     ),
                                   ),
                                   Transform.translate(
-                                    offset: const Offset(-56, -31),
+                                    offset: const Offset(-45, -25),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: const Color(0XFFEFEFEF),
@@ -559,8 +559,8 @@ class _MessageGroupState extends State<MessageGroup> {
                                                         'assets/images/reactions/${reactionToText(reaction)}.png',
                                                         package:
                                                             'robin_flutter',
-                                                        width: 22,
-                                                        height: 22,
+                                                        width: 15,
+                                                        height: 15,
                                                       ),
                                                     )
                                                   : Container(),
@@ -575,21 +575,21 @@ class _MessageGroupState extends State<MessageGroup> {
                         !widget.message.sentByMe &&
                                 widget.message.reactions.isNotEmpty
                             ? Transform.translate(
-                              offset: Offset((textBubbleSize - 46) - (widget.message.reactions.length * 24), -7),
+                              offset: Offset((textBubbleSize - 36) - (widget.message.reactions.length * 24), -7),
                               child: Row(
                                 textDirection: ui.TextDirection.rtl,
                                 children: [
                                   Container(
-                                    width: 12,
-                                    height: 12,
+                                    width: 8.7,
+                                    height: 8.7,
                                     decoration: const BoxDecoration(
                                       color: white,
                                       shape: BoxShape.circle,
                                     ),
                                     child: Center(
                                       child: Container(
-                                        width: 8,
-                                        height: 8,
+                                        width: 5.6,
+                                        height: 5.6,
                                         decoration: const BoxDecoration(
                                           color: Color(0XFFFBFBFB),
                                           shape: BoxShape.circle,
@@ -598,18 +598,18 @@ class _MessageGroupState extends State<MessageGroup> {
                                     ),
                                   ),
                                   Transform.translate(
-                                    offset: const Offset(20, -7),
+                                    offset: const Offset(15, -5),
                                     child: Container(
-                                      width: 18,
-                                      height: 18,
+                                      width: 13,
+                                      height: 13,
                                       decoration: const BoxDecoration(
                                         color: white,
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
                                         child: Container(
-                                          width: 16,
-                                          height: 16,
+                                          width: 11.6,
+                                          height: 11.6,
                                           decoration: const BoxDecoration(
                                             color: Color(0XFFFBFBFB),
                                             shape: BoxShape.circle,
@@ -619,7 +619,7 @@ class _MessageGroupState extends State<MessageGroup> {
                                     ),
                                   ),
                                   Transform.translate(
-                                    offset: const Offset(52, -19),
+                                    offset: const Offset(40, -15),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: white,
@@ -647,8 +647,8 @@ class _MessageGroupState extends State<MessageGroup> {
                                                         'assets/images/reactions/${reactionToText(reaction)}.png',
                                                         package:
                                                             'robin_flutter',
-                                                        width: 22,
-                                                        height: 22,
+                                                        width: 15,
+                                                        height: 15,
                                                       ),
                                                     )
                                                   : Container(),

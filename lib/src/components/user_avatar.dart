@@ -20,8 +20,10 @@ class UserAvatar extends StatelessWidget {
     int count = 0;
     for (String initial in name.split(' ')) {
       if (count < 2) {
-        initials += initial[0].toUpperCase();
-        count += 1;
+        if(initial.isNotEmpty){
+          initials += initial[0].toUpperCase();
+          count += 1;
+        }
       } else {
         break;
       }

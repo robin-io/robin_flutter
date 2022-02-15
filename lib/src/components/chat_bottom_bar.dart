@@ -388,11 +388,12 @@ class ChatBottomBar extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: AnimatedSizeAndFade(
+                sizeDuration: const Duration(milliseconds: 0),
                 child: rc.isRecording.value
                     ? const RecordingBottomBar()
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           InkWell(
                             onTap: () {
@@ -448,25 +449,10 @@ class ChatBottomBar extends StatelessWidget {
                               ),
                               controller: rc.messageController,
                               focusNode: rc.messageFocus,
-                              textInputAction: TextInputAction.send,
-                              onFieldSubmitted: (text) {
-                                if (!rc.isFileSending.value) {
-                                  if (rc.file['file'] != null) {
-                                    if (rc.replyView.value) {
-                                      rc.sendReplyAsAttachment();
-                                    } else {
-                                      rc.sendAttachment();
-                                    }
-                                  } else if (rc
-                                      .messageController.text.isNotEmpty) {
-                                    if (rc.replyView.value) {
-                                      rc.sendReplyAsTextMessage();
-                                    } else {
-                                      rc.sendTextMessage();
-                                    }
-                                  }
-                                }
-                              },
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.newline,
+                              minLines: 1,
+                              maxLines: 4,
                               decoration:
                                   textFieldDecoration(radius: 24, style: 2)
                                       .copyWith(
@@ -535,12 +521,16 @@ class ChatBottomBar extends StatelessWidget {
                                 HapticFeedback.heavyImpact();
                                 rc.isRecording.value = true;
                               },
-                              child: SvgPicture.asset(
-                                'assets/icons/microphone.svg',
-                                package: 'robin_flutter',
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.cover,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: SvgPicture.asset(
+                                  'assets/icons/microphone.svg',
+                                  package: 'robin_flutter',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             // secondChild: const SizedBox(
