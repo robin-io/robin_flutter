@@ -114,7 +114,7 @@ class _RobinAudioPlayerState extends State<RobinAudioPlayer> {
                 ),
               ),
               Transform.translate(
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackShape: RobinTrackShape(),

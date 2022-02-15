@@ -60,83 +60,88 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ],
               )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    padding: EdgeInsets.zero,
-                    width: 30,
-                    child: IconButton(
-                      onPressed: () async {
-                        rc.resetChatView();
-                        Navigator.pop(context);
-                        rc.renderHomeConversations();
-                        rc.renderArchivedConversations();
-                      },
+            : InkWell(
+                onTap: () {
+                  showConversationInfo(context);
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        size: 16,
-                        color: Color(0XFF54515C),
+                      width: 30,
+                      child: IconButton(
+                        onPressed: () async {
+                          rc.resetChatView();
+                          Navigator.pop(context);
+                          rc.renderHomeConversations();
+                          rc.renderArchivedConversations();
+                        },
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 16,
+                          color: Color(0XFF54515C),
+                        ),
                       ),
                     ),
-                  ),
-                  UserAvatar(
-                    name: rc.currentConversation.value.name ?? '',
-                    conversationIcon:
-                        rc.currentConversation.value.conversationIcon,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                rc.currentConversation.value.name ?? '',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: black,
-                                  fontWeight: FontWeight.w500,
+                    UserAvatar(
+                      name: rc.currentConversation.value.name ?? '',
+                      conversationIcon:
+                          rc.currentConversation.value.conversationIcon,
+                      size: 40,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  rc.currentConversation.value.name ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        rc.currentConversation.value.isGroup ?? false
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 3.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Obx(
-                                        () => Text(
-                                          '${rc.currentConversation.value.participants!.length.toString()} Members',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0XFF7A7A7A),
-                                            fontWeight: FontWeight.w400,
+                            ],
+                          ),
+                          rc.currentConversation.value.isGroup ?? false
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 3.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Obx(
+                                          () => Text(
+                                            '${rc.currentConversation.value.participants!.length.toString()} Members',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0XFF7A7A7A),
+                                              fontWeight: FontWeight.w400,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(),
-                      ],
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
         centerTitle: false,
         actions: [
