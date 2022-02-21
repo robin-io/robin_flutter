@@ -265,184 +265,157 @@ class RobinConversationMedia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height - 45,
-      child: Column(
-        children: [
-          Transform.translate(
-            offset: const Offset(0, 15),
-            child: Container(
-              height: 30,
-              width: MediaQuery.of(context).size.width * 0.93,
-              decoration: const BoxDecoration(
-                color: Color(0XFFEBF3FE),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-            ),
+    return Obx(
+      () => Container(
+        height: MediaQuery.of(context).size.height - 70,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+          color: white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Obx(
-                () => Container(
-                  height: MediaQuery.of(context).size.height - 75,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+        ),
+        child: rc.chatViewLoading.value ||
+                rc.conversationInfoLoading.value
+            ? const Padding(
+                padding: EdgeInsets.only(top: 15),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      green,
                     ),
                   ),
-                  child: rc.chatViewLoading.value ||
-                          rc.conversationInfoLoading.value
-                      ? const Padding(
-                          padding: EdgeInsets.only(top: 15),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 3,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                green,
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          width: 1,
+                          color: Color(0XFFF1F1F1),
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 24,
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                size: 24,
+                                color: Color(0XFF51545C),
+                              ),
+                              padding: const EdgeInsets.all(0),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            rc.currentConversation.value.isGroup!
+                                ? 'Group Media'
+                                : 'Chat Media',
+                            style: const TextStyle(
+                              color: black,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: DefaultTabController(
+                              length: 3,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 42,
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        8,
+                                      ),
+                                      color: const Color(0XFFEFEFEF),
+                                    ),
+                                    child: TabBar(
+                                      // give the indicator a decoration (color and border radius)
+                                      indicator: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                          6.93,
+                                        ),
+                                        color: green,
+                                      ),
+                                      labelColor: white,
+                                      labelStyle: const TextStyle(
+                                        fontSize: 13,
+                                      ),
+                                      unselectedLabelStyle:
+                                          const TextStyle(
+                                        fontSize: 13,
+                                      ),
+                                      unselectedLabelColor:
+                                          const Color(0XFF8D9091),
+                                      tabs: const [
+                                        Tab(
+                                          text: 'Photos',
+                                        ),
+                                        Tab(
+                                          text: 'Links',
+                                        ),
+                                        Tab(
+                                          text: 'Docs',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context)
+                                            .size
+                                            .height -
+                                        220,
+                                    child: TabBarView(
+                                      children: [
+                                        renderPhotos(context),
+                                        renderLinks(),
+                                        renderDocs(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 1,
-                                    color: Color(0XFFF1F1F1),
-                                  ),
-                                ),
-                              ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 24,
-                                      child: IconButton(
-                                        icon: const Icon(
-                                          Icons.close,
-                                          size: 24,
-                                          color: Color(0XFF51545C),
-                                        ),
-                                        padding: const EdgeInsets.all(0),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      rc.currentConversation.value.isGroup!
-                                          ? 'Group Media'
-                                          : 'Chat Media',
-                                      style: const TextStyle(
-                                        color: black,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: DefaultTabController(
-                                        length: 3,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 42,
-                                              padding: const EdgeInsets.all(3),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                  8,
-                                                ),
-                                                color: const Color(0XFFEFEFEF),
-                                              ),
-                                              child: TabBar(
-                                                // give the indicator a decoration (color and border radius)
-                                                indicator: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                    6.93,
-                                                  ),
-                                                  color: green,
-                                                ),
-                                                labelColor: white,
-                                                labelStyle: const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                                unselectedLabelStyle:
-                                                    const TextStyle(
-                                                  fontSize: 13,
-                                                ),
-                                                unselectedLabelColor:
-                                                    const Color(0XFF8D9091),
-                                                tabs: const [
-                                                  Tab(
-                                                    text: 'Photos',
-                                                  ),
-                                                  Tab(
-                                                    text: 'Links',
-                                                  ),
-                                                  Tab(
-                                                    text: 'Docs',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height -
-                                                  220,
-                                              child: TabBarView(
-                                                children: [
-                                                  renderPhotos(context),
-                                                  renderLinks(),
-                                                  renderDocs(),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
       ),
     );
   }

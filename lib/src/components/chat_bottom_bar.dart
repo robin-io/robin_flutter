@@ -15,7 +15,10 @@ class ChatBottomBar extends StatelessWidget {
   final RobinController rc = Get.find();
   final double bottomPadding;
 
-  ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key);
+  ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key) {
+    rc.messageController.text =
+        rc.messageDrafts[rc.currentConversation.value.id!] ?? "";
+  }
 
   void showOverLay(BuildContext context) {
     var overlay = Overlay.of(context)!;
@@ -254,8 +257,16 @@ class ChatBottomBar extends StatelessWidget {
                                                           ) ==
                                                           'image'
                                                       ? "Photo"
-                                                      : fileName(rc
-                                                          .replyMessage!.link),
+                                                      : fileType(
+                                                                path: rc
+                                                                    .replyMessage!
+                                                                    .link,
+                                                              ) ==
+                                                              'audio'
+                                                          ? "Audio"
+                                                          : fileName(rc
+                                                              .replyMessage!
+                                                              .link),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: const TextStyle(
@@ -449,6 +460,8 @@ class ChatBottomBar extends StatelessWidget {
                               ),
                               controller: rc.messageController,
                               focusNode: rc.messageFocus,
+                              enabled: !rc.chatOptionsOpened.value,
+                              textCapitalization: TextCapitalization.sentences,
                               keyboardType: TextInputType.multiline,
                               textInputAction: TextInputAction.newline,
                               minLines: 1,

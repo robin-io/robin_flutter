@@ -66,6 +66,8 @@ class RobinController extends GetxController {
 
   Map userColors = {};
 
+  Map messageDrafts = {};
+
   RxMap conversationMessages = {}.obs;
 
   RxMap file = {}.obs;
@@ -122,7 +124,6 @@ class RobinController extends GetxController {
       renderArchivedConversations();
     });
     allUsersSearchController.addListener(() {
-      print(allUsersSearchControllerPrevious != allUsersSearchController.text);
       if (allUsersSearchControllerPrevious != allUsersSearchController.text) {
         renderAllUsers();
         allUsersSearchControllerPrevious = allUsersSearchController.text;
@@ -197,7 +198,7 @@ class RobinController extends GetxController {
               sendReadReceipts([robinMessage.id]);
             }
             Future.delayed(const Duration(milliseconds: 17), () {
-              // scrollToEnd();
+              scrollToEnd();
             });
           }
         } else {
@@ -732,6 +733,14 @@ class RobinController extends GetxController {
     chatViewLoading.value = false;
   }
 
+  void handleMessageDraft(String conversationId) {
+    if (rc.messageController.text.isNotEmpty) {
+      messageDrafts[conversationId] = rc.messageController.text;
+    } else {
+      messageDrafts[conversationId] = "";
+    }
+  }
+
   void generateUserColors() {
     List<Color> colors = groupUserColors.toList();
     for (Map user in currentConversation.value.participants!) {
@@ -762,11 +771,13 @@ class RobinController extends GetxController {
     }
   }
 
-  Future<bool> deleteConversation({bool? showLoader, String? conversationId}) async {
+  Future<bool> deleteConversation(
+      {bool? showLoader, String? conversationId}) async {
     try {
       chatViewLoading.value = showLoader ?? true;
       await robinCore!.deleteConversation(
-    conversationId ?? currentConversation.value.id!, currentUser!.robinToken);
+          conversationId ?? currentConversation.value.id!,
+          currentUser!.robinToken);
       chatViewLoading.value = false;
       return true;
     } catch (e) {
@@ -1001,6 +1012,6 @@ class RobinController extends GetxController {
     Map<String, dynamic> body = {
       'conversation_id': currentUser!.robinToken,
     };
-    print(await robinCore!.starMessage(body, messageId));
+    robinCore!.starMessage(body, messageId);
   }
 }

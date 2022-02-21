@@ -33,7 +33,7 @@ class _RecordingBottomBarState extends State<RecordingBottomBar> {
     bool hasPermission = await _recorder.hasPermission();
     if (hasPermission) {
       Directory tempDir = await getTemporaryDirectory();
-      String path = tempDir.path + '/voice_note.m4a';
+      String path = tempDir.path + '/${DateTime.now().millisecondsSinceEpoch}voice_note.m4a';
       await _recorder.start(path: path);
       _recordDuration = 0;
       _startTimer();

@@ -26,9 +26,8 @@ class Conversation extends StatelessWidget {
     }
   }
 
-  void deleteConversation(BuildContext context){
-    rc.allConversations
-        .remove(conversation.id);
+  void deleteConversation(BuildContext context) {
+    rc.allConversations.remove(conversation.id);
     if (conversation.archived!) {
       rc.renderArchivedConversations();
     } else {
@@ -37,9 +36,8 @@ class Conversation extends StatelessWidget {
     rc.deleteConversation(conversationId: conversation.id, showLoader: false);
   }
 
-  void leaveGroup(BuildContext context){
-    rc.allConversations
-        .remove(conversation.id);
+  void leaveGroup(BuildContext context) {
+    rc.allConversations.remove(conversation.id);
     if (conversation.archived!) {
       rc.renderArchivedConversations();
     } else {
@@ -74,7 +72,7 @@ class Conversation extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width:  conversation.isGroup! ?45 : 90,
+                width: conversation.isGroup! ? 45 : 90,
               ),
               SvgPicture.asset(
                 'assets/icons/archive_black.svg',
@@ -103,7 +101,7 @@ class Conversation extends StatelessWidget {
                 ),
               ),
               const SizedBox(
-                width:  23,
+                width: 23,
               ),
               SvgPicture.asset(
                 'assets/icons/delete.svg',
@@ -125,10 +123,10 @@ class Conversation extends StatelessWidget {
       rc.selectedConversation.value = '';
       if (value == 1) {
         handleArchive(context);
-      }else if(value == 2){
-        if(conversation.isGroup!){
+      } else if (value == 2) {
+        if (conversation.isGroup!) {
           leaveGroup(context);
-        }else{
+        } else {
           deleteConversation(context);
         }
       }
@@ -169,7 +167,7 @@ class Conversation extends StatelessWidget {
       },
       child: Slidable(
         key: ValueKey(conversation.id),
-        endActionPane: ActionPane(
+        startActionPane: ActionPane(
           dismissible: DismissiblePane(
             onDismissed: () {
               handleArchive(context);
@@ -187,12 +185,13 @@ class Conversation extends StatelessWidget {
             )
           ],
         ),
-        startActionPane: ActionPane(
+        endActionPane: ActionPane(
           extentRatio: 0.23,
           motion: const DrawerMotion(),
           children: [
             SlidableAction(
-              onPressed: conversation.isGroup! ? leaveGroup : deleteConversation,
+              onPressed:
+                  conversation.isGroup! ? leaveGroup : deleteConversation,
               backgroundColor: const Color(0XFFD53120),
               autoClose: true,
               foregroundColor: white,
