@@ -454,7 +454,7 @@ class _TextBubbleState extends State<TextBubble> {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0XFF9999BC),
                     ),
@@ -522,7 +522,7 @@ class _TextBubbleState extends State<TextBubble> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0XFF9999BC),
                   ),

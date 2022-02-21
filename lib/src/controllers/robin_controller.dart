@@ -173,6 +173,7 @@ class RobinController extends GetxController {
                 RobinLastMessage.fromRobinMessage(robinMessage);
             allConversations[robinMessage.conversationId]?.updatedAt =
                 DateTime.now();
+
             if (robinMessage.conversationId != currentConversation.value.id) {
               int unreadMessages = allConversations[robinMessage.conversationId]
                       ?.unreadMessages ??
@@ -193,7 +194,8 @@ class RobinController extends GetxController {
             }
           }
           if (robinMessage.conversationId == currentConversation.value.id) {
-            conversationMessages[robinMessage.id] = robinMessage;
+            conversationMessages.value = {robinMessage.id : robinMessage, ...conversationMessages};
+            // conversationMessages[robinMessage.id] = robinMessage;
             if (!robinMessage.sentByMe) {
               sendReadReceipts([robinMessage.id]);
             }
@@ -332,7 +334,7 @@ class RobinController extends GetxController {
           !robinMessage.sentByMe) {
         sendReadReceipts([robinMessage.id]);
       }
-      if (atMaxScroll.value) {
+      if (!atMaxScroll.value) {
         Future.delayed(const Duration(milliseconds: 17), () {
           scrollToEnd();
         });
@@ -342,7 +344,7 @@ class RobinController extends GetxController {
 
   scrollToEnd() {
     messagesScrollController.animateTo(
-      messagesScrollController.position.maxScrollExtent,
+      0,
       duration: const Duration(milliseconds: 200),
       curve: Curves.fastOutSlowIn,
     );
@@ -813,7 +815,8 @@ class RobinController extends GetxController {
       if (!robinMessage.isRead && !robinMessage.sentByMe) {
         unreadMessages.add(robinMessage.id);
       }
-      allMessages[robinMessage.id] = robinMessage;
+      allMessages = {robinMessage.id : robinMessage, ...allMessages};
+      // allMessages[robinMessage.id] = robinMessage;
     }
     if (unreadMessages.isNotEmpty && !currentConversation.value.isGroup!) {
       sendReadReceipts(unreadMessages);

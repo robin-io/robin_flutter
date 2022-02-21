@@ -290,19 +290,22 @@ class Conversation extends StatelessWidget {
                                 color: Color(0XFF51545C),
                               ),
                             ),
+                            const SizedBox(height: 3),
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: 22,
+                              height: 22,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: robinOrange,
                               ),
                               child: Center(
                                 child: Text(
-                                  '${conversation.unreadMessages}',
+                                  conversation.unreadMessages! > 9
+                                      ? '9+'
+                                      : '${conversation.unreadMessages}',
                                   maxLines: 1,
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: white,
                                   ),
                                 ),

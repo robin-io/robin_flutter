@@ -46,6 +46,7 @@ String formatDate(String dateString) {
   String formattedDate = Jiffy(dateString).fromNow();
   formattedDate = formattedDate.replaceAll(' ago', '');
   formattedDate = formattedDate.replaceAll('a few seconds', 'few seconds');
+  formattedDate = formattedDate.replaceAll("a day", 'Yesterday');
   return formattedDate;
 }
 
@@ -217,11 +218,7 @@ String fileType({String? path}) {
 }
 
 String fileName(String path) {
-  String name = path.split('/').last;
-  if (name == 'voice_note.m4a') {
-    return 'Voice Note';
-  }
-  return name;
+  return path.split('/').last;
 }
 
 List<LinkifyElement> matchLinks(String str) {

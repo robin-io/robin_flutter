@@ -13,20 +13,14 @@ class RenderMessages extends StatelessWidget {
   }) : super(key: key) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (!rc.finishedInitialScroll.value) {
-        Future.delayed(const Duration(milliseconds: 5), () {
-          rc.messagesScrollController.jumpTo(
-            rc.messagesScrollController.position.maxScrollExtent - 10,
-          );
-          rc.messagesScrollController.addListener(() {
-            if (rc.messagesScrollController.position.pixels <
-                rc.messagesScrollController.position.maxScrollExtent - 120) {
-              rc.atMaxScroll.value = false;
-            } else if (!rc.atMaxScroll.value) {
-              rc.atMaxScroll.value = true;
-            }
-          });
-          rc.finishedInitialScroll.value = true;
+        rc.messagesScrollController.addListener(() {
+          if (rc.messagesScrollController.position.pixels > 200) {
+            rc.atMaxScroll.value = false;
+          } else if (!rc.atMaxScroll.value) {
+            rc.atMaxScroll.value = true;
+          }
         });
+        rc.finishedInitialScroll.value = true;
       }
     });
   }
@@ -41,27 +35,29 @@ class RenderMessages extends StatelessWidget {
         children: [
           ListView.builder(
             itemCount: rc.conversationMessages.length,
+            reverse: true,
+            shrinkWrap: rc.conversationMessages.length < 25,
             itemBuilder: (context, index) {
-              RobinMessage message =
-                  rc.conversationMessages.values.toList()[index];
+              RobinMessage message = rc.conversationMessages.values
+                  .toList()[index];
               return MessageGroup(
                 message: message,
-                lastInSeries: (index < rc.conversationMessages.length - 1 &&
+                lastInSeries: (index > 0 &&
                         rc.conversationMessages.values
-                                .toList()[index + 1]
+                                .toList()[index - 1]
                                 .senderToken !=
                             message.senderToken) ||
-                    index == rc.conversationMessages.length - 1,
+                    index == 0,
                 firstInSeries: !rc.currentConversation.value.isGroup!
                     ? false
                     : message.sentByMe
                         ? false
                         : (index > 0 &&
                                 rc.conversationMessages.values
-                                        .toList()[index - 1]
+                                        .toList()[index + 1]
                                         .senderToken !=
                                     message.senderToken) ||
-                            index == 0,
+                            index == rc.conversationMessages.length - 1,
                 maxWidth: maxWidth,
               );
             },

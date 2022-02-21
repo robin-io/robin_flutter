@@ -455,8 +455,8 @@ class ChatBottomBar extends StatelessWidget {
                           Expanded(
                             child: TextFormField(
                               style: const TextStyle(
-                                color: Color(0XFF535F89),
-                                fontSize: 14,
+                                color: Color(0XFF333F69),
+                                fontSize: 15,
                               ),
                               controller: rc.messageController,
                               focusNode: rc.messageFocus,
