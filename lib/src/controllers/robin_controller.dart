@@ -39,7 +39,7 @@ class RobinController extends GetxController {
   RxBool chatViewLoading = false.obs;
   RxBool showSendButton = false.obs;
   RxBool isFileSending = false.obs;
-  RxBool atMaxScroll = false.obs;
+  RxBool atMaxScroll = true.obs;
 
   RxBool isRecording = false.obs;
 
@@ -194,14 +194,18 @@ class RobinController extends GetxController {
             }
           }
           if (robinMessage.conversationId == currentConversation.value.id) {
-            conversationMessages.value = {robinMessage.id : robinMessage, ...conversationMessages};
-            // conversationMessages[robinMessage.id] = robinMessage;
+            conversationMessages.value = {
+              robinMessage.id: robinMessage,
+              ...conversationMessages
+            };
             if (!robinMessage.sentByMe) {
               sendReadReceipts([robinMessage.id]);
             }
-            Future.delayed(const Duration(milliseconds: 17), () {
-              scrollToEnd();
-            });
+            if (atMaxScroll.value) {
+              Future.delayed(const Duration(milliseconds: 17), () {
+                scrollToEnd();
+              });
+            }
           }
         } else {
           switch (data['name']) {
@@ -210,6 +214,12 @@ class RobinController extends GetxController {
               break;
             case 'delete.message':
               handleDeleteMessages(data['value']['ids']);
+              break;
+            case 'new.group.moderator':
+              handleNewGroupModerator(data['value']);
+              break;
+            case 'remove.group.participant':
+              handleRemoveGroupParticipant(data['value']);
               break;
             case 'message.reaction':
               if (conversationMessages[data['value']['message_id']] != null) {
@@ -269,6 +279,64 @@ class RobinController extends GetxController {
         // });
       },
     );
+  }
+
+  handleRemoveGroupParticipant(Map value) {
+    if (allConversations[value['conversation_id']] != null) {
+      RobinConversation conversation =
+          allConversations[value['conversation_id']]!;
+      List participants = conversation.participants!;
+      int index = 0;
+      for (int i = 0; i < participants.length; i++) {
+        if (participants[i]['user_token'] ==
+            value['participant']['user_token']) {
+          index = i;
+          break;
+        }
+      }
+      participants.removeAt(index);
+      conversation.participants = participants;
+      allConversations[conversation.id!] = conversation;
+      if (conversation.archived!) {
+        renderArchivedConversations();
+      } else {
+        renderHomeConversations();
+      }
+      if (currentConversation.value.id! == value['conversation_id']) {
+        currentConversation.value = conversation;
+        rc.chatViewLoading.value = true;
+        rc.chatViewLoading.value = false;
+      }
+    }
+  }
+
+  handleNewGroupModerator(Map value) {
+    if (allConversations[value['conversation_id']] != null) {
+      RobinConversation conversation =
+          allConversations[value['conversation_id']]!;
+      List participants = conversation.participants!;
+      int index = 0;
+      for (int i = 0; i < participants.length; i++) {
+        if (participants[i]['user_token'] ==
+            value['participant']['user_token']) {
+          index = i;
+          break;
+        }
+      }
+      participants[index]['is_moderator'] = true;
+      conversation.participants = participants;
+      allConversations[conversation.id!] = conversation;
+      if (conversation.archived!) {
+        renderArchivedConversations();
+      } else {
+        renderHomeConversations();
+      }
+      if (currentConversation.value.id! == value['conversation_id']) {
+        currentConversation.value = conversation;
+        rc.chatViewLoading.value = true;
+        rc.chatViewLoading.value = false;
+      }
+    }
   }
 
   handleNewConversation(Map conversation) {
@@ -334,7 +402,7 @@ class RobinController extends GetxController {
           !robinMessage.sentByMe) {
         sendReadReceipts([robinMessage.id]);
       }
-      if (!atMaxScroll.value) {
+      if (atMaxScroll.value) {
         Future.delayed(const Duration(milliseconds: 17), () {
           scrollToEnd();
         });
@@ -658,6 +726,30 @@ class RobinController extends GetxController {
     }
   }
 
+  void assignGroupModerator(String userToken) async {
+    try {
+      conversationInfoLoading.value = true;
+      Map<String, String> body = {
+        'user_token': userToken,
+      };
+      var response = await robinCore!
+          .assignGroupModerator(body, currentConversation.value.id!);
+      currentConversation.value = RobinConversation.fromJson(response);
+      allConversations[currentConversation.value.id!] =
+          currentConversation.value;
+      if (currentConversation.value.archived!) {
+        renderArchivedConversations();
+      } else {
+        renderHomeConversations();
+      }
+      conversationInfoLoading.value = false;
+    } catch (e) {
+      conversationInfoLoading.value = false;
+      showErrorMessage(e.toString());
+      rethrow;
+    }
+  }
+
   void removeGroupParticipant(String userToken) async {
     try {
       conversationInfoLoading.value = true;
@@ -717,6 +809,11 @@ class RobinController extends GetxController {
     messageController.clear();
     finishedInitialScroll.value = false;
     currentConversation.value = conversation;
+    String pastMessage = messageDrafts[currentConversation.value.id!] ?? "";
+    if (pastMessage.isNotEmpty) {
+      messageController.text = pastMessage;
+    }
+    messageDrafts.remove(currentConversation.value.id!);
     if (currentConversation.value.isGroup!) {
       generateUserColors();
     }
@@ -815,7 +912,7 @@ class RobinController extends GetxController {
       if (!robinMessage.isRead && !robinMessage.sentByMe) {
         unreadMessages.add(robinMessage.id);
       }
-      allMessages = {robinMessage.id : robinMessage, ...allMessages};
+      allMessages = {robinMessage.id: robinMessage, ...allMessages};
       // allMessages[robinMessage.id] = robinMessage;
     }
     if (unreadMessages.isNotEmpty && !currentConversation.value.isGroup!) {
@@ -828,7 +925,7 @@ class RobinController extends GetxController {
     try {
       if (messageController.text.isNotEmpty) {
         Map<String, String> message = {
-          'msg': messageController.text,
+          'msg': messageController.text.trim(),
           'timestamp': DateTime.now().toString(),
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
@@ -851,7 +948,7 @@ class RobinController extends GetxController {
     try {
       if (messageController.text.isNotEmpty) {
         Map<String, String> message = {
-          'msg': messageController.text,
+          'msg': messageController.text.trim(),
           'timestamp': DateTime.now().toString(),
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,

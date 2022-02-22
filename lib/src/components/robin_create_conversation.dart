@@ -48,8 +48,14 @@ class RobinCreateConversation extends StatelessWidget {
       users.add(
         InkWell(
           onTap: () async {
-            for(RobinConversation conversation in rc.allConversations.values.toList()){
-              if(user.robinToken == conversation.token){
+            if (rc.allConversations.isEmpty) {
+              Map<String, String> body = {
+                'receiver_name': user.displayName,
+                'receiver_token': user.robinToken,
+              };
+              RobinConversation conversation =
+                  await rc.createConversation(body);
+              try {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -62,15 +68,13 @@ class RobinCreateConversation extends StatelessWidget {
                     rc.currentConversation.value = RobinConversation.empty();
                   });
                 });
+              } finally {
+                // widget was disposed before conversation was created
               }
-              else {
-                Map<String, String> body = {
-                  'receiver_name': user.displayName,
-                  'receiver_token': user.robinToken,
-                };
-                RobinConversation conversation =
-                await rc.createConversation(body);
-                try {
+            } else {
+              for (RobinConversation conversation
+                  in rc.allConversations.values.toList()) {
+                if (user.robinToken == conversation.token) {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -83,8 +87,30 @@ class RobinCreateConversation extends StatelessWidget {
                       rc.currentConversation.value = RobinConversation.empty();
                     });
                   });
-                } finally {
-                  // widget was disposed before conversation was created
+                } else {
+                  Map<String, String> body = {
+                    'receiver_name': user.displayName,
+                    'receiver_token': user.robinToken,
+                  };
+                  RobinConversation conversation =
+                      await rc.createConversation(body);
+                  try {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RobinChat(
+                          conversation: conversation,
+                        ),
+                      ),
+                    ).then((value) {
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        rc.currentConversation.value =
+                            RobinConversation.empty();
+                      });
+                    });
+                  } finally {
+                    // widget was disposed before conversation was created
+                  }
                 }
               }
             }
@@ -280,8 +306,7 @@ class RobinCreateConversation extends StatelessWidget {
                             child: Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 3,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(
+                                valueColor: AlwaysStoppedAnimation<Color>(
                                   green,
                                 ),
                               ),

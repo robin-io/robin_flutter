@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,283 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return options;
+  }
+
+  void confirmLeaveGroup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Leave Group',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to leave the ${rc.currentConversation.value.name} Group',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.leaveGroup(
+                                    rc.currentConversation.value.id!);
+                                if (successful) {
+                                  showSuccessMessage('Group left successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void confirmDeleteConversation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Delete Conversation',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to delete your conversation with ${rc.currentConversation.value.name}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.deleteConversation();
+                                if (successful) {
+                                  showSuccessMessage('Deleted successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -74,7 +353,8 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       width: 30,
                       child: IconButton(
                         onPressed: () async {
-                          rc.handleMessageDraft(rc.currentConversation.value.id!);
+                          rc.handleMessageDraft(
+                              rc.currentConversation.value.id!);
                           rc.resetChatView();
                           Navigator.pop(context);
                           rc.renderHomeConversations();
@@ -179,39 +459,16 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       Radius.circular(6.0),
                     ),
                   ),
-                  onSelected: (value) async {
+                  onSelected: (value) {
                     if (value == 'Select Messages') {
                       rc.selectMessageView.value = true;
                     } else if (value == 'Contact Info' ||
                         value == 'Group Info') {
                       showConversationInfo(context);
                     } else if (value == 'Leave Group') {
-                      bool successful =
-                          await rc.leaveGroup(rc.currentConversation.value.id!);
-                      if (successful) {
-                        showSuccessMessage('Group left successfully');
-                        rc.allConversations
-                            .remove(rc.currentConversation.value.id!);
-                        if (rc.currentConversation.value.archived!) {
-                          rc.renderArchivedConversations();
-                        } else {
-                          rc.renderHomeConversations();
-                        }
-                        Navigator.pop(context);
-                      }
+                      confirmLeaveGroup(context);
                     } else if (value == 'Delete Conversation') {
-                      bool successful = await rc.deleteConversation();
-                      if (successful) {
-                        showSuccessMessage('Deleted successfully');
-                        rc.allConversations
-                            .remove(rc.currentConversation.value.id!);
-                        if (rc.currentConversation.value.archived!) {
-                          rc.renderArchivedConversations();
-                        } else {
-                          rc.renderHomeConversations();
-                        }
-                        Navigator.pop(context);
-                      }
+                      confirmDeleteConversation(context);
                     }
                   },
                   itemBuilder: (context) {

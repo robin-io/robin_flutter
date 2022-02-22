@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:robin_flutter/src/components/robin_add_group_participants.dart';
 import 'package:robin_flutter/src/components/robin_conversation_media.dart';
 import 'package:robin_flutter/src/components/robin_encryption_details.dart';
+import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'package:robin_flutter/src/components/robin_create_group.dart';
@@ -147,6 +148,15 @@ void showConversationMedia(BuildContext context) {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (_) => RobinConversationMedia(),
+  );
+}
+
+void showGroupParticipantOptions(BuildContext context, Map participant) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinGroupParticipantOptions(participant: participant),
   );
 }
 

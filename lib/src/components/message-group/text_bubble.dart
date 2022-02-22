@@ -538,7 +538,12 @@ class _TextBubbleState extends State<TextBubble> {
                                 ) ==
                                 'image'
                             ? "Photo"
-                            : fileName(reply.link),
+                            : fileType(
+                                      path: reply.link,
+                                    ) ==
+                                    'audio'
+                                ? "Audio"
+                                : fileName(reply.link),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: const TextStyle(

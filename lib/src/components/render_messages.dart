@@ -14,7 +14,7 @@ class RenderMessages extends StatelessWidget {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (!rc.finishedInitialScroll.value) {
         rc.messagesScrollController.addListener(() {
-          if (rc.messagesScrollController.position.pixels > 200) {
+          if (rc.messagesScrollController.position.pixels > 250) {
             rc.atMaxScroll.value = false;
           } else if (!rc.atMaxScroll.value) {
             rc.atMaxScroll.value = true;
@@ -52,7 +52,7 @@ class RenderMessages extends StatelessWidget {
                     ? false
                     : message.sentByMe
                         ? false
-                        : (index > 0 &&
+                        : (index <  rc.conversationMessages.length - 1&&
                                 rc.conversationMessages.values
                                         .toList()[index + 1]
                                         .senderToken !=

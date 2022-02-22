@@ -12,14 +12,12 @@ import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:robin_flutter/src/views/robin_image_preview.dart';
 
 class RobinConversationInfo extends StatelessWidget {
   final RobinController rc = Get.find();
 
   RobinConversationInfo({Key? key}) : super(key: key) {
     rc.getConversationInfo();
-    print(rc.currentConversation);
   }
 
   RxBool seeAllParticipants = false.obs;
@@ -30,134 +28,6 @@ class RobinConversationInfo extends StatelessWidget {
       participants.add(user['user_token']);
     }
     return participants;
-  }
-
-  void confirmRemoveGroupParticipant(BuildContext context, Map participant) {
-    showDialog(
-      context: context,
-      builder: (_) => GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
-              child: Container(
-                width: 270,
-                decoration: BoxDecoration(
-                  color: const Color(0XFFF2F2F2),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      'Confirm Removal',
-                      style: TextStyle(
-                        color: black,
-                        fontSize: 17,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                      child: Text(
-                        'Do you want to remove ${participant['meta_data']['display_name']} from the ${rc.currentConversation.value.name} Group',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0XFF51545C),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          top: BorderSide(
-                            width: 1,
-                            color: Color(0XFFB0B0B3),
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    right: BorderSide(
-                                      width: 0.5,
-                                      color: Color(0XFFB0B0B3),
-                                    ),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Cancel',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Color(0XFFD53120),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                rc.removeGroupParticipant(
-                                    participant['user_token']);
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    left: BorderSide(
-                                      width: 0.5,
-                                      color: Color(0XFFB0B0B3),
-                                    ),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Proceed',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: green,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget renderPhotos(BuildContext context) {
@@ -495,74 +365,70 @@ class RobinConversationInfo extends StatelessWidget {
             ),
           ),
           padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-          child: Row(
-            children: [
-              UserAvatar(
-                name: '${participant['meta_data']['display_name']}',
-                size: 40,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        isCurrentUser
-                            ? '${participant['meta_data']['display_name']} (You)'
-                            : '${participant['meta_data']['display_name']}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: black,
-                          fontWeight: FontWeight.w500,
+          child: InkWell(
+            onTap: !isCurrentUser && isModerator
+                ? () {
+                    showGroupParticipantOptions(context, participant);
+                  }
+                : null,
+            child: Row(
+              children: [
+                UserAvatar(
+                  name: '${participant['meta_data']['display_name']}',
+                  size: 40,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          isCurrentUser
+                              ? '${participant['meta_data']['display_name']} (You)'
+                              : '${participant['meta_data']['display_name']}',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: black,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                    participant['is_moderator']
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 5, right: 5),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: const Color(0XFFF5F7FC),
-                              ),
-                              padding: const EdgeInsets.fromLTRB(10, 3, 10, 3),
-                              child: const Text(
-                                'moderator',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0XFF8D9091),
-                                  fontWeight: FontWeight.w500,
+                      participant['is_moderator']
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 5, right: 5),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: const Color(0XFFF5F7FC),
+                                ),
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 3, 10, 3),
+                                child: const Text(
+                                  'moderator',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0XFF8D9091),
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : Container(),
-                    !isCurrentUser && isModerator
-                        ? IconButton(
-                            icon: const Icon(
-                              Icons.clear,
-                              size: 16,
-                              color: Color(0XFFD53120),
-                            ),
-                            onPressed: () {
-                              confirmRemoveGroupParticipant(
-                                  context, participant);
-                            },
-                          )
-                        : Container(),
-                  ],
+                            )
+                          : Container(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
     }
-    if (!seeAllParticipants.value) {
+    if (!seeAllParticipants.value &&
+        rc.currentConversation.value.participants!.length > 4) {
       participants.add(
         GestureDetector(
           onTap: () {
@@ -593,6 +459,285 @@ class RobinConversationInfo extends StatelessWidget {
     return allParticipants;
   }
 
+  void confirmLeaveGroup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Leave Group',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to leave the ${rc.currentConversation.value.name} Group',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.leaveGroup(
+                                    rc.currentConversation.value.id!);
+                                if (successful) {
+                                  showSuccessMessage('Group left successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void confirmDeleteConversation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Delete Conversation',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to delete your conversation with ${rc.currentConversation.value.name}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.deleteConversation();
+                                if (successful) {
+                                  showSuccessMessage('Deleted successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -606,8 +751,7 @@ class RobinConversationInfo extends StatelessWidget {
             topRight: Radius.circular(20),
           ),
         ),
-        child: rc.chatViewLoading.value ||
-                rc.conversationInfoLoading.value
+        child: rc.chatViewLoading.value || rc.conversationInfoLoading.value
             ? const Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Center(
@@ -635,8 +779,7 @@ class RobinConversationInfo extends StatelessWidget {
                       ),
                     ),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -680,8 +823,8 @@ class RobinConversationInfo extends StatelessWidget {
                           ),
                           UserAvatar(
                             name: rc.currentConversation.value.name!,
-                            conversationIcon: rc.currentConversation
-                                .value.conversationIcon,
+                            conversationIcon:
+                                rc.currentConversation.value.conversationIcon,
                             size: 75,
                           ),
                           const SizedBox(
@@ -701,8 +844,8 @@ class RobinConversationInfo extends StatelessWidget {
                               : Container(),
                           rc.currentConversation.value.isGroup!
                               ? Text(
-                                  rc.currentConversation.value
-                                              .participants!.length ==
+                                  rc.currentConversation.value.participants!
+                                              .length ==
                                           1
                                       ? '1 Member'
                                       : rc.currentConversation.value
@@ -730,8 +873,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     ),
                                     children: [
                                       TextSpan(
-                                        text: DateFormat('dd/MM/yyyy')
-                                            .format(
+                                        text: DateFormat('dd/MM/yyyy').format(
                                           rc.currentConversation.value
                                               .createdAt!,
                                         ),
@@ -748,8 +890,8 @@ class RobinConversationInfo extends StatelessWidget {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: rc.currentConversation
-                                            .value.moderatorName,
+                                        text: rc.currentConversation.value
+                                            .moderatorName,
                                         style: const TextStyle(
                                           color: Color(0XFF071439),
                                           fontSize: 12,
@@ -772,8 +914,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     height: 42,
                                     padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(
+                                      borderRadius: BorderRadius.circular(
                                         8,
                                       ),
                                       color: const Color(0XFFEFEFEF),
@@ -781,8 +922,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     child: TabBar(
                                       // give the indicator a decoration (color and border radius)
                                       indicator: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(
+                                        borderRadius: BorderRadius.circular(
                                           6.93,
                                         ),
                                         color: green,
@@ -791,8 +931,7 @@ class RobinConversationInfo extends StatelessWidget {
                                       labelStyle: const TextStyle(
                                         fontSize: 13,
                                       ),
-                                      unselectedLabelStyle:
-                                          const TextStyle(
+                                      unselectedLabelStyle: const TextStyle(
                                         fontSize: 13,
                                       ),
                                       unselectedLabelColor:
@@ -825,9 +964,8 @@ class RobinConversationInfo extends StatelessWidget {
                                       showConversationMedia(context);
                                     },
                                     child: Container(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(
-                                              15, 7, 15, 0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          15, 7, 15, 0),
                                       child: const Text(
                                         'See All Media',
                                         style: TextStyle(
@@ -846,8 +984,8 @@ class RobinConversationInfo extends StatelessWidget {
                               showEncryptionDetails(context);
                             },
                             child: Container(
-                              padding: const EdgeInsets.fromLTRB(
-                                  15, 10, 15, 12),
+                              padding:
+                                  const EdgeInsets.fromLTRB(15, 10, 15, 12),
                               decoration: const BoxDecoration(
                                 color: Color(0XFFFBFBFB),
                                 border: Border(
@@ -892,8 +1030,7 @@ class RobinConversationInfo extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.fromLTRB(
-                                15, 10, 15, 12),
+                            padding: const EdgeInsets.fromLTRB(15, 10, 15, 12),
                             decoration: const BoxDecoration(
                               color: Color(0XFFFBFBFB),
                               border: Border(
@@ -905,8 +1042,7 @@ class RobinConversationInfo extends StatelessWidget {
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
@@ -949,33 +1085,12 @@ class RobinConversationInfo extends StatelessWidget {
                           ),
                           rc.currentConversation.value.isGroup!
                               ? InkWell(
-                                  onTap: () async {
-                                    bool successful =
-                                        await rc.leaveGroup(rc
-                                            .currentConversation
-                                            .value
-                                            .id!);
-                                    if (successful) {
-                                      showSuccessMessage(
-                                          'Group left successfully');
-                                      rc.allConversations.remove(rc
-                                          .currentConversation
-                                          .value
-                                          .id!);
-                                      if (rc.currentConversation.value
-                                          .archived!) {
-                                        rc.renderArchivedConversations();
-                                      } else {
-                                        rc.renderHomeConversations();
-                                      }
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    }
+                                  onTap: () {
+                                    confirmLeaveGroup(context);
                                   },
                                   child: Container(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(
-                                            15, 10, 15, 12),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        15, 10, 15, 12),
                                     decoration: const BoxDecoration(
                                       color: Color(0XFFFFFFFF),
                                       border: Border(
@@ -999,30 +1114,12 @@ class RobinConversationInfo extends StatelessWidget {
                                   ),
                                 )
                               : InkWell(
-                                  onTap: () async {
-                                    bool successful =
-                                        await rc.deleteConversation();
-                                    if (successful) {
-                                      showSuccessMessage(
-                                          'Deleted successfully');
-                                      rc.allConversations.remove(rc
-                                          .currentConversation
-                                          .value
-                                          .id!);
-                                      if (rc.currentConversation.value
-                                          .archived!) {
-                                        rc.renderArchivedConversations();
-                                      } else {
-                                        rc.renderHomeConversations();
-                                      }
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    }
+                                  onTap: () {
+                                    confirmDeleteConversation(context);
                                   },
                                   child: Container(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(
-                                            15, 10, 15, 12),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        15, 10, 15, 12),
                                     decoration: const BoxDecoration(
                                       color: Color(0XFFFFFFFF),
                                       border: Border(

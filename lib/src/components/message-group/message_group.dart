@@ -406,6 +406,9 @@ class _MessageGroupState extends State<MessageGroup> {
                 ? () {
                     if (rc.selectedMessageIds.contains(widget.message.id)) {
                       rc.selectedMessageIds.remove(widget.message.id);
+                      if (rc.selectedMessageIds.isEmpty) {
+                        rc.selectMessageView.value = false;
+                      }
                     } else {
                       rc.selectedMessageIds.add(widget.message.id);
                     }
@@ -575,41 +578,24 @@ class _MessageGroupState extends State<MessageGroup> {
                         !widget.message.sentByMe &&
                                 widget.message.reactions.isNotEmpty
                             ? Transform.translate(
-                              offset: Offset((textBubbleSize - 36) - (widget.message.reactions.length * 24), -7),
-                              child: Row(
-                                textDirection: ui.TextDirection.rtl,
-                                children: [
-                                  Container(
-                                    width: 8.7,
-                                    height: 8.7,
-                                    decoration: const BoxDecoration(
-                                      color: white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Container(
-                                        width: 5.6,
-                                        height: 5.6,
-                                        decoration: const BoxDecoration(
-                                          color: Color(0XFFFBFBFB),
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(15, -5),
-                                    child: Container(
-                                      width: 13,
-                                      height: 13,
+                                offset: Offset(
+                                    (textBubbleSize - 36) -
+                                        (widget.message.reactions.length * 24),
+                                    -7),
+                                child: Row(
+                                  textDirection: ui.TextDirection.rtl,
+                                  children: [
+                                    Container(
+                                      width: 8.7,
+                                      height: 8.7,
                                       decoration: const BoxDecoration(
                                         color: white,
                                         shape: BoxShape.circle,
                                       ),
                                       child: Center(
                                         child: Container(
-                                          width: 11.6,
-                                          height: 11.6,
+                                          width: 5.6,
+                                          height: 5.6,
                                           decoration: const BoxDecoration(
                                             color: Color(0XFFFBFBFB),
                                             shape: BoxShape.circle,
@@ -617,49 +603,69 @@ class _MessageGroupState extends State<MessageGroup> {
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(40, -15),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: white,
-                                        borderRadius:
-                                            BorderRadius.circular(24),
-                                      ),
-                                      padding: const EdgeInsets.all(2),
+                                    Transform.translate(
+                                      offset: const Offset(15, -5),
                                       child: Container(
-                                        decoration: BoxDecoration(
-                                          color: const Color(0XFFFBFBFB),
-                                          borderRadius:
-                                              BorderRadius.circular(24),
+                                        width: 13,
+                                        height: 13,
+                                        decoration: const BoxDecoration(
+                                          color: white,
+                                          shape: BoxShape.circle,
                                         ),
-                                        child: Row(
-                                          children: [
-                                            for (String reaction in widget
-                                                .message.reactions.keys
-                                                .toList())
-                                              reactions.contains(reaction)
-                                                  ? Padding(
-                                                      padding:
-                                                          const EdgeInsets
-                                                              .all(3),
-                                                      child: Image.asset(
-                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
-                                                        package:
-                                                            'robin_flutter',
-                                                        width: 15,
-                                                        height: 15,
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                          ],
+                                        child: Center(
+                                          child: Container(
+                                            width: 11.6,
+                                            height: 11.6,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0XFFFBFBFB),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
+                                    Transform.translate(
+                                      offset: const Offset(40, -15),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: white,
+                                          borderRadius:
+                                              BorderRadius.circular(24),
+                                        ),
+                                        padding: const EdgeInsets.all(2),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color(0XFFFBFBFB),
+                                            borderRadius:
+                                                BorderRadius.circular(24),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              for (String reaction in widget
+                                                  .message.reactions.keys
+                                                  .toList())
+                                                reactions.contains(reaction)
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(3),
+                                                        child: Image.asset(
+                                                          'assets/images/reactions/${reactionToText(reaction)}.png',
+                                                          package:
+                                                              'robin_flutter',
+                                                          width: 15,
+                                                          height: 15,
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
                             : Container(),
                       ],
                     ),

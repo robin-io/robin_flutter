@@ -15,10 +15,7 @@ class ChatBottomBar extends StatelessWidget {
   final RobinController rc = Get.find();
   final double bottomPadding;
 
-  ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key) {
-    rc.messageController.text =
-        rc.messageDrafts[rc.currentConversation.value.id!] ?? "";
-  }
+  ChatBottomBar({Key? key, required this.bottomPadding}) : super(key: key);
 
   void showOverLay(BuildContext context) {
     var overlay = Overlay.of(context)!;
