@@ -10,10 +10,15 @@ import 'package:get/get.dart';
 
 class RobinChat extends StatelessWidget {
   final RobinConversation conversation;
+  final bool? newUser;
   final RobinController rc = Get.find();
 
-  RobinChat({Key? key, required this.conversation}) : super(key: key) {
-    rc.initChatView(conversation);
+  RobinChat({
+    Key? key,
+    required this.conversation,
+    this.newUser
+  }) : super(key: key) {
+    rc.initChatView(conversation, newUser ?? false);
   }
 
   void showForwardMessages(BuildContext context) {
@@ -33,7 +38,7 @@ class RobinChat extends StatelessWidget {
       },
       child: Obx(
         () => Scaffold(
-          backgroundColor: const Color(0XFFF5F7FC),
+          backgroundColor: const Color(0xFFF5F7FC),
           appBar: ChatAppBar(),
           body: Column(
             children: [
@@ -133,4 +138,5 @@ class RobinChat extends StatelessWidget {
       ),
     );
   }
+
 }

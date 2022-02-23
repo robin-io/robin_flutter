@@ -501,7 +501,7 @@ class RobinGroupParticipantOptions extends StatelessWidget {
                             ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                            padding: const EdgeInsets.all(20),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -538,7 +538,7 @@ class RobinGroupParticipantOptions extends StatelessWidget {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                      padding: const EdgeInsets.all(20),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,

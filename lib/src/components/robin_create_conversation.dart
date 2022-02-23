@@ -61,6 +61,7 @@ class RobinCreateConversation extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => RobinChat(
                       conversation: conversation,
+                      newUser: true
                     ),
                   ),
                 ).then((value) {

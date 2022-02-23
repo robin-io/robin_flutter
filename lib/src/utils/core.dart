@@ -126,9 +126,9 @@ class RobinCore {
     }
   }
 
-  getDetailsFromUserToken(String userToken) async {
+  getDetailsFromUserToken(String userToken, {bool? refresh}) async {
     try {
-      return await api.getDetailsFromUserToken(userToken);
+      return await api.getDetailsFromUserToken(userToken, refresh: refresh);
     } catch (e) {
       throw e.toString();
     }
@@ -142,9 +142,9 @@ class RobinCore {
     }
   }
 
-  getConversationMessages(String conversationId, String userToken) async {
+  getConversationMessages(String conversationId, String userToken, {bool? refresh}) async {
     try {
-      return await api.getConversationMessages(conversationId, userToken);
+      return await api.getConversationMessages(conversationId, userToken, refresh: refresh);
     } catch (e) {
       throw e.toString();
     }

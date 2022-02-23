@@ -116,7 +116,7 @@ class RobinController extends GetxController {
     keys = _keys;
     robinConnect();
     robinInitialized = true;
-    getConversations();
+    getConversations(refresh: false);
     homeSearchController.addListener(() {
       renderHomeConversations();
     });
@@ -145,6 +145,7 @@ class RobinController extends GetxController {
     groupChatNameController.addListener(() {
       groupChatNameEmpty.value = groupChatNameController.text.isEmpty;
     });
+    getConversations(refresh: true);
   }
 
   Future robinConnect() async {
@@ -418,13 +419,16 @@ class RobinController extends GetxController {
     );
   }
 
-  void getConversations() async {
+  void getConversations({bool? refresh}) async {
     try {
-      isConversationsLoading.value = true;
-      var conversations =
-          await robinCore!.getDetailsFromUserToken(currentUser!.robinToken);
-      allConversations =
-          conversations == null ? {} : toRobinConversations(conversations);
+      if(allConversations.isEmpty) isConversationsLoading.value = true;
+      var conversations = await robinCore!.getDetailsFromUserToken(
+          currentUser!.robinToken,
+          refresh: refresh
+      );
+      allConversations = conversations == null
+          ? {}
+          : toRobinConversations(conversations);
       renderHomeConversations();
       renderArchivedConversations();
       isConversationsLoading.value = false;
@@ -803,13 +807,13 @@ class RobinController extends GetxController {
     }
   }
 
-  void initChatView(RobinConversation conversation) {
+  void initChatView(RobinConversation conversation, bool newUser) {
     resetChatView();
     userColors = {};
     messageController.clear();
     finishedInitialScroll.value = false;
     currentConversation.value = conversation;
-    String pastMessage = messageDrafts[currentConversation.value.id!] ?? "";
+    String pastMessage = messageDrafts[currentConversation.value.id!] ?? '';
     if (pastMessage.isNotEmpty) {
       messageController.text = pastMessage;
     }
@@ -817,7 +821,8 @@ class RobinController extends GetxController {
     if (currentConversation.value.isGroup!) {
       generateUserColors();
     }
-    getMessages();
+    if(newUser != true) getMessages(refresh: false);
+    getMessages(refresh: true);
   }
 
   void resetChatView() {
@@ -888,12 +893,13 @@ class RobinController extends GetxController {
     }
   }
 
-  void getMessages() async {
+  void getMessages({bool? refresh}) async {
     try {
-      chatViewLoading.value = true;
+      if(conversationMessages.isEmpty) chatViewLoading.value = true;
       var response = await robinCore!.getConversationMessages(
         currentConversation.value.id!,
         currentUser!.robinToken,
+        refresh: refresh
       );
       conversationMessages.value = toRobinMessage(response ?? []);
       chatViewLoading.value = false;
@@ -915,8 +921,8 @@ class RobinController extends GetxController {
       allMessages = {robinMessage.id: robinMessage, ...allMessages};
       // allMessages[robinMessage.id] = robinMessage;
     }
-    if (unreadMessages.isNotEmpty && !currentConversation.value.isGroup!) {
-      sendReadReceipts(unreadMessages);
+    if (unreadMessages.isNotEmpty && currentConversation.value.isGroup != null) {
+      if(!currentConversation.value.isGroup!) sendReadReceipts(unreadMessages);
     }
     return allMessages;
   }
