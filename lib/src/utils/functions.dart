@@ -1,15 +1,19 @@
 import 'package:get/get.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:jiffy/jiffy.dart';
 import 'package:linkify/linkify.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:robin_flutter/src/components/robin_add_group_participants.dart';
 import 'package:robin_flutter/src/components/robin_conversation_media.dart';
 import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
+import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
 import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/robin_conversation_info.dart';
@@ -368,25 +372,61 @@ String reactionToText(String value) {
     case '⁉️':
       reaction = 'exclaim';
       break;
-
     case '😂':
       reaction = 'laugh';
       break;
-
     case '❤️':
       reaction = 'heart';
       break;
-
     case '👍':
       reaction = 'thumbs_up';
       break;
-
     case '👎':
       reaction = 'thumbs_down';
       break;
-
     default:
       break;
   }
   return reaction;
+}
+
+void updateLocalConversations() async {
+  String userToken = rc.currentUser!.robinToken;
+  String fileName = 'userDetails$userToken.json';
+  var dir = await getTemporaryDirectory();
+  File file = File(dir.path + '/$fileName');
+  List<Map> conversationsList = [];
+  for (RobinConversation conversation in rc.allConversations.values.toList()) {
+    conversationsList.add(conversation.toJson());
+  }
+  file.writeAsStringSync(
+    jsonEncode({
+      'data': {
+        'conversations': conversationsList,
+      },
+    }),
+    flush: true,
+    mode: FileMode.write,
+  );
+}
+
+void updateLocalConversationMessages(String conversationId, Map message) async {
+  String userToken = rc.currentUser!.robinToken;
+  String fileName = 'conversation$conversationId$userToken.json';
+  var dir = await getTemporaryDirectory();
+  File file = File(dir.path + '/$fileName');
+  List messagesList = [];
+  if (file.existsSync()) {
+    final fileData = file.readAsStringSync();
+    final response = jsonDecode(fileData);
+    messagesList = response['data'];
+  }
+  messagesList.add(message);
+  file.writeAsStringSync(
+    jsonEncode({
+      'data': messagesList,
+    }),
+    flush: true,
+    mode: FileMode.write,
+  );
 }

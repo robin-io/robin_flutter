@@ -48,6 +48,8 @@ class DataSource {
         return response['data']['conversations'];
       }
     }).catchError((e) {
+      print('Tope');
+      print(e);
       errorHandler.handleError(e);
     });
   }

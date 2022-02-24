@@ -167,6 +167,7 @@ class RobinController extends GetxController {
         if (data['is_event'] == null || data['is_event'] == false) {
           RobinMessage robinMessage = RobinMessage.fromJson(data);
           if (allConversations[robinMessage.conversationId] != null) {
+            updateLocalConversationMessages(robinMessage.conversationId, data);
             if (!robinMessage.sentByMe) {
               FlutterRingtonePlayer.playNotification();
             }
@@ -188,6 +189,7 @@ class RobinController extends GetxController {
             var sortedEntries = sortConversations();
             allConversations =
                 Map<String, RobinConversation>.fromEntries(sortedEntries);
+            updateLocalConversations();
             if (allConversations[robinMessage.conversationId]!.archived!) {
               renderArchivedConversations();
             } else {
@@ -298,6 +300,7 @@ class RobinController extends GetxController {
       participants.removeAt(index);
       conversation.participants = participants;
       allConversations[conversation.id!] = conversation;
+      updateLocalConversations();
       if (conversation.archived!) {
         renderArchivedConversations();
       } else {
@@ -327,6 +330,7 @@ class RobinController extends GetxController {
       participants[index]['is_moderator'] = true;
       conversation.participants = participants;
       allConversations[conversation.id!] = conversation;
+      updateLocalConversations();
       if (conversation.archived!) {
         renderArchivedConversations();
       } else {
@@ -350,6 +354,7 @@ class RobinController extends GetxController {
             robinConversation.id!: robinConversation,
             ...allConversations,
           };
+          updateLocalConversations();
           if (robinConversation.archived!) {
             renderArchivedConversations();
           } else {
@@ -364,6 +369,7 @@ class RobinController extends GetxController {
         robinConversation.id!: robinConversation,
         ...allConversations,
       };
+      updateLocalConversations();
       if (robinConversation.archived!) {
         renderArchivedConversations();
       } else {
@@ -388,6 +394,7 @@ class RobinController extends GetxController {
           var sortedEntries = sortConversations();
           allConversations =
               Map<String, RobinConversation>.fromEntries(sortedEntries);
+          updateLocalConversations();
           renderHomeConversations();
           renderArchivedConversations();
         }
@@ -511,6 +518,7 @@ class RobinController extends GetxController {
   void archiveConversation(String conversationId, String key) {
     robinCore!.archiveConversation(conversationId, currentUser!.robinToken);
     allConversations[key]!.archived = true;
+    updateLocalConversations();
     renderHomeConversations();
     renderArchivedConversations();
   }
@@ -518,6 +526,7 @@ class RobinController extends GetxController {
   void unarchiveConversation(String conversationId, String key) {
     robinCore!.unarchiveConversation(conversationId, currentUser!.robinToken);
     allConversations[key]!.archived = false;
+    updateLocalConversations();
     renderHomeConversations();
     renderArchivedConversations();
   }
@@ -666,6 +675,7 @@ class RobinController extends GetxController {
         conversation.id!: conversation,
         ...allConversations,
       };
+      updateLocalConversations();
       renderHomeConversations();
       renderArchivedConversations();
       isCreatingConversation.value = false;
@@ -695,6 +705,7 @@ class RobinController extends GetxController {
           conversation.id!: conversation,
           ...allConversations,
         };
+        updateLocalConversations();
         renderHomeConversations();
         renderArchivedConversations();
       }
@@ -717,6 +728,7 @@ class RobinController extends GetxController {
       currentConversation.value = RobinConversation.fromJson(response);
       allConversations[currentConversation.value.id!] =
           currentConversation.value;
+      updateLocalConversations();
       if (currentConversation.value.archived!) {
         renderArchivedConversations();
       } else {
@@ -796,6 +808,7 @@ class RobinController extends GetxController {
           conversation.id!: conversation,
           ...allConversations,
         };
+        updateLocalConversations();
         renderHomeConversations();
         renderArchivedConversations();
         return conversation;
