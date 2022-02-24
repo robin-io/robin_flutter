@@ -75,14 +75,16 @@ class _TextBubbleState extends State<TextBubble> {
     if (offset.dy - 47 < 50) {
       offset = Offset(offset.dx, 100);
     }
-    if (offset.dy + size.height + 240 > MediaQuery.of(context).size.height) {
-      offset = Offset(
-          offset.dx,
-          offset.dy -
-              (offset.dy +
-                  size.height +
-                  245 -
-                  MediaQuery.of(context).size.height));
+    if (size.height < 165) {
+      if (offset.dy + size.height + 240 > MediaQuery.of(context).size.height) {
+        offset = Offset(
+            offset.dx,
+            offset.dy -
+                (offset.dy +
+                    size.height +
+                    245 -
+                    MediaQuery.of(context).size.height));
+      }
     }
     OverlayEntry? entry;
     entry = OverlayEntry(
@@ -871,7 +873,11 @@ class _TextBubbleState extends State<TextBubble> {
                                           0.75) -
                                       111,
                                 ),
-                                child: formatText(widget.message.text),
+                                child: formatText(widget.message.text,
+                                    truncate: widget.loadUrl != null &&
+                                            !widget.loadUrl!
+                                        ? true
+                                        : false),
                               ),
                               const SizedBox(
                                 width: 5,

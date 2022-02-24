@@ -428,14 +428,11 @@ class RobinController extends GetxController {
 
   void getConversations({bool? refresh}) async {
     try {
-      if(allConversations.isEmpty) isConversationsLoading.value = true;
-      var conversations = await robinCore!.getDetailsFromUserToken(
-          currentUser!.robinToken,
-          refresh: refresh
-      );
-      allConversations = conversations == null
-          ? {}
-          : toRobinConversations(conversations);
+      if (allConversations.isEmpty) isConversationsLoading.value = true;
+      var conversations = await robinCore!
+          .getDetailsFromUserToken(currentUser!.robinToken, refresh: refresh);
+      allConversations =
+          conversations == null ? {} : toRobinConversations(conversations);
       renderHomeConversations();
       renderArchivedConversations();
       isConversationsLoading.value = false;
@@ -834,7 +831,7 @@ class RobinController extends GetxController {
     if (currentConversation.value.isGroup!) {
       generateUserColors();
     }
-    if(newUser != true) getMessages(refresh: false);
+    if (newUser != true) getMessages(refresh: false);
     getMessages(refresh: true);
   }
 
@@ -908,12 +905,10 @@ class RobinController extends GetxController {
 
   void getMessages({bool? refresh}) async {
     try {
-      if(conversationMessages.isEmpty) chatViewLoading.value = true;
+      if (conversationMessages.isEmpty) chatViewLoading.value = true;
       var response = await robinCore!.getConversationMessages(
-        currentConversation.value.id!,
-        currentUser!.robinToken,
-        refresh: refresh
-      );
+          currentConversation.value.id!, currentUser!.robinToken,
+          refresh: refresh);
       conversationMessages.value = toRobinMessage(response ?? []);
       chatViewLoading.value = false;
     } catch (e) {
@@ -934,8 +929,9 @@ class RobinController extends GetxController {
       allMessages = {robinMessage.id: robinMessage, ...allMessages};
       // allMessages[robinMessage.id] = robinMessage;
     }
-    if (unreadMessages.isNotEmpty && currentConversation.value.isGroup != null) {
-      if(!currentConversation.value.isGroup!) sendReadReceipts(unreadMessages);
+    if (unreadMessages.isNotEmpty &&
+        currentConversation.value.isGroup != null) {
+      if (!currentConversation.value.isGroup!) sendReadReceipts(unreadMessages);
     }
     return allMessages;
   }

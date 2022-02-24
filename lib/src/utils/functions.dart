@@ -265,9 +265,11 @@ void _launchURL(String url, bool isMail) async {
   await canLaunch(url) ? await launch(url) : throw 'Could not launch $url';
 }
 
-Widget formatText(String string) {
+Widget formatText(String string, {bool? truncate}) {
   var formattedTexts = matchLinks(string);
   return RichText(
+    maxLines: truncate != null && truncate ? 7 : null,
+    overflow: truncate != null && truncate ? TextOverflow.ellipsis : TextOverflow.visible,
     text: TextSpan(
       children: [
         for (LinkifyElement formattedText in formattedTexts)
