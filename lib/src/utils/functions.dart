@@ -1,27 +1,29 @@
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:linkify/linkify.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:robin_flutter/src/utils/constants.dart';
+import 'package:robin_flutter/src/models/robin_conversation.dart';
+import 'package:robin_flutter/src/models/robin_message_reaction.dart';
+import 'package:robin_flutter/src/components/robin_create_group.dart';
+import 'package:robin_flutter/src/components/robin_conversation_info.dart';
+import 'package:robin_flutter/src/controllers/robin_controller.dart';
+import 'package:robin_flutter/src/components/robin_create_conversation.dart';
+import 'package:robin_flutter/src/components/message-group/url-preview/url_preview.dart';
 import 'package:robin_flutter/src/components/robin_add_group_participants.dart';
 import 'package:robin_flutter/src/components/robin_conversation_media.dart';
 import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
-import 'package:robin_flutter/src/models/robin_conversation.dart';
-import 'package:robin_flutter/src/models/robin_message_reaction.dart';
-import 'package:robin_flutter/src/components/robin_create_group.dart';
-import 'package:robin_flutter/src/components/robin_conversation_info.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:robin_flutter/src/utils/constants.dart';
-import 'package:robin_flutter/src/controllers/robin_controller.dart';
-import 'package:robin_flutter/src/components/robin_create_conversation.dart';
-import 'package:robin_flutter/src/components/message-group/url-preview/url_preview.dart';
+
 
 final RobinController rc = Get.find();
 
@@ -53,6 +55,25 @@ String formatDate(String dateString) {
   formattedDate = formattedDate.replaceAll('a few seconds', 'few seconds');
   formattedDate = formattedDate.replaceAll("a day", 'Yesterday');
   return formattedDate;
+}
+
+String formatTimestamp(DateTime dateTime) {
+  final date = DateTime(dateTime.year, dateTime.month, dateTime.day);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  if (date == today) {
+    return 'Today';
+  }
+  final yesterday = DateTime(now.year, now.month, now.day - 1);
+  if (date == yesterday) {
+    return 'Yesterday';
+  }
+  if(date.year == now.year){
+    final DateFormat formatter = DateFormat('E, d MMM');
+    return formatter.format(date);
+  }
+  final DateFormat formatter = DateFormat('d MMM y');
+  return formatter.format(date);
 }
 
 IconButton backButton(BuildContext context, {IconData? icon, double? size}) {
@@ -269,7 +290,9 @@ Widget formatText(String string, {bool? truncate}) {
   var formattedTexts = matchLinks(string);
   return RichText(
     maxLines: truncate != null && truncate ? 7 : null,
-    overflow: truncate != null && truncate ? TextOverflow.ellipsis : TextOverflow.visible,
+    overflow: truncate != null && truncate
+        ? TextOverflow.ellipsis
+        : TextOverflow.visible,
     text: TextSpan(
       children: [
         for (LinkifyElement formattedText in formattedTexts)
@@ -332,6 +355,7 @@ Widget getURLPreview(String string) {
           padding: const EdgeInsets.only(bottom: 4),
           child: UrlPreview(
             url: firstLink,
+            key: Key(firstLink),
           ),
         )
       : Container(

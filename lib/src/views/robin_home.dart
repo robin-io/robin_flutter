@@ -12,7 +12,7 @@ import 'package:robin_flutter/src/models/robin_keys.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
-class Robin extends StatelessWidget {
+class Robin extends StatelessWidget with WidgetsBindingObserver {
   final String apiKey;
   final RobinCurrentUser currentUser;
   final Function getUsers;
@@ -28,6 +28,17 @@ class Robin extends StatelessWidget {
     required this.keys,
   }) : super(key: key) {
     rc.initializeController(apiKey, currentUser, getUsers, keys);
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        rc.appResume();
+        break;
+    }
   }
 
   @override

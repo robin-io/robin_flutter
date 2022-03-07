@@ -55,7 +55,6 @@ class RobinCore {
       }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      print(e.toString());
       rc.robinConnect();
       await Future.delayed(const Duration(milliseconds: 1000), () {
         sendTextMessage(conversationId, message, senderToken, senderName);
@@ -142,9 +141,11 @@ class RobinCore {
     }
   }
 
-  getConversationMessages(String conversationId, String userToken, {bool? refresh}) async {
+  getConversationMessages(String conversationId, String userToken,
+      {bool? refresh}) async {
     try {
-      return await api.getConversationMessages(conversationId, userToken, refresh: refresh);
+      return await api.getConversationMessages(conversationId, userToken,
+          refresh: refresh);
     } catch (e) {
       throw e.toString();
     }

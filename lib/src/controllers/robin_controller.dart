@@ -148,6 +148,16 @@ class RobinController extends GetxController {
     getConversations(refresh: true);
   }
 
+  void appResume() {
+    if (robinConnection!.closeCode != null) {
+      robinConnect();
+      getConversations(refresh: false);
+      if (currentConversation.value.id != null) {
+        getMessages(refresh: true);
+      }
+    }
+  }
+
   Future robinConnect() async {
     robinConnection = robinCore!.connect(apiKey, currentUser!.robinToken);
     Future.delayed(const Duration(milliseconds: 750), () {
@@ -944,6 +954,7 @@ class RobinController extends GetxController {
           'timestamp': DateTime.now().toString(),
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
+          'localId': 'testing-local-id'
         };
         robinCore!.sendTextMessage(
           currentConversation.value.id!,

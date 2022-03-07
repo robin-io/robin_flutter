@@ -83,30 +83,32 @@ class RobinConversationInfo extends StatelessWidget {
                                           rc.currentConversationInfo['photos']
                                               [itemIndex])
                                       .link;
-                                  return CachedNetworkImage(
-                                    imageUrl: link,
-                                    fit: BoxFit.fitWidth,
-                                    placeholder: (context, url) =>
-                                        const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(10, 10, 15, 10),
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                              Color(0XFF15AE73),
+                                  return Container(
+                                    child: CachedNetworkImage(
+                                      imageUrl: link,
+                                      fit: BoxFit.fitWidth,
+                                      placeholder: (context, url) =>
+                                          const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                          child: SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.5,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                Color(0XFF15AE73),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
                                     ),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
                                   );
                                 }),
                             SafeArea(
@@ -146,14 +148,14 @@ class RobinConversationInfo extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.only(top: 5.0),
+              padding: const EdgeInsets.all(3.0),
               child: Hero(
                 tag: message.link,
                 child: CachedNetworkImage(
                   imageUrl: message.link,
                   width: 80,
                   height: 63,
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                   placeholder: (context, url) => const Padding(
                     padding: EdgeInsets.fromLTRB(10, 10, 15, 10),
                     child: SizedBox(
@@ -175,17 +177,13 @@ class RobinConversationInfo extends StatelessWidget {
             ),
           ),
         );
-        docs.add(
-          const SizedBox(
-            width: 5,
-          ),
-        );
       }
       return Padding(
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
         child: SingleChildScrollView(
           child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.start,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: docs,
           ),
         ),

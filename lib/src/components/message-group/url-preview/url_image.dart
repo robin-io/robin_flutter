@@ -14,7 +14,7 @@ class PreviewImage extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: _image!,
         fit: BoxFit.cover,
-        width: 75,
+        height: 50,
         errorWidget: (context, url, error) => const Icon(
           Icons.error,
           color: black,
