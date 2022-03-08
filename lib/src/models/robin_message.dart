@@ -13,6 +13,8 @@ class RobinMessage {
   late final String senderName;
   late final String senderToken;
   late final String? replyTo;
+  late final String? localId;
+  late bool? delivered;
   bool isRead = false;
   late final bool isForwarded;
   late final Map<String, RobinMessageReaction> reactions;
@@ -21,23 +23,26 @@ class RobinMessage {
 
   final RobinController rc = Get.find();
 
-  RobinMessage.fromJson(Map json) {
+  RobinMessage.fromJson(Map json, bool isDelivered) {
     id = json['_id'];
     isAttachment = json['content']['is_attachment'] ?? false;
     text = isAttachment ? "" : json['content']['msg'];
     link = isAttachment ? json['content']['attachment'] : '';
     conversationId = json['conversation_id'];
     isForwarded = json['is_forwarded'] ?? false;
-    senderToken = isForwarded ? json['content']['sender_token'] : json['sender_token'];
+    senderToken =
+        isForwarded ? json['content']['sender_token'] : json['sender_token'];
     sentByMe = rc.currentUser?.robinToken == senderToken;
     senderName = json['sender_name'] ?? "";
     replyTo = json['reply_to'];
+    localId = json['content']['localId'] ?? '';
+    delivered = isDelivered;
     isRead = json['is_read'] ?? false;
-    reactions =  convertToReactions(json['reactions'] ?? []);
+    reactions = convertToReactions(json['reactions'] ?? []);
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);
     timestamp = json['created_at'] == null
         ? DateTime.now()
-        : DateTime.parse(json['created_at']);
+        : DateTime.parse(json['created_at']).toLocal();
   }
 }

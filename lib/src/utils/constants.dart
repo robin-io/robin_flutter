@@ -7,7 +7,7 @@ const String wsUrl = 'wss://$baseUrl/ws';
 
 const String robinChannel = 'private_chat';
 
-DateFormat dateFormat = DateFormat('hh:mm');
+DateFormat dateFormat = DateFormat('HH:mm');
 
 const Color white = Color(0XFFFFFFFF);
 const Color black = Color(0XFF000000);

@@ -893,20 +893,31 @@ class _TextBubbleState extends State<TextBubble> {
                                       color: Color(0XFF7A7A7A),
                                     ),
                                   ),
-                                  widget.message.sentByMe &&
-                                          !rc.currentConversation.value.isGroup!
-                                      ? SizedBox(
-                                          height: 10,
-                                          child: SvgPicture.asset(
-                                            widget.message.isRead
-                                                ? 'assets/icons/read_receipt.svg'
-                                                : 'assets/icons/unread_receipt.svg',
-                                            package: 'robin_flutter',
-                                            width: 18,
-                                            height: 18,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
+                                  widget.message.sentByMe
+                                      ? !widget.message.delivered!
+                                          ? Padding(
+                                            padding: const EdgeInsets.only(left: 4),
+                                            child: Image.asset(
+                                                'assets/images/delayed.png',
+                                                package: 'robin_flutter',
+                                                width: 14,
+                                                fit: BoxFit.cover,
+                                              ),
+                                          )
+                                          : SizedBox(
+                                              height: 10,
+                                              child: SvgPicture.asset(
+                                                !widget.message.isRead ||
+                                                        rc.currentConversation
+                                                            .value.isGroup!
+                                                    ? 'assets/icons/delivered.svg'
+                                                    : 'assets/icons/read_receipt.svg',
+                                                package: 'robin_flutter',
+                                                width: 18,
+                                                height: 18,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
                                       : Container(),
                                   const SizedBox(
                                     width: 3,

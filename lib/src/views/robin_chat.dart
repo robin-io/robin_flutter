@@ -116,7 +116,7 @@ class RobinChat extends StatelessWidget {
           floatingActionButton: rc.chatViewLoading.value || rc.atMaxScroll.value
               ? null
               : Padding(
-                  padding: const EdgeInsets.only(bottom: 75),
+                  padding: const EdgeInsets.only(bottom: 105),
                   child: SizedBox(
                     width: 35,
                     height: 35,

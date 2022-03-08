@@ -46,7 +46,7 @@ class RobinConversationInfo extends StatelessWidget {
       List<Widget> docs = [];
       for (int i = 0; i < rc.currentConversationInfo['photos'].length; i++) {
         Map doc = rc.currentConversationInfo['photos'][i];
-        RobinMessage message = RobinMessage.fromJson(doc);
+        RobinMessage message = RobinMessage.fromJson(doc, true);
         docs.add(
           GestureDetector(
             onTap: () {
@@ -80,9 +80,10 @@ class RobinConversationInfo extends StatelessWidget {
                                 itemBuilder: (BuildContext context,
                                     int itemIndex, int pageViewIndex) {
                                   String link = RobinMessage.fromJson(
-                                          rc.currentConversationInfo['photos']
-                                              [itemIndex])
-                                      .link;
+                                    rc.currentConversationInfo['photos']
+                                        [itemIndex],
+                                    true,
+                                  ).link;
                                   return Container(
                                     child: CachedNetworkImage(
                                       imageUrl: link,
@@ -91,8 +92,8 @@ class RobinConversationInfo extends StatelessWidget {
                                           const Padding(
                                         padding: EdgeInsets.all(10),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 15, 10),
                                           child: SizedBox(
                                             width: 24,
                                             height: 24,
@@ -208,7 +209,7 @@ class RobinConversationInfo extends StatelessWidget {
       for (Map link in rc.currentConversationInfo['links']) {
         links.add(
           TextBubble(
-            message: RobinMessage.fromJson(link),
+            message: RobinMessage.fromJson(link, true),
             lastInSeries: false,
             firstInSeries: false,
             maxWidth: double.infinity,
@@ -249,7 +250,7 @@ class RobinConversationInfo extends StatelessWidget {
       for (Map doc in rc.currentConversationInfo['documents']) {
         docs.add(
           TextBubble(
-            message: RobinMessage.fromJson(doc),
+            message: RobinMessage.fromJson(doc, true),
             lastInSeries: false,
             firstInSeries: false,
             maxWidth: double.infinity,

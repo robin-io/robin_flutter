@@ -252,6 +252,16 @@ String fileType({String? path}) {
   return 'generic';
 }
 
+String formatISOTime(DateTime date) {
+  var duration = date.timeZoneOffset;
+  if (duration.isNegative){
+    return (date.toIso8601String() + '-${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
+  }
+  else{
+    return (date.toIso8601String() + '+${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
+  }
+}
+
 String fileName(String path) {
   return path.split('/').last;
 }
@@ -379,6 +389,30 @@ Map<String, RobinMessageReaction> convertToReactions(List reactions) {
     robinReactions[robinReaction.type] = robinReaction;
   }
   return robinReactions;
+}
+
+Map localRobinMessageJson(Map message, String conversationId,
+    String senderToken, String senderName, String? replyTo,) {
+  return {
+    "_id": message['localId'],
+    'conversation_id': conversationId,
+    "content": {
+      'is_attachment': false,
+      'attachment': '',
+      'msg' : message['msg'],
+      'sender_token': senderToken,
+      'sender_name': senderName,
+      'localId': message['localId'],
+    },
+    'sender_token': senderToken,
+    'sender_name': senderName,
+    'is_forwarded': false,
+    'reply_to': replyTo,
+    'is_read': false,
+    'reactions': [],
+    'deleted_for': [],
+    'created_at': message['timestamp']
+  };
 }
 
 void showChatOptions(OverlayEntry entry) {

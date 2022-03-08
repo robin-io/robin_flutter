@@ -35,7 +35,7 @@ class RobinConversationMedia extends StatelessWidget {
       List<Widget> docs = [];
       for (int i = 0; i < rc.currentConversationInfo['photos'].length; i++) {
         Map doc = rc.currentConversationInfo['photos'][i];
-        RobinMessage message = RobinMessage.fromJson(doc);
+        RobinMessage message = RobinMessage.fromJson(doc, true);
         docs.add(
           GestureDetector(
             onTap: () {
@@ -57,7 +57,7 @@ class RobinConversationMedia extends StatelessWidget {
                           children: [
                             CarouselSlider.builder(
                                 itemCount:
-                                rc.currentConversationInfo['photos'].length,
+                                    rc.currentConversationInfo['photos'].length,
                                 options: CarouselOptions(
                                   initialPage: i,
                                   height: MediaQuery.of(context).size.height,
@@ -69,26 +69,27 @@ class RobinConversationMedia extends StatelessWidget {
                                 itemBuilder: (BuildContext context,
                                     int itemIndex, int pageViewIndex) {
                                   String link = RobinMessage.fromJson(
-                                      rc.currentConversationInfo['photos']
-                                      [itemIndex])
-                                      .link;
+                                    rc.currentConversationInfo['photos']
+                                        [itemIndex],
+                                    true,
+                                  ).link;
                                   return Container(
                                     child: CachedNetworkImage(
                                       imageUrl: link,
                                       fit: BoxFit.fitWidth,
                                       placeholder: (context, url) =>
-                                      const Padding(
+                                          const Padding(
                                         padding: EdgeInsets.all(10),
                                         child: Padding(
-                                          padding:
-                                          EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                          padding: EdgeInsets.fromLTRB(
+                                              10, 10, 15, 10),
                                           child: SizedBox(
                                             width: 24,
                                             height: 24,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2.5,
                                               valueColor:
-                                              AlwaysStoppedAnimation<Color>(
+                                                  AlwaysStoppedAnimation<Color>(
                                                 Color(0XFF15AE73),
                                               ),
                                             ),
@@ -96,7 +97,7 @@ class RobinConversationMedia extends StatelessWidget {
                                         ),
                                       ),
                                       errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
+                                          const Icon(Icons.error),
                                     ),
                                   );
                                 }),
@@ -129,7 +130,7 @@ class RobinConversationMedia extends StatelessWidget {
                 transitionBuilder: (context, anim1, anim2, child) {
                   return SlideTransition(
                     position: Tween(
-                        begin: const Offset(0, 1), end: const Offset(0, 0))
+                            begin: const Offset(0, 1), end: const Offset(0, 0))
                         .animate(anim1),
                     child: child,
                   );
@@ -197,7 +198,7 @@ class RobinConversationMedia extends StatelessWidget {
       for (Map link in rc.currentConversationInfo['links']) {
         links.add(
           TextBubble(
-            message: RobinMessage.fromJson(link),
+            message: RobinMessage.fromJson(link, true),
             lastInSeries: false,
             firstInSeries: false,
             maxWidth: double.infinity,
@@ -238,7 +239,7 @@ class RobinConversationMedia extends StatelessWidget {
       for (Map doc in rc.currentConversationInfo['documents']) {
         docs.add(
           TextBubble(
-            message: RobinMessage.fromJson(doc),
+            message: RobinMessage.fromJson(doc, true),
             lastInSeries: false,
             firstInSeries: false,
             maxWidth: double.infinity,
@@ -275,8 +276,7 @@ class RobinConversationMedia extends StatelessWidget {
             topRight: Radius.circular(20),
           ),
         ),
-        child: rc.chatViewLoading.value ||
-                rc.conversationInfoLoading.value
+        child: rc.chatViewLoading.value || rc.conversationInfoLoading.value
             ? const Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Center(
@@ -304,8 +304,7 @@ class RobinConversationMedia extends StatelessWidget {
                       ),
                     ),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -354,8 +353,7 @@ class RobinConversationMedia extends StatelessWidget {
                                     height: 42,
                                     padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(
+                                      borderRadius: BorderRadius.circular(
                                         8,
                                       ),
                                       color: const Color(0XFFEFEFEF),
@@ -363,8 +361,7 @@ class RobinConversationMedia extends StatelessWidget {
                                     child: TabBar(
                                       // give the indicator a decoration (color and border radius)
                                       indicator: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(
+                                        borderRadius: BorderRadius.circular(
                                           6.93,
                                         ),
                                         color: green,
@@ -373,8 +370,7 @@ class RobinConversationMedia extends StatelessWidget {
                                       labelStyle: const TextStyle(
                                         fontSize: 13,
                                       ),
-                                      unselectedLabelStyle:
-                                          const TextStyle(
+                                      unselectedLabelStyle: const TextStyle(
                                         fontSize: 13,
                                       ),
                                       unselectedLabelColor:
@@ -393,9 +389,7 @@ class RobinConversationMedia extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: MediaQuery.of(context)
-                                            .size
-                                            .height -
+                                    height: MediaQuery.of(context).size.height -
                                         220,
                                     child: TabBarView(
                                       children: [
