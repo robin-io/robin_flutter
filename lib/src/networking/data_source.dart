@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:robin_flutter/src/networking/error_handler.dart';
 import 'package:robin_flutter/src/networking/network_util.dart';
 import 'package:robin_flutter/src/networking/endpoints.dart';
@@ -24,17 +28,28 @@ class DataSource {
     });
   }
 
-  getDetailsFromUserToken(String userToken) async {
+  getDetailsFromUserToken(String userToken, {bool? refresh}) async {
+    String fileName = 'userDetails$userToken.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/$fileName');
+    if(refresh == false && file.existsSync()){
+      final fileData = file.readAsStringSync();
+      final response = jsonDecode(fileData);
+      return response['data']['conversations'];
+    }
     return netUtil
         .get('$getDetailsFromUserTokenUrl/$userToken')
         .then((response) {
-          print(response);
       if (response['error']) {
         throw response['msg'];
-      } else {
+      }
+      else {
+        file.writeAsStringSync(jsonEncode(response), flush: true, mode: FileMode.write);
         return response['data']['conversations'];
       }
     }).catchError((e) {
+      print('Tope');
+      print(e);
       errorHandler.handleError(e);
     });
   }
@@ -51,18 +66,30 @@ class DataSource {
     });
   }
 
-  getConversationMessages(String conversationId, String userToken) async {
-    return netUtil
-        .get('$getConversationMessagesUrl/$conversationId/$userToken')
-        .then((response) {
-      if (response['error']) {
-        throw response['msg'];
-      } else {
-        return response['data'];
-      }
-    }).catchError((e) {
-      errorHandler.handleError(e);
-    });
+  getConversationMessages(String conversationId, String userToken, {bool? refresh}) async {
+    String fileName = 'conversation$conversationId$userToken.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/$fileName');
+    if(refresh == false && file.existsSync()){
+      final fileData = file.readAsStringSync();
+      final response = jsonDecode(fileData);
+      return response['data'];
+    }
+    else {
+      return netUtil
+          .get('$getConversationMessagesUrl/$conversationId/$userToken')
+          .then((response) {
+        if (response['error']) {
+          throw response['msg'];
+        }
+        else {
+          file.writeAsStringSync(jsonEncode(response), flush: true, mode: FileMode.write);
+          return response['data'];
+        }
+      }).catchError((e) {
+        errorHandler.handleError(e);
+      });
+    }
   }
 
   createGroupChat(Map body) async {

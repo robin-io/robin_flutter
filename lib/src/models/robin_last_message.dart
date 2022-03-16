@@ -7,6 +7,7 @@ class RobinLastMessage {
   late final bool isAttachment;
   late final bool sentByMe;
   late final String senderName;
+  late final bool isNull;
 
   final RobinController rc = Get.find();
 
@@ -28,6 +29,22 @@ class RobinLastMessage {
             json['sender_name'] == null ? "" : '${json['sender_name']}: ';
       }
     }
+  }
+
+  Map? toJson() {
+    if (text == '') {
+      return null;
+    }
+    Map lastMessageJson = {
+      'is_attachment': isAttachment,
+      'msg': text,
+      'sender_name': senderName == "" ? null : senderName.replaceAll(': ', ''),
+      'sender_token': ''
+    };
+    if (sentByMe) {
+      lastMessageJson['sender_token'] = rc.currentUser?.robinToken;
+    }
+    return lastMessageJson;
   }
 
   RobinLastMessage.fromRobinMessage(RobinMessage message) {

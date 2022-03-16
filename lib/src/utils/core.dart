@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 
 class RobinCore {
   static final DataSource api = DataSource();
-
   final RobinController rc = Get.find();
 
   WebSocketChannel connect(String? apiKey, String? userToken) {
@@ -39,7 +38,7 @@ class RobinCore {
     }
   }
 
-  void sendTextMessage(String conversationId, Map message, String senderToken,
+  void sendTextMessage(Map message, String conversationId, String senderToken,
       String senderName) async {
     Map body = {
       'type': 1,
@@ -55,16 +54,15 @@ class RobinCore {
       }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      print(e.toString());
       rc.robinConnect();
       await Future.delayed(const Duration(milliseconds: 1000), () {
-        sendTextMessage(conversationId, message, senderToken, senderName);
+        sendTextMessage(message, conversationId, senderToken, senderName);
       });
     }
   }
 
-  void replyToMessage(Map message, String conversationId, String replyTo,
-      String senderToken, String senderName) async {
+  void replyToMessage(Map message, String conversationId, String senderToken,
+      String senderName, String replyTo) async {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -126,9 +124,9 @@ class RobinCore {
     }
   }
 
-  getDetailsFromUserToken(String userToken) async {
+  getDetailsFromUserToken(String userToken, {bool? refresh}) async {
     try {
-      return await api.getDetailsFromUserToken(userToken);
+      return await api.getDetailsFromUserToken(userToken, refresh: refresh);
     } catch (e) {
       throw e.toString();
     }
@@ -142,9 +140,11 @@ class RobinCore {
     }
   }
 
-  getConversationMessages(String conversationId, String userToken) async {
+  getConversationMessages(String conversationId, String userToken,
+      {bool? refresh}) async {
     try {
-      return await api.getConversationMessages(conversationId, userToken);
+      return await api.getConversationMessages(conversationId, userToken,
+          refresh: refresh);
     } catch (e) {
       throw e.toString();
     }

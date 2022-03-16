@@ -26,10 +26,13 @@ dependencies:
   shared_preferences: ^2.0.11
   shimmer: ^2.0.0
   get: ^4.6.1
+  uuid: ^3.0.6
   fluttertoast: ^8.0.8
   jiffy: ^5.0.0
   flutter_ringtone_player: ^3.1.1
-  flutter_audio_recorder2: ^0.0.2
+  path_provider: ^2.0.9
+  record: ^3.0.2
+  audioplayers: ^0.20.1
   animated_size_and_fade: ^3.0.0
   carousel_slider: ^4.0.0
 

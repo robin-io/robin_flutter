@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +25,287 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       options.add('Leave Group');
     } else {
       options.insert(0, 'Contact Info');
+      options.add('Delete Conversation');
     }
 
     return options;
+  }
+
+  void confirmLeaveGroup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Leave Group',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to leave the ${rc.currentConversation.value.name} Group',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.leaveGroup(
+                                    rc.currentConversation.value.id!);
+                                if (successful) {
+                                  showSuccessMessage('Group left successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void confirmDeleteConversation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: 270,
+                decoration: BoxDecoration(
+                  color: const Color(0XFFF2F2F2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text(
+                      'Delete Conversation',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                      child: Text(
+                        'Are you sure you want to delete your conversation with ${rc.currentConversation.value.name}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0XFF51545C),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 1,
+                            color: Color(0XFFB0B0B3),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Color(0XFFD53120),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                bool successful = await rc.deleteConversation();
+                                if (successful) {
+                                  showSuccessMessage('Deleted successfully');
+                                  rc.allConversations
+                                      .remove(rc.currentConversation.value.id!);
+                                  if (rc.currentConversation.value.archived!) {
+                                    rc.renderArchivedConversations();
+                                  } else {
+                                    rc.renderHomeConversations();
+                                  }
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 0.5,
+                                      color: Color(0XFFB0B0B3),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Proceed',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -60,83 +340,90 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ],
               )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    padding: EdgeInsets.zero,
-                    width: 30,
-                    child: IconButton(
-                      onPressed: () async {
-                        rc.resetChatView();
-                        Navigator.pop(context);
-                        rc.renderHomeConversations();
-                        rc.renderArchivedConversations();
-                      },
+            : InkWell(
+                onTap: () {
+                  showConversationInfo(context);
+                },
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        size: 16,
-                        color: Color(0XFF54515C),
+                      width: 30,
+                      child: IconButton(
+                        onPressed: () async {
+                          rc.handleMessageDraft(
+                              rc.currentConversation.value.id!);
+                          rc.resetChatView();
+                          Navigator.pop(context);
+                          rc.renderHomeConversations();
+                          rc.renderArchivedConversations();
+                        },
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 16,
+                          color: Color(0XFF54515C),
+                        ),
                       ),
                     ),
-                  ),
-                  UserAvatar(
-                    name: rc.currentConversation.value.name ?? '',
-                    conversationIcon:
-                        rc.currentConversation.value.conversationIcon,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                rc.currentConversation.value.name ?? '',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: black,
-                                  fontWeight: FontWeight.w500,
+                    UserAvatar(
+                      name: rc.currentConversation.value.name ?? '',
+                      conversationIcon:
+                          rc.currentConversation.value.conversationIcon,
+                      size: 40,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  rc.currentConversation.value.name ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        rc.currentConversation.value.isGroup ?? false
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 3.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Obx(
-                                        () => Text(
-                                          '${rc.currentConversation.value.participants!.length.toString()} Members',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0XFF7A7A7A),
-                                            fontWeight: FontWeight.w400,
+                            ],
+                          ),
+                          rc.currentConversation.value.isGroup ?? false
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 3.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Obx(
+                                          () => Text(
+                                            '${rc.currentConversation.value.participants!.length.toString()} Members',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0XFF7A7A7A),
+                                              fontWeight: FontWeight.w400,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(),
-                      ],
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
         centerTitle: false,
         actions: [
@@ -172,26 +459,16 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       Radius.circular(6.0),
                     ),
                   ),
-                  onSelected: (value) async {
+                  onSelected: (value) {
                     if (value == 'Select Messages') {
                       rc.selectMessageView.value = true;
                     } else if (value == 'Contact Info' ||
                         value == 'Group Info') {
                       showConversationInfo(context);
                     } else if (value == 'Leave Group') {
-                      bool successful =
-                          await rc.leaveGroup(rc.currentConversation.value.id!);
-                      if (successful) {
-                        showSuccessMessage('Group left successfully');
-                        rc.allConversations
-                            .remove(rc.currentConversation.value.id!);
-                        if (rc.currentConversation.value.archived!) {
-                          rc.renderArchivedConversations();
-                        } else {
-                          rc.renderHomeConversations();
-                        }
-                        Navigator.pop(context);
-                      }
+                      confirmLeaveGroup(context);
+                    } else if (value == 'Delete Conversation') {
+                      confirmDeleteConversation(context);
                     }
                   },
                   itemBuilder: (context) {
@@ -206,7 +483,8 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                               Text(
                                 option,
                                 style: TextStyle(
-                                  color: option == 'Leave Group'
+                                  color: option == 'Leave Group' ||
+                                          option == 'Delete Conversation'
                                       ? const Color(0XFFD53120)
                                       : const Color(0XFF51545C),
                                   fontSize: 14,
@@ -220,7 +498,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                       ? 'assets/icons/conversation_info.svg'
                                       : option == 'Select Messages'
                                           ? 'assets/icons/select_messages.svg'
-                                          : option == 'Leave Group'
+                                          : option == 'Leave Group' ||
+                                                  option ==
+                                                      'Delete Conversation'
                                               ? 'assets/icons/leave_group.svg'
                                               : '',
                                   package: 'robin_flutter',

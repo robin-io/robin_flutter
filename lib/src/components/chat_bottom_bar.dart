@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -253,8 +254,16 @@ class ChatBottomBar extends StatelessWidget {
                                                           ) ==
                                                           'image'
                                                       ? "Photo"
-                                                      : fileName(rc
-                                                          .replyMessage!.link),
+                                                      : fileType(
+                                                                path: rc
+                                                                    .replyMessage!
+                                                                    .link,
+                                                              ) ==
+                                                              'audio'
+                                                          ? "Audio"
+                                                          : fileName(rc
+                                                              .replyMessage!
+                                                              .link),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: const TextStyle(
@@ -315,7 +324,7 @@ class ChatBottomBar extends StatelessWidget {
                     ),
                   )
                 : Container(height: 0),
-            rc.file['file'] != null
+            rc.file.isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Container(
@@ -327,7 +336,7 @@ class ChatBottomBar extends StatelessWidget {
                         children: [
                           fileType() == 'image'
                               ? Image.file(
-                                  File(rc.file['file'].path),
+                                  File(rc.file[0].path),
                                   fit: BoxFit.fitHeight,
                                   height: 50,
                                   width: 50,
@@ -347,7 +356,7 @@ class ChatBottomBar extends StatelessWidget {
                             child: Text(
                               fileType() == 'image'
                                   ? 'Photo'
-                                  : rc.file['file'].name.toString(),
+                                  : rc.file[0].name.toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: const TextStyle(
@@ -363,7 +372,7 @@ class ChatBottomBar extends StatelessWidget {
                               ? Container()
                               : IconButton(
                                   onPressed: () {
-                                    rc.file['file'] = null;
+                                    rc.file.value = [];
                                   },
                                   icon: Container(
                                     width: 24,
@@ -387,11 +396,12 @@ class ChatBottomBar extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12),
               child: AnimatedSizeAndFade(
+                sizeDuration: const Duration(milliseconds: 0),
                 child: rc.isRecording.value
-                    ? RecordingBottomBar()
+                    ? const RecordingBottomBar()
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           InkWell(
                             onTap: () {
@@ -442,30 +452,17 @@ class ChatBottomBar extends StatelessWidget {
                           Expanded(
                             child: TextFormField(
                               style: const TextStyle(
-                                color: Color(0XFF535F89),
-                                fontSize: 14,
+                                color: Color(0XFF333F69),
+                                fontSize: 15,
                               ),
                               controller: rc.messageController,
                               focusNode: rc.messageFocus,
-                              textInputAction: TextInputAction.send,
-                              onFieldSubmitted: (text) {
-                                if (!rc.isFileSending.value) {
-                                  if (rc.file['file'] != null) {
-                                    if (rc.replyView.value) {
-                                      rc.sendReplyAsAttachment();
-                                    } else {
-                                      rc.sendAttachment();
-                                    }
-                                  } else if (rc
-                                      .messageController.text.isNotEmpty) {
-                                    if (rc.replyView.value) {
-                                      rc.sendReplyAsTextMessage();
-                                    } else {
-                                      rc.sendTextMessage();
-                                    }
-                                  }
-                                }
-                              },
+                              enabled: !rc.chatOptionsOpened.value,
+                              textCapitalization: TextCapitalization.sentences,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.newline,
+                              minLines: 1,
+                              maxLines: 4,
                               decoration:
                                   textFieldDecoration(radius: 24, style: 2)
                                       .copyWith(
@@ -481,7 +478,7 @@ class ChatBottomBar extends StatelessWidget {
                             firstChild: GestureDetector(
                               onTap: () {
                                 if (!rc.isFileSending.value) {
-                                  if (rc.file['file'] != null) {
+                                  if (rc.file.isNotEmpty) {
                                     if (rc.replyView.value) {
                                       rc.sendReplyAsAttachment();
                                     } else {
@@ -529,24 +526,29 @@ class ChatBottomBar extends StatelessWidget {
                                       ),
                               ),
                             ),
-                            // secondChild: InkWell(
-                            //   onTap: () {
-                            //     rc.isRecording.value = true;
-                            //   },
-                            //   child: SvgPicture.asset(
-                            //     'assets/icons/microphone.svg',
-                            //     package: 'robin_flutter',
-                            //     width: 24,
-                            //     height: 24,
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            // ),
-                            secondChild: const SizedBox(
-                              height: 24,
-                              width: 1,
+                            secondChild: InkWell(
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                rc.isRecording.value = true;
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: SvgPicture.asset(
+                                  'assets/icons/microphone.svg',
+                                  package: 'robin_flutter',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
+                            // secondChild: const SizedBox(
+                            //   height: 24,
+                            //   width: 1,
+                            // ),
                             crossFadeState: rc.showSendButton.value ||
-                                    rc.file['file'] != null
+                                    rc.file.isNotEmpty
                                 ? CrossFadeState.showFirst
                                 : CrossFadeState.showSecond,
                             duration: const Duration(milliseconds: 200),

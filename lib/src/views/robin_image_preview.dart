@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 
 class ImagePreview extends StatefulWidget {
-  const ImagePreview(this.attachment);
+  const ImagePreview({
+    Key? key,
+    required this.attachment,
+    this.isLocal,
+  }) : super(key: key);
 
   final String attachment;
+  final bool? isLocal;
 
   @override
   _ImagePreviewState createState() => _ImagePreviewState();
@@ -25,28 +31,33 @@ class _ImagePreviewState extends State<ImagePreview> {
               Center(
                 child: Hero(
                   tag: widget.attachment,
-                  child: CachedNetworkImage(
-                    imageUrl: widget.attachment,
-                    fit: BoxFit.contain,
-                    placeholder: (context, url) => const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(10, 10, 15, 10),
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0XFF15AE73),
+                  child: widget.isLocal != null && widget.isLocal!
+                      ? Image.file(
+                          File(widget.attachment),
+                          fit: BoxFit.contain,
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.attachment,
+                          fit: BoxFit.contain,
+                          placeholder: (context, url) => const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(10, 10, 15, 10),
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0XFF15AE73),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  ),
                 ),
               ),
               SafeArea(
