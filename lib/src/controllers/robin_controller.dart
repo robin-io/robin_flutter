@@ -1068,7 +1068,7 @@ class RobinController extends GetxController {
     }
   }
 
-  Future sendAttachment({String? path}) async {
+  Future sendAttachment({String? path, List<String>? captions}) async {
     try {
       if (path != null) {
         isFileSending.value = true;
@@ -1102,12 +1102,15 @@ class RobinController extends GetxController {
         isFileSending.value = false;
       } else if (file.isNotEmpty) {
         isFileSending.value = true;
-        for (var currentFile in file) {
+        for (int index = 0; index < file.length; index++) {
+          var currentFile = file[index];
           Map<String, String> body = {
             'conversation_id': currentConversation.value.id!,
             'sender_token': currentUser!.robinToken,
             'sender_name': currentUser!.fullName,
-            'msg': messageController.text.trim(),
+            'msg': captions != null && index < captions.length
+                ? captions[index]
+                : messageController.text.trim(),
             'timestamp': formatISOTime(DateTime.now()),
             'file_path': currentFile.path,
             'local_id': uuid.v4(),
@@ -1140,7 +1143,7 @@ class RobinController extends GetxController {
     }
   }
 
-  Future sendReplyAsAttachment({String? path}) async {
+  Future sendReplyAsAttachment({String? path, List<String>? captions}) async {
     try {
       if (path != null) {
         isFileSending.value = true;
@@ -1178,13 +1181,16 @@ class RobinController extends GetxController {
         replyView.value = false;
       } else if (file.isNotEmpty) {
         isFileSending.value = true;
-        for (var currentFile in file) {
+        for (int index = 0; index < file.length; index++) {
+          var currentFile = file[index];
           Map<String, String> body = {
             'conversation_id': currentConversation.value.id!,
             'message_id': replyMessage!.id,
             'sender_token': currentUser!.robinToken,
             'sender_name': currentUser!.fullName,
-            'msg': messageController.text.trim(),
+            'msg': captions != null && index < captions.length
+                ? captions[index]
+                : messageController.text.trim(),
             'timestamp': formatISOTime(DateTime.now()),
             'file_path': currentFile.path,
             'local_id': uuid.v4()

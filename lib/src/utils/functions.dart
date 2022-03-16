@@ -10,6 +10,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:robin_flutter/src/views/robin_send_image.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
@@ -216,7 +217,7 @@ InputDecoration textFieldDecoration({double? radius, int? style}) {
   );
 }
 
-getMedia({required String source, bool? isGroup}) async {
+getMedia(BuildContext context, {required String source, bool? isGroup}) async {
   final ImagePicker picker = ImagePicker();
   if (isGroup != null && isGroup == true) {
     XFile? file = await picker.pickImage(
@@ -233,6 +234,14 @@ getMedia({required String source, bool? isGroup}) async {
       final List<XFile>? images = await picker.pickMultiImage();
       if (images != null) {
         rc.file.value = images;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RobinSendImage(),
+          ),
+        ).then((value) {
+          rc.file.value = [];
+        });
       }
     } else {
       XFile? file = await picker.pickImage(

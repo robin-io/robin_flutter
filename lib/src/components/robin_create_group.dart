@@ -107,7 +107,7 @@ class RobinCreateGroup extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    getMedia(source: 'gallery', isGroup: true);
+                    getMedia(context, source: 'gallery', isGroup: true);
                   },
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
