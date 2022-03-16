@@ -54,7 +54,7 @@ class ChatBottomBar extends StatelessWidget {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    getMedia(source: 'camera');
+                                    getMedia(context, source: 'camera');
                                     disposeChatOptions();
                                   },
                                   child: Padding(
@@ -88,8 +88,8 @@ class ChatBottomBar extends StatelessWidget {
                                   height: 2,
                                 ),
                                 InkWell(
-                                  onTap: () {
-                                    getMedia(source: 'gallery');
+                                  onTap: () async {
+                                    await getMedia(context, source: 'gallery');
                                     disposeChatOptions();
                                   },
                                   child: Padding(
@@ -547,10 +547,10 @@ class ChatBottomBar extends StatelessWidget {
                             //   height: 24,
                             //   width: 1,
                             // ),
-                            crossFadeState: rc.showSendButton.value ||
-                                    rc.file.isNotEmpty
-                                ? CrossFadeState.showFirst
-                                : CrossFadeState.showSecond,
+                            crossFadeState:
+                                rc.showSendButton.value || rc.file.isNotEmpty
+                                    ? CrossFadeState.showFirst
+                                    : CrossFadeState.showSecond,
                             duration: const Duration(milliseconds: 200),
                           )
                         ],

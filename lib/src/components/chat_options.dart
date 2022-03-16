@@ -169,7 +169,7 @@ class _ExpandingActionButton extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  getMedia(source: 'camera');
+                  getMedia(context, source: 'camera');
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -201,8 +201,7 @@ class _ExpandingActionButton extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  print('hi there');
-                  getMedia(source: 'gallery');
+                  getMedia(context, source: 'gallery');
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
