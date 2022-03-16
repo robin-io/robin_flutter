@@ -5,8 +5,7 @@ import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
-import '../utils/functions.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
 
 class RobinSendImage extends StatelessWidget {
   final RobinController rc = Get.find();
@@ -39,13 +38,24 @@ class RobinSendImage extends StatelessWidget {
     for (int index = 0; index < rc.file.length; index++) {
       var image = rc.file[index];
       images.add(
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0, right: 7.0),
-          child: Image.file(
-            File(image.path),
-            width: 44,
-            height: 44,
-            fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () {
+            carouselController.jumpToPage(index);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(top: 15.0, right: 7.0),
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              color: currentIndex.value == index
+                  ? Colors.white
+                  : Colors.transparent,
+              child: Image.file(
+                File(image.path),
+                width: 44,
+                height: 44,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
       );
@@ -67,19 +77,20 @@ class RobinSendImage extends StatelessWidget {
                 itemCount: rc.file.length,
                 carouselController: carouselController,
                 options: CarouselOptions(
-                  initialPage: 0,
-                  height: MediaQuery.of(context).size.height,
-                  viewportFraction: 1,
-                  enableInfiniteScroll: false,
-                  autoPlay: false,
-                  scrollDirection: Axis.horizontal,
-                ),
+                    initialPage: 0,
+                    height: MediaQuery.of(context).size.height,
+                    viewportFraction: 1,
+                    enableInfiniteScroll: false,
+                    autoPlay: false,
+                    scrollDirection: Axis.horizontal,
+                    onPageChanged: (index, reason) {
+                      currentIndex.value = index;
+                      captionController.text = captions[currentIndex.value];
+                      captionController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: captionController.text.length));
+                    }),
                 itemBuilder:
                     (BuildContext context, int itemIndex, int pageViewIndex) {
-                  currentIndex.value = itemIndex;
-                  Future.delayed(const Duration(milliseconds: 200), () {
-                    captionController.text = captions[currentIndex.value];
-                  });
                   return Image.file(
                     File(rc.file[itemIndex].path),
                     width: MediaQuery.of(context).size.width,
@@ -100,6 +111,7 @@ class RobinSendImage extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             Navigator.pop(context);
+                            rc.file.value = [];
                           },
                           icon: const Icon(
                             Icons.close,
@@ -109,10 +121,22 @@ class RobinSendImage extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            captions.removeAt(currentIndex.value);
-                            rc.file.removeAt(currentIndex.value);
+                            int delete = currentIndex.value;
+                            if (rc.file.length != 1 &&
+                                currentIndex.value == rc.file.length - 1) {
+                              carouselController
+                                  .jumpToPage(currentIndex.value - 1);
+                            }
+                            captions.removeAt(delete);
+                            rc.file.removeAt(delete);
                             if (rc.file.isEmpty) {
                               Navigator.pop(context);
+                            } else {
+                              captionController.text =
+                                  captions[currentIndex.value];
+                              captionController.selection =
+                                  TextSelection.fromPosition(TextPosition(
+                                      offset: captionController.text.length));
                             }
                           },
                           icon: SvgPicture.asset(
@@ -125,6 +149,7 @@ class RobinSendImage extends StatelessWidget {
                       ],
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,9 +200,14 @@ class RobinSendImage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: renderImages(),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: renderImages(),
+                            ),
+                          ),
                         )
                       ],
                     ),

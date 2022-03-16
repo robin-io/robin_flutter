@@ -1102,7 +1102,9 @@ class RobinController extends GetxController {
         isFileSending.value = false;
       } else if (file.isNotEmpty) {
         isFileSending.value = true;
+        print(file.length);
         for (int index = 0; index < file.length; index++) {
+          print('Sending ${index + 1}...');
           var currentFile = file[index];
           Map<String, String> body = {
             'conversation_id': currentConversation.value.id!,
@@ -1137,6 +1139,7 @@ class RobinController extends GetxController {
         isFileSending.value = false;
       }
     } catch (e) {
+      print(e);
       isFileSending.value = false;
       showErrorMessage(e.toString());
       rethrow;

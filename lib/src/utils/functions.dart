@@ -239,9 +239,7 @@ getMedia(BuildContext context, {required String source, bool? isGroup}) async {
           MaterialPageRoute(
             builder: (context) => RobinSendImage(),
           ),
-        ).then((value) {
-          rc.file.value = [];
-        });
+        );
       }
     } else {
       XFile? file = await picker.pickImage(
