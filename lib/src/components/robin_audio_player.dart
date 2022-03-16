@@ -22,7 +22,7 @@ class _RobinAudioPlayerState extends State<RobinAudioPlayer> {
   bool isPlaying = false;
   bool audioPlayed = false;
 
-  AudioPlayer player = AudioPlayer();
+  AudioPlayer player = AudioPlayer(playerId: 'robin_voice_note_player_id');
 
   @override
   void initState() {
@@ -105,7 +105,7 @@ class _RobinAudioPlayerState extends State<RobinAudioPlayer> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(5, 0, 15, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
                   child: Icon(
                     isPlaying ? Icons.pause : Icons.play_arrow,
                     size: 32,
@@ -113,34 +113,39 @@ class _RobinAudioPlayerState extends State<RobinAudioPlayer> {
                   ),
                 ),
               ),
-              Transform.translate(
-                offset: const Offset(0, 3),
-                child: SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackShape: RobinTrackShape(),
-                    thumbColor: green,
-                    trackHeight: 2,
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 7,
+              Expanded(
+                child: Transform.translate(
+                  offset: const Offset(0, 3),
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackShape: RobinTrackShape(),
+                      thumbColor: green,
+                      trackHeight: 2,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 7,
+                      ),
+                      activeTrackColor: const Color(0XFFCCCCCC),
                     ),
-                    activeTrackColor: const Color(0XFFCCCCCC),
-                  ),
-                  child: Slider(
-                    value: double.parse(currentPos.toString()),
-                    min: 0,
-                    max: double.parse(maxDuration.toString()),
-                    divisions: maxDuration,
-                    label: currentPosLabel,
-                    onChanged: (double value) async {
-                      int seekVal = value.round();
-                      int result =
-                          await player.seek(Duration(milliseconds: seekVal));
-                      if (result == 1) {
-                        currentPos = seekVal;
-                      }
-                    },
+                    child: Slider(
+                      value: double.parse(currentPos.toString()),
+                      min: 0,
+                      max: double.parse(maxDuration.toString()),
+                      divisions: maxDuration,
+                      label: currentPosLabel,
+                      onChanged: (double value) async {
+                        int seekVal = value.round();
+                        int result =
+                            await player.seek(Duration(milliseconds: seekVal));
+                        if (result == 1) {
+                          currentPos = seekVal;
+                        }
+                      },
+                    ),
                   ),
                 ),
+              ),
+              const SizedBox(
+                width: 10,
               ),
             ],
           ),

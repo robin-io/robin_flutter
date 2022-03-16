@@ -11,10 +11,20 @@ import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 
-class RobinCreateConversation extends StatelessWidget {
+class RobinCreateConversation extends StatefulWidget {
+  const RobinCreateConversation({Key? key}) : super(key: key);
+
+  @override
+  State<RobinCreateConversation> createState() =>
+      _RobinCreateConversationState();
+}
+
+class _RobinCreateConversationState extends State<RobinCreateConversation> {
   final RobinController rc = Get.find();
 
-  RobinCreateConversation({Key? key}) : super(key: key) {
+  @override
+  initState() {
+    super.initState();
     rc.getAllUsers();
   }
 
@@ -59,10 +69,8 @@ class RobinCreateConversation extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RobinChat(
-                      conversation: conversation,
-                      newUser: true
-                    ),
+                    builder: (context) =>
+                        RobinChat(conversation: conversation, newUser: true),
                   ),
                 ).then((value) {
                   Future.delayed(const Duration(milliseconds: 100), () {
@@ -238,6 +246,7 @@ class RobinCreateConversation extends StatelessWidget {
             InkWell(
               onTap: () {
                 rc.allUsersSearchController.clear();
+                rc.groupIcon.value = {};
                 rc.createGroupParticipants.value = {};
                 showCreateGroupChat(context);
               },

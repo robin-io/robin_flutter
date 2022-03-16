@@ -398,7 +398,7 @@ class _MessageGroupState extends State<MessageGroup> {
           bottom: widget.lastInSeries ? 5 : 0,
           left: 10,
           right: 10,
-          top: widget.message.reactions.isNotEmpty ? 28 : 5,
+          top: widget.message.allReactions.isNotEmpty ? 28 : 5,
         ),
         child: Obx(
           () => GestureDetector(
@@ -475,6 +475,7 @@ class _MessageGroupState extends State<MessageGroup> {
                             }
                           },
                           child: TextBubble(
+                            key: Key(widget.message.id),
                             message: widget.message,
                             lastInSeries: widget.lastInSeries,
                             firstInSeries: widget.firstInSeries,
@@ -482,7 +483,7 @@ class _MessageGroupState extends State<MessageGroup> {
                           ),
                         ),
                         widget.message.sentByMe &&
-                                widget.message.reactions.isNotEmpty
+                                widget.message.allReactions.isNotEmpty
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -551,19 +552,51 @@ class _MessageGroupState extends State<MessageGroup> {
                                         child: Row(
                                           children: [
                                             for (String reaction in widget
-                                                .message.reactions.keys
+                                                .message.allReactions.keys
                                                 .toList())
                                               reactions.contains(reaction)
                                                   ? Padding(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               2),
-                                                      child: Image.asset(
-                                                        'assets/images/reactions/${reactionToText(reaction)}.png',
-                                                        package:
-                                                            'robin_flutter',
-                                                        width: 15,
-                                                        height: 15,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Image.asset(
+                                                            'assets/images/reactions/${reactionToText(reaction)}.png',
+                                                            package:
+                                                                'robin_flutter',
+                                                            width: 15,
+                                                            height: 15,
+                                                          ),
+                                                          widget
+                                                                      .message
+                                                                      .allReactions[
+                                                                          reaction]!
+                                                                      .number >
+                                                                  1
+                                                              ? Text(
+                                                                  widget
+                                                                      .message
+                                                                      .allReactions[
+                                                                          reaction]!
+                                                                      .number
+                                                                      .toString(),
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Color(
+                                                                        0XFF51545C),
+                                                                  ),
+                                                                )
+                                                              : const SizedBox(),
+                                                        ],
                                                       ),
                                                     )
                                                   : Container(),
@@ -576,11 +609,12 @@ class _MessageGroupState extends State<MessageGroup> {
                               )
                             : Container(),
                         !widget.message.sentByMe &&
-                                widget.message.reactions.isNotEmpty
+                                widget.message.allReactions.isNotEmpty
                             ? Transform.translate(
                                 offset: Offset(
                                     (textBubbleSize - 36) -
-                                        (widget.message.reactions.length * 24),
+                                        (widget.message.allReactions.length *
+                                            24),
                                     -7),
                                 child: Row(
                                   textDirection: ui.TextDirection.rtl,
@@ -642,19 +676,35 @@ class _MessageGroupState extends State<MessageGroup> {
                                           child: Row(
                                             children: [
                                               for (String reaction in widget
-                                                  .message.reactions.keys
+                                                  .message.allReactions.keys
                                                   .toList())
                                                 reactions.contains(reaction)
                                                     ? Padding(
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(3),
-                                                        child: Image.asset(
-                                                          'assets/images/reactions/${reactionToText(reaction)}.png',
-                                                          package:
-                                                              'robin_flutter',
-                                                          width: 15,
-                                                          height: 15,
+                                                        child: Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              'assets/images/reactions/${reactionToText(reaction)}.png',
+                                                              package:
+                                                                  'robin_flutter',
+                                                              width: 15,
+                                                              height: 15,
+                                                            ),
+                                                            Text(
+                                                              '2',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 14,
+                                                                color: Color(
+                                                                    0XFF51545C),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       )
                                                     : Container(),

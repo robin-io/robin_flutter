@@ -17,7 +17,6 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
   final RobinCurrentUser currentUser;
   final Function getUsers;
   final RobinKeys keys;
-
   final RobinController rc = Get.put(RobinController());
 
   Robin({
@@ -34,6 +33,7 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    rc.state = state;
     switch (state) {
       case AppLifecycleState.resumed:
         rc.appResume();

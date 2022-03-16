@@ -11,10 +11,16 @@ import 'package:robin_flutter/src/components/robin_create_group.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 
-class RobinSelectGroupParticipants extends StatelessWidget {
-  final RobinController rc = Get.find();
+class RobinSelectGroupParticipants extends StatefulWidget {
 
-  RobinSelectGroupParticipants({Key? key}) : super(key: key);
+  const RobinSelectGroupParticipants({Key? key}) : super(key: key);
+
+  @override
+  State<RobinSelectGroupParticipants> createState() => _RobinSelectGroupParticipantsState();
+}
+
+class _RobinSelectGroupParticipantsState extends State<RobinSelectGroupParticipants> {
+  final RobinController rc = Get.find();
 
   List<Widget> renderUsers(BuildContext context) {
     List<Widget> users = [];

@@ -24,7 +24,6 @@ import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 
-
 final RobinController rc = Get.find();
 
 void showErrorMessage(String message) {
@@ -49,6 +48,14 @@ void showSuccessMessage(String message) {
   );
 }
 
+bool switchToCol(double width, int chars) {
+  bool shouldSwitch = false;
+  if ((width / 14) * 1.5 > chars) {
+    return true;
+  }
+  return shouldSwitch;
+}
+
 String formatDate(String dateString) {
   String formattedDate = Jiffy(dateString).fromNow();
   formattedDate = formattedDate.replaceAll(' ago', '');
@@ -68,7 +75,7 @@ String formatTimestamp(DateTime dateTime) {
   if (date == yesterday) {
     return 'Yesterday';
   }
-  if(date.year == now.year){
+  if (date.year == now.year) {
     final DateFormat formatter = DateFormat('E, d MMM');
     return formatter.format(date);
   }
@@ -212,33 +219,42 @@ InputDecoration textFieldDecoration({double? radius, int? style}) {
 getMedia({required String source, bool? isGroup}) async {
   final ImagePicker picker = ImagePicker();
   if (isGroup != null && isGroup == true) {
-    rc.groupIcon.value = {
-      'file': await picker.pickImage(
+    XFile? file = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 10,
+    );
+    if (file != null) {
+      rc.groupIcon.value = {
+        'file': file,
+      };
+    }
+  } else {
+    if (source == 'gallery') {
+      final List<XFile>? images = await picker.pickMultiImage();
+      if (images != null) {
+        rc.file.value = images;
+      }
+    } else {
+      XFile? file = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 10,
-      )
-    };
-  } else {
-    ImageSource imageSource = ImageSource.camera;
-    if (source == 'gallery') {
-      imageSource = ImageSource.gallery;
+      );
+      if (file != null) {
+        rc.file.value = [file];
+      }
     }
-    rc.file.value = {
-      'file': await picker.pickImage(
-        source: imageSource,
-        imageQuality: 10,
-      )
-    };
   }
 }
 
 getDocument() async {
   FilePickerResult? document = await FilePicker.platform.pickFiles();
-  rc.file.value = {'file': document?.files.first};
+  if (document != null) {
+    rc.file.value = [document.files.first];
+  }
 }
 
 String fileType({String? path}) {
-  String filePath = path ?? rc.file['file'].path;
+  String filePath = path ?? rc.file[0].path;
   String? ext = filePath.split('.').last.toLowerCase();
 
   if (imageFormats.contains(ext)) {
@@ -254,11 +270,12 @@ String fileType({String? path}) {
 
 String formatISOTime(DateTime date) {
   var duration = date.timeZoneOffset;
-  if (duration.isNegative){
-    return (date.toIso8601String() + '-${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
-  }
-  else{
-    return (date.toIso8601String() + '+${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
+  if (duration.isNegative) {
+    return (date.toIso8601String() +
+        '-${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
+  } else {
+    return (date.toIso8601String() +
+        '+${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}');
   }
 }
 
@@ -381,28 +398,45 @@ String getTimestamp() {
   return timestamp;
 }
 
-Map<String, RobinMessageReaction> convertToReactions(List reactions) {
-  Map<String, RobinMessageReaction> robinReactions = {};
+List<Map<String, RobinMessageReaction>> getReactions(List reactions) {
+  Map<String, RobinMessageReaction> allReactions = {};
+  Map<String, RobinMessageReaction> myReactions = {};
   for (Map reaction in reactions) {
     RobinMessageReaction robinReaction =
         RobinMessageReaction.fromJson(reaction);
-    robinReactions[robinReaction.type] = robinReaction;
+    if (robinReaction.userToken == rc.currentUser?.robinToken) {
+      myReactions[robinReaction.type] = robinReaction;
+    }
+    if (allReactions[robinReaction.type] == null) {
+      allReactions[robinReaction.type] = robinReaction;
+    } else {
+      robinReaction.number = allReactions[robinReaction.type]!.number += 1;
+      allReactions[robinReaction.type] = robinReaction;
+    }
   }
-  return robinReactions;
+  return [allReactions, myReactions];
 }
 
-Map localRobinMessageJson(Map message, String conversationId,
-    String senderToken, String senderName, String? replyTo,) {
+Map localRobinMessageJson(
+  Map message,
+  String conversationId,
+  String senderToken,
+  String senderName, {
+  String? replyTo,
+  bool? isAttachment,
+  String? filePath,
+}) {
   return {
-    "_id": message['localId'],
+    "_id": message['local_id'],
     'conversation_id': conversationId,
     "content": {
-      'is_attachment': false,
-      'attachment': '',
-      'msg' : message['msg'],
+      'is_attachment': isAttachment ?? false,
+      'attachment': isAttachment == null || !isAttachment ? '' : filePath,
+      'msg': message['msg'],
       'sender_token': senderToken,
       'sender_name': senderName,
-      'localId': message['localId'],
+      'local_id': message['local_id'],
+      'file_path': filePath
     },
     'sender_token': senderToken,
     'sender_name': senderName,

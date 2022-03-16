@@ -120,10 +120,12 @@ class _TextBubbleState extends State<TextBubble> {
                               padding: const EdgeInsets.all(1.5),
                               child: GestureDetector(
                                 onTap: () {
-                                  if (widget.message.reactions.keys
+                                  if (widget.message.myReactions.keys
                                       .contains(reaction)) {
-                                    rc.removeReaction(widget.message.id,
-                                        widget.message.reactions[reaction]!.id);
+                                    rc.removeReaction(
+                                        widget.message.id,
+                                        widget
+                                            .message.myReactions[reaction]!.id);
                                   } else {
                                     rc.sendReaction(
                                         reaction, widget.message.id);
@@ -133,7 +135,7 @@ class _TextBubbleState extends State<TextBubble> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: widget.message.reactions.keys
+                                    color: widget.message.myReactions.keys
                                             .contains(reaction)
                                         ? robinOrange
                                         : null,
@@ -445,7 +447,7 @@ class _TextBubbleState extends State<TextBubble> {
             ),
             Container(
               color: const Color(0XFFF5F7FC),
-              width: imageWidth - 6 < 0 ? null : imageWidth - 6,
+              width: imageWidth - 9 < 0 ? null : imageWidth - 9,
               padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,6 +610,21 @@ class _TextBubbleState extends State<TextBubble> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              widget.message.isForwarded
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                          left: widget.message.isAttachment &&
+                                  fileType(path: widget.message.link) != 'audio'
+                              ? 5
+                              : 12,
+                          top: 5),
+                      child: SvgPicture.asset(
+                        'assets/icons/forwarded.svg',
+                        package: 'robin_flutter',
+                        width: 60,
+                      ),
+                    )
+                  : SizedBox(),
               widget.firstInSeries
                   ? Padding(
                       padding:
@@ -627,7 +644,7 @@ class _TextBubbleState extends State<TextBubble> {
                   ? Padding(
                       padding: const EdgeInsets.all(4),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           fileType(path: widget.message.link) == 'image'
                               ? ClipRRect(
@@ -655,7 +672,12 @@ class _TextBubbleState extends State<TextBubble> {
                                                 pageBuilder:
                                                     (context, anim1, anim2) {
                                                   return ImagePreview(
-                                                    widget.message.link,
+                                                    attachment:
+                                                        widget.message.link,
+                                                    isLocal: !widget.message
+                                                            .delivered! &&
+                                                        widget.message.filePath
+                                                            .isNotEmpty,
                                                   );
                                                 },
                                                 transitionBuilder: (context,
@@ -683,30 +705,55 @@ class _TextBubbleState extends State<TextBubble> {
                                               });
                                             }
                                           },
-                                          child: CachedNetworkImage(
-                                            imageUrl: widget.message.link,
-                                            placeholder: (context, url) =>
-                                                const Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  10, 10, 15, 10),
-                                              child: SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2.5,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    Color(0XFF15AE73),
-                                                  ),
+                                          child: widget.message.delivered!
+                                              ? CachedNetworkImage(
+                                                  imageUrl: widget.message.link,
+                                                  fit: BoxFit.fitWidth,
+                                                  placeholder: (context, url) {
+                                                    if (widget
+                                                            .message.justSent &&
+                                                        widget.message.filePath
+                                                            .isNotEmpty) {
+                                                      return Image.file(
+                                                        File(widget
+                                                            .message.filePath),
+                                                        fit: BoxFit.fitWidth,
+                                                      );
+                                                    }
+                                                    return const Padding(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              10, 10, 15, 10),
+                                                      child: SizedBox(
+                                                        width: 26,
+                                                        height: 26,
+                                                        child: Center(
+                                                          child: SizedBox(
+                                                            width: 24,
+                                                            height: 24,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              strokeWidth: 2.5,
+                                                              valueColor:
+                                                                  AlwaysStoppedAnimation<
+                                                                      Color>(
+                                                                Color(
+                                                                    0XFF15AE73),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  errorWidget: (context, url,
+                                                          error) =>
+                                                      const Icon(Icons.error),
+                                                )
+                                              : Image.file(
+                                                  File(widget.message.link),
+                                                  fit: BoxFit.fitWidth,
                                                 ),
-                                              ),
-                                            ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(Icons.error),
-                                          ),
                                         ),
                                       ),
                                     ),
@@ -775,36 +822,42 @@ class _TextBubbleState extends State<TextBubble> {
                                                     ),
                                                     fileDownloaded.value
                                                         ? Container()
-                                                        : SizedBox(
-                                                            width: 20,
-                                                            height: 20,
-                                                            child: fileDownloading
-                                                                    .value
-                                                                ? const SizedBox(
-                                                                    width: 20,
-                                                                    height: 20,
-                                                                    child:
-                                                                        CircularProgressIndicator(
-                                                                      strokeWidth:
-                                                                          2.5,
-                                                                      valueColor:
-                                                                          AlwaysStoppedAnimation(
-                                                                        green,
+                                                        : !widget.message
+                                                                .delivered!
+                                                            ? Container()
+                                                            : SizedBox(
+                                                                width: 20,
+                                                                height: 20,
+                                                                child: fileDownloading
+                                                                        .value
+                                                                    ? const SizedBox(
+                                                                        width:
+                                                                            20,
+                                                                        height:
+                                                                            20,
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          strokeWidth:
+                                                                              2.5,
+                                                                          valueColor:
+                                                                              AlwaysStoppedAnimation(
+                                                                            green,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    : Center(
+                                                                        child: SvgPicture
+                                                                            .asset(
+                                                                          'assets/icons/export.svg',
+                                                                          package:
+                                                                              'robin_flutter',
+                                                                          width:
+                                                                              20,
+                                                                          height:
+                                                                              20,
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                  )
-                                                                : Center(
-                                                                    child: SvgPicture
-                                                                        .asset(
-                                                                      'assets/icons/export.svg',
-                                                                      package:
-                                                                          'robin_flutter',
-                                                                      width: 20,
-                                                                      height:
-                                                                          20,
-                                                                    ),
-                                                                  ),
-                                                          ),
+                                                              ),
                                                   ],
                                                 ),
                                               ),
@@ -816,38 +869,147 @@ class _TextBubbleState extends State<TextBubble> {
                           const SizedBox(
                             height: 5,
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                dateFormat.format(widget.message.timestamp),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0XFF7A7A7A),
-                                ),
-                              ),
-                              widget.message.sentByMe &&
-                                      !rc.currentConversation.value.isGroup!
-                                  ? SizedBox(
-                                      height: 10,
-                                      child: SvgPicture.asset(
-                                        widget.message.isRead
-                                            ? 'assets/icons/read_receipt.svg'
-                                            : 'assets/icons/unread_receipt.svg',
-                                        package: 'robin_flutter',
-                                        width: 18,
-                                        height: 18,
-                                        fit: BoxFit.cover,
+                          switchToCol(
+                                  widget.maxWidth, widget.message.text.length)
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            (MediaQuery.of(context).size.width *
+                                                    0.75) -
+                                                111,
                                       ),
-                                    )
-                                  : Container(),
-                              const SizedBox(
-                                width: 3,
-                              ),
-                            ],
-                          ),
+                                      child: formatText(widget.message.text,
+                                          truncate: widget.loadUrl != null &&
+                                                  !widget.loadUrl!
+                                              ? true
+                                              : false),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          dateFormat
+                                              .format(widget.message.timestamp),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0XFF7A7A7A),
+                                          ),
+                                        ),
+                                        widget.message.sentByMe
+                                            ? !widget.message.delivered!
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 4),
+                                                    child: Image.asset(
+                                                      'assets/images/delayed.png',
+                                                      package: 'robin_flutter',
+                                                      width: 14,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    height: 10,
+                                                    child: SvgPicture.asset(
+                                                      !widget.message.isRead ||
+                                                              rc.currentConversation
+                                                                  .value.isGroup!
+                                                          ? 'assets/icons/delivered.svg'
+                                                          : 'assets/icons/read_receipt.svg',
+                                                      package: 'robin_flutter',
+                                                      width: 18,
+                                                      height: 18,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                            : Container(),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            (MediaQuery.of(context).size.width *
+                                                    0.75) -
+                                                10,
+                                      ),
+                                      child: formatText(widget.message.text,
+                                          truncate: widget.loadUrl != null &&
+                                                  !widget.loadUrl!
+                                              ? true
+                                              : false),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          dateFormat
+                                              .format(widget.message.timestamp),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0XFF7A7A7A),
+                                          ),
+                                        ),
+                                        widget.message.sentByMe
+                                            ? !widget.message.delivered!
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 4),
+                                                    child: Image.asset(
+                                                      'assets/images/delayed.png',
+                                                      package: 'robin_flutter',
+                                                      width: 14,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    height: 10,
+                                                    child: SvgPicture.asset(
+                                                      !widget.message.isRead ||
+                                                              rc.currentConversation
+                                                                  .value.isGroup!
+                                                          ? 'assets/icons/delivered.svg'
+                                                          : 'assets/icons/read_receipt.svg',
+                                                      package: 'robin_flutter',
+                                                      width: 18,
+                                                      height: 18,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                            : Container(),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                           const SizedBox(
                             height: 3,
                           ),
@@ -862,70 +1024,147 @@ class _TextBubbleState extends State<TextBubble> {
                           widget.loadUrl ?? true
                               ? getURLPreview(widget.message.text)
                               : Container(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                  maxWidth: (MediaQuery.of(context).size.width *
-                                          0.75) -
-                                      111,
-                                ),
-                                child: formatText(widget.message.text,
-                                    truncate: widget.loadUrl != null &&
-                                            !widget.loadUrl!
-                                        ? true
-                                        : false),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    dateFormat.format(widget.message.timestamp),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0XFF7A7A7A),
+                          switchToCol(
+                                  widget.maxWidth, widget.message.text.length)
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            (MediaQuery.of(context).size.width *
+                                                    0.75) -
+                                                111,
+                                      ),
+                                      child: formatText(widget.message.text,
+                                          truncate: widget.loadUrl != null &&
+                                                  !widget.loadUrl!
+                                              ? true
+                                              : false),
                                     ),
-                                  ),
-                                  widget.message.sentByMe
-                                      ? !widget.message.delivered!
-                                          ? Padding(
-                                            padding: const EdgeInsets.only(left: 4),
-                                            child: Image.asset(
-                                                'assets/images/delayed.png',
-                                                package: 'robin_flutter',
-                                                width: 14,
-                                                fit: BoxFit.cover,
-                                              ),
-                                          )
-                                          : SizedBox(
-                                              height: 10,
-                                              child: SvgPicture.asset(
-                                                !widget.message.isRead ||
-                                                        rc.currentConversation
-                                                            .value.isGroup!
-                                                    ? 'assets/icons/delivered.svg'
-                                                    : 'assets/icons/read_receipt.svg',
-                                                package: 'robin_flutter',
-                                                width: 18,
-                                                height: 18,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                      : Container(),
-                                  const SizedBox(
-                                    width: 3,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          dateFormat
+                                              .format(widget.message.timestamp),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0XFF7A7A7A),
+                                          ),
+                                        ),
+                                        widget.message.sentByMe
+                                            ? !widget.message.delivered!
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 4),
+                                                    child: Image.asset(
+                                                      'assets/images/delayed.png',
+                                                      package: 'robin_flutter',
+                                                      width: 14,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    height: 10,
+                                                    child: SvgPicture.asset(
+                                                      !widget.message.isRead ||
+                                                              rc.currentConversation
+                                                                  .value.isGroup!
+                                                          ? 'assets/icons/delivered.svg'
+                                                          : 'assets/icons/read_receipt.svg',
+                                                      package: 'robin_flutter',
+                                                      width: 18,
+                                                      height: 18,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                            : Container(),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            (MediaQuery.of(context).size.width *
+                                                    0.75) -
+                                                111,
+                                      ),
+                                      child: formatText(widget.message.text,
+                                          truncate: widget.loadUrl != null &&
+                                                  !widget.loadUrl!
+                                              ? true
+                                              : false),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          dateFormat
+                                              .format(widget.message.timestamp),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Color(0XFF7A7A7A),
+                                          ),
+                                        ),
+                                        widget.message.sentByMe
+                                            ? !widget.message.delivered!
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 4),
+                                                    child: Image.asset(
+                                                      'assets/images/delayed.png',
+                                                      package: 'robin_flutter',
+                                                      width: 14,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    height: 10,
+                                                    child: SvgPicture.asset(
+                                                      !widget.message.isRead ||
+                                                              rc.currentConversation
+                                                                  .value.isGroup!
+                                                          ? 'assets/icons/delivered.svg'
+                                                          : 'assets/icons/read_receipt.svg',
+                                                      package: 'robin_flutter',
+                                                      width: 18,
+                                                      height: 18,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  )
+                                            : Container(),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                         ],
                       ),
                     ),

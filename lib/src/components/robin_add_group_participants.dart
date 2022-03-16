@@ -8,16 +8,26 @@ import 'package:get/get.dart';
 import 'package:robin_flutter/src/components/user_avatar.dart';
 import 'package:robin_flutter/src/components/users_loading.dart';
 
-class RobinAddGroupParticipants extends StatelessWidget {
-  final RobinController rc = Get.find();
-
+class RobinAddGroupParticipants extends StatefulWidget {
   final List<String> existingParticipants;
 
-  RobinAddGroupParticipants({
+  const RobinAddGroupParticipants({
     Key? key,
     required this.existingParticipants,
-  }) : super(key: key) {
-    rc.getAddGroupUsers(existingParticipants);
+  }) : super(key: key);
+
+  @override
+  State<RobinAddGroupParticipants> createState() =>
+      _RobinAddGroupParticipantsState();
+}
+
+class _RobinAddGroupParticipantsState extends State<RobinAddGroupParticipants> {
+  final RobinController rc = Get.find();
+
+  @override
+  initState() {
+    super.initState();
+    rc.getAddGroupUsers(widget.existingParticipants);
   }
 
   List<Widget> renderUsers(BuildContext context) {
@@ -190,8 +200,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                       height: 5,
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15),
+                      padding: const EdgeInsets.only(left: 15, right: 15),
                       child: TextFormField(
                         style: const TextStyle(
                           color: Color(0XFF8D9091),
@@ -225,11 +234,9 @@ class RobinAddGroupParticipants extends StatelessWidget {
                         } else {
                           Map allUsersMap = {};
                           for (RobinUser user in rc.allUsers) {
-                            allUsersMap[user.robinToken] =
-                                user.toJson();
+                            allUsersMap[user.robinToken] = user.toJson();
                           }
-                          rc.createGroupParticipants.value =
-                              allUsersMap;
+                          rc.createGroupParticipants.value = allUsersMap;
                         }
                       },
                       child: Container(
@@ -254,10 +261,8 @@ class RobinAddGroupParticipants extends StatelessWidget {
                               maxLines: 1,
                               style: TextStyle(
                                 fontSize: 16,
-                                color: rc.createGroupParticipants
-                                            .isNotEmpty &&
-                                        rc.createGroupParticipants
-                                                .length ==
+                                color: rc.createGroupParticipants.isNotEmpty &&
+                                        rc.createGroupParticipants.length ==
                                             rc.allUsers.length
                                     ? green
                                     : const Color(0xFFBBC1D6),
@@ -272,8 +277,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   color: rc.createGroupParticipants
                                               .isNotEmpty &&
-                                          rc.createGroupParticipants
-                                                  .length ==
+                                          rc.createGroupParticipants.length ==
                                               rc.allUsers.length
                                       ? green
                                       : null,
@@ -281,8 +285,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                                     width: 2,
                                     style: rc.createGroupParticipants
                                                 .isNotEmpty &&
-                                            rc.createGroupParticipants
-                                                    .length ==
+                                            rc.createGroupParticipants.length ==
                                                 rc.allUsers.length
                                         ? BorderStyle.none
                                         : BorderStyle.solid,
@@ -306,8 +309,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                         ? const UsersLoading()
                         : rc.allUsers.isEmpty
                             ? Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   const SizedBox(height: 35),
                                   Image.asset(
@@ -333,8 +335,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                                       child: CircularProgressIndicator(
                                         strokeWidth: 3,
                                         valueColor:
-                                            AlwaysStoppedAnimation<
-                                                Color>(
+                                            AlwaysStoppedAnimation<Color>(
                                           green,
                                         ),
                                       ),
@@ -369,8 +370,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                   onPressed: rc.createGroupParticipants.isEmpty
                       ? null
                       : () async {
-                          var successful =
-                              await rc.addGroupParticipants();
+                          var successful = await rc.addGroupParticipants();
                           if (successful) {
                             Navigator.pop(context);
                           }
@@ -385,8 +385,7 @@ class RobinAddGroupParticipants extends StatelessWidget {
                               child: CircularProgressIndicator(
                                 strokeWidth: 3,
                                 valueColor:
-                                    AlwaysStoppedAnimation<Color>(
-                                        white),
+                                    AlwaysStoppedAnimation<Color>(white),
                               ),
                             ),
                           ),

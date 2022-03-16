@@ -11,16 +11,13 @@ class RenderMessages extends StatelessWidget {
     Key? key,
   }) : super(key: key) {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (!rc.finishedInitialScroll.value) {
-        rc.messagesScrollController.addListener(() {
-          if (rc.messagesScrollController.position.pixels > 250) {
-            rc.atMaxScroll.value = false;
-          } else if (!rc.atMaxScroll.value) {
-            rc.atMaxScroll.value = true;
-          }
-        });
-        rc.finishedInitialScroll.value = true;
-      }
+      rc.messagesScrollController.addListener(() {
+        if (rc.messagesScrollController.position.pixels > 250) {
+          rc.atMaxScroll.value = false;
+        } else if (!rc.atMaxScroll.value) {
+          rc.atMaxScroll.value = true;
+        }
+      });
     });
   }
 
@@ -87,7 +84,7 @@ class RenderMessages extends StatelessWidget {
                   );
                 }
               }
-              if(index == rc.conversationMessages.length- 1){
+              if (index == rc.conversationMessages.length - 1) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -111,21 +108,21 @@ class RenderMessages extends StatelessWidget {
                     MessageGroup(
                       message: message,
                       lastInSeries: (index > 0 &&
-                          rc.conversationMessages.values
-                              .toList()[index - 1]
-                              .senderToken !=
-                              message.senderToken) ||
+                              rc.conversationMessages.values
+                                      .toList()[index - 1]
+                                      .senderToken !=
+                                  message.senderToken) ||
                           index == 0,
                       firstInSeries: !rc.currentConversation.value.isGroup!
                           ? false
                           : message.sentByMe
-                          ? false
-                          : (index < rc.conversationMessages.length - 1 &&
-                          rc.conversationMessages.values
-                              .toList()[index + 1]
-                              .senderToken !=
-                              message.senderToken) ||
-                          index == rc.conversationMessages.length - 1,
+                              ? false
+                              : (index < rc.conversationMessages.length - 1 &&
+                                      rc.conversationMessages.values
+                                              .toList()[index + 1]
+                                              .senderToken !=
+                                          message.senderToken) ||
+                                  index == rc.conversationMessages.length - 1,
                       maxWidth: maxWidth,
                     ),
                   ],
@@ -154,11 +151,6 @@ class RenderMessages extends StatelessWidget {
             },
             controller: rc.messagesScrollController,
           ),
-          !rc.finishedInitialScroll.value
-              ? Container(
-                  color: white,
-                )
-              : Container(),
         ],
       ),
     );

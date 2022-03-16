@@ -20,7 +20,7 @@ class RobinConversationInfo extends StatelessWidget {
     rc.getConversationInfo();
   }
 
-  RxBool seeAllParticipants = false.obs;
+  final RxBool seeAllParticipants = false.obs;
 
   List<String> getParticipantsRobinToken() {
     List<String> participants = [];
@@ -84,32 +84,30 @@ class RobinConversationInfo extends StatelessWidget {
                                         [itemIndex],
                                     true,
                                   ).link;
-                                  return Container(
-                                    child: CachedNetworkImage(
-                                      imageUrl: link,
-                                      fit: BoxFit.fitWidth,
-                                      placeholder: (context, url) =>
-                                          const Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              10, 10, 15, 10),
-                                          child: SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                Color(0XFF15AE73),
-                                              ),
+                                  return CachedNetworkImage(
+                                    imageUrl: link,
+                                    fit: BoxFit.fitWidth,
+                                    placeholder: (context, url) =>
+                                        const Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              Color(0XFF15AE73),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
                                     ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
                                   );
                                 }),
                             SafeArea(
@@ -183,7 +181,7 @@ class RobinConversationInfo extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
         child: SingleChildScrollView(
           child: Wrap(
-            alignment: WrapAlignment.center,
+            alignment: WrapAlignment.start,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: docs,
           ),
@@ -341,12 +339,18 @@ class RobinConversationInfo extends StatelessWidget {
         ),
       );
     }
-    Map currentUser =
-        rc.currentConversation.value.participants![currentUserIndex];
-    rc.currentConversation.value.participants!.removeAt(currentUserIndex);
-    rc.currentConversation.value.participants!.insert(0, currentUser);
+    if (currentUserIndex <
+        rc.currentConversation.value.participants!.length - 1) {
+      Map currentUser =
+          rc.currentConversation.value.participants![currentUserIndex];
+      rc.currentConversation.value.participants!.removeAt(currentUserIndex);
+      rc.currentConversation.value.participants!.insert(0, currentUser);
+    }
     int shownUsers = 0;
     for (Map participant in rc.currentConversation.value.participants!) {
+      if (participant['meta_data'] == null) {
+        participant['meta_data'] = {'display_name': 'Invalid User'};
+      }
       if (!seeAllParticipants.value && shownUsers >= 4) {
         break;
       }

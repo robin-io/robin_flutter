@@ -16,8 +16,11 @@ class RobinMessage {
   late final String? localId;
   late bool? delivered;
   bool isRead = false;
+  late bool justSent;
+  late String filePath;
   late final bool isForwarded;
-  late final Map<String, RobinMessageReaction> reactions;
+  late final Map<String, RobinMessageReaction> allReactions;
+  late final Map<String, RobinMessageReaction> myReactions;
   late final bool deletedForMe;
   late final DateTime timestamp;
 
@@ -26,7 +29,7 @@ class RobinMessage {
   RobinMessage.fromJson(Map json, bool isDelivered) {
     id = json['_id'];
     isAttachment = json['content']['is_attachment'] ?? false;
-    text = isAttachment ? "" : json['content']['msg'];
+    text = json['content']['msg'] ?? "";
     link = isAttachment ? json['content']['attachment'] : '';
     conversationId = json['conversation_id'];
     isForwarded = json['is_forwarded'] ?? false;
@@ -35,10 +38,14 @@ class RobinMessage {
     sentByMe = rc.currentUser?.robinToken == senderToken;
     senderName = json['sender_name'] ?? "";
     replyTo = json['reply_to'];
-    localId = json['content']['localId'] ?? '';
+    localId = json['content']['local_id'] ?? '';
+    filePath = json['content']['file_path'] ?? '';
+    justSent = rc.conversationMessages.keys.contains(localId);
     delivered = isDelivered;
     isRead = json['is_read'] ?? false;
-    reactions = convertToReactions(json['reactions'] ?? []);
+    List<Map<String, RobinMessageReaction>> reactions = getReactions(json['reactions'] ?? []);
+    allReactions = reactions[0];
+    myReactions = reactions[1];
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);
     timestamp = json['created_at'] == null

@@ -74,14 +74,9 @@ class UserAvatar extends StatelessWidget {
                   return Container(
                     width: size ?? 45,
                     height: size ?? 45,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0XFFF4F6F8),
-                      border: Border.all(
-                        width: 1,
-                        style: BorderStyle.solid,
-                        color: const Color(0XFFCADAF8),
-                      ),
+                      color: Color(0XFFF4F6F8),
                     ),
                     child: Center(
                       child: Text(

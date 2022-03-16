@@ -324,7 +324,7 @@ class ChatBottomBar extends StatelessWidget {
                     ),
                   )
                 : Container(height: 0),
-            rc.file['file'] != null
+            rc.file.isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Container(
@@ -336,7 +336,7 @@ class ChatBottomBar extends StatelessWidget {
                         children: [
                           fileType() == 'image'
                               ? Image.file(
-                                  File(rc.file['file'].path),
+                                  File(rc.file[0].path),
                                   fit: BoxFit.fitHeight,
                                   height: 50,
                                   width: 50,
@@ -356,7 +356,7 @@ class ChatBottomBar extends StatelessWidget {
                             child: Text(
                               fileType() == 'image'
                                   ? 'Photo'
-                                  : rc.file['file'].name.toString(),
+                                  : rc.file[0].name.toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: const TextStyle(
@@ -372,7 +372,7 @@ class ChatBottomBar extends StatelessWidget {
                               ? Container()
                               : IconButton(
                                   onPressed: () {
-                                    rc.file['file'] = null;
+                                    rc.file.value = [];
                                   },
                                   icon: Container(
                                     width: 24,
@@ -478,7 +478,7 @@ class ChatBottomBar extends StatelessWidget {
                             firstChild: GestureDetector(
                               onTap: () {
                                 if (!rc.isFileSending.value) {
-                                  if (rc.file['file'] != null) {
+                                  if (rc.file.isNotEmpty) {
                                     if (rc.replyView.value) {
                                       rc.sendReplyAsAttachment();
                                     } else {
@@ -548,7 +548,7 @@ class ChatBottomBar extends StatelessWidget {
                             //   width: 1,
                             // ),
                             crossFadeState: rc.showSendButton.value ||
-                                    rc.file['file'] != null
+                                    rc.file.isNotEmpty
                                 ? CrossFadeState.showFirst
                                 : CrossFadeState.showSecond,
                             duration: const Duration(milliseconds: 200),
