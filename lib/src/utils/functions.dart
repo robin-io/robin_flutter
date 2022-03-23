@@ -231,7 +231,9 @@ getMedia(BuildContext context, {required String source, bool? isGroup}) async {
     }
   } else {
     if (source == 'gallery') {
-      final List<XFile>? images = await picker.pickMultiImage();
+      final List<XFile>? images = await picker.pickMultiImage(
+        imageQuality: 10,
+      );
       if (images != null) {
         rc.file.value = images;
         Navigator.push(
@@ -409,6 +411,7 @@ List<Map<String, RobinMessageReaction>> getReactions(List reactions) {
   Map<String, RobinMessageReaction> allReactions = {};
   Map<String, RobinMessageReaction> myReactions = {};
   for (Map reaction in reactions) {
+    print(reaction);
     RobinMessageReaction robinReaction =
         RobinMessageReaction.fromJson(reaction);
     if (robinReaction.userToken == rc.currentUser?.robinToken) {
@@ -512,22 +515,26 @@ void updateLocalConversations() async {
 }
 
 void updateLocalConversationMessages(String conversationId, Map message) async {
-  String userToken = rc.currentUser!.robinToken;
-  String fileName = 'conversation$conversationId$userToken.json';
-  var dir = await getTemporaryDirectory();
-  File file = File(dir.path + '/$fileName');
-  List messagesList = [];
-  if (file.existsSync()) {
-    final fileData = file.readAsStringSync();
-    final response = jsonDecode(fileData);
-    messagesList = response['data'];
+  if (conversationId.isNotEmpty) {
+    String userToken = rc.currentUser!.robinToken;
+    String fileName = 'conversation$conversationId$userToken.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/$fileName');
+    List messagesList = [];
+    if (file.existsSync()) {
+      final fileData = file.readAsStringSync();
+      final response = jsonDecode(fileData);
+      messagesList = response['data'];
+    }
+    if (message.isNotEmpty) {
+      messagesList.add(message);
+    }
+    file.writeAsStringSync(
+      jsonEncode({
+        'data': messagesList,
+      }),
+      flush: true,
+      mode: FileMode.write,
+    );
   }
-  messagesList.add(message);
-  file.writeAsStringSync(
-    jsonEncode({
-      'data': messagesList,
-    }),
-    flush: true,
-    mode: FileMode.write,
-  );
 }

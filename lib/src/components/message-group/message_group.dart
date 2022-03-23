@@ -692,18 +692,31 @@ class _MessageGroupState extends State<MessageGroup> {
                                                               width: 15,
                                                               height: 15,
                                                             ),
-                                                            Text(
-                                                              '2',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                fontSize: 14,
-                                                                color: Color(
-                                                                    0XFF51545C),
-                                                              ),
-                                                            ),
+                                                            widget
+                                                                        .message
+                                                                        .allReactions[
+                                                                            reaction]!
+                                                                        .number >
+                                                                    1
+                                                                ? Text(
+                                                                    widget
+                                                                        .message
+                                                                        .allReactions[
+                                                                            reaction]!
+                                                                        .number
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Color(
+                                                                          0XFF51545C),
+                                                                    ),
+                                                                  )
+                                                                : const SizedBox(),
                                                           ],
                                                         ),
                                                       )
