@@ -25,12 +25,15 @@ class RobinMessage {
   late final bool deletedForMe;
   late final DateTime timestamp;
 
-  List<String>? groupIds;
-  List<String>? groupLinks;
-  List<String>? groupIsReads;
-  List<String>? groupAllReactions;
-  List<String>? groupMyReactions;
-  List<String>? groupTimeStamps;
+  List<String> groupIds = [];
+  List<String> groupLinks = [];
+  List<bool> groupJustSent = [];
+  List<bool> groupIsReads = [];
+  List<bool> groupDelivered = [];
+  List<String> groupFilePaths = [];
+  List<Map<String, RobinMessageReaction>> groupAllReactions = [];
+  List<Map<String, RobinMessageReaction>> groupMyReactions = [];
+  List<DateTime> groupTimeStamps = [];
 
   final RobinController rc = Get.find();
 
@@ -76,12 +79,25 @@ class RobinMessage {
     senderName = group[0].senderName;
     replyTo = group[0].replyTo;
     filePath = '';
-    justSent = false;
+    justSent = group[0].justSent;
     delivered = true;
     isRead = group[0].isRead;
     allReactions = group[0].allReactions;
     myReactions = group[0].myReactions;
     deletedForMe = group[0].deletedForMe;
     timestamp = group[0].timestamp;
+
+    for(RobinMessage message in group){
+      groupIds.add(message.id);
+      groupLinks.add(message.link);
+      groupJustSent.add(message.justSent);
+      groupIsReads.add(message.isRead);
+      groupDelivered.add(message.delivered ?? true);
+      groupFilePaths.add(message.filePath);
+      groupAllReactions.add(message.allReactions);
+      groupMyReactions.add(message.myReactions);
+      groupTimeStamps.add(message.timestamp);
+    }
+
   }
 }

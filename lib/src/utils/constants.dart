@@ -54,6 +54,7 @@ const List<Color> groupUserColors = [
 const List<String> reactions = ['⁉️', '😂', '❤️', '👍', '👎'];
 
 const List<String> imageFormats = ['png', 'jpg', 'jpeg', 'gif', 'heic'];
+const List<String> videoFormats = ['mp4', 'mov', 'wmv', 'avi', 'mpeg-2', 'mkv', 'avchd', 'flv', 'f4v', 'swf'];
 const List<String> audioFormats = [
   'mp3',
   'm4a',

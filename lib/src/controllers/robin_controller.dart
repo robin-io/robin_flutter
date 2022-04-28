@@ -468,7 +468,8 @@ class RobinController extends GetxController {
           break;
         }
       }
-    } else if (currentUser?.robinToken == robinConversation.token) {
+    } else if (currentUser?.robinToken == robinConversation.token ||
+        currentUser?.robinToken == robinConversation.altToken) {
       allConversations = {
         robinConversation.id!: robinConversation,
         ...allConversations,
@@ -1010,17 +1011,47 @@ class RobinController extends GetxController {
       //         ) ==
       //         'image' &&
       //     robinMessage.text.isEmpty) {
-      //   imageGroup.add(robinMessage);
+      //   if (imageGroup.isNotEmpty) {
+      //     RobinMessage previousMessage = imageGroup.last;
+      //     if (similarImageCheck(previousMessage, robinMessage)) {
+      //       imageGroup.add(robinMessage);
+      //       if(imageGroup.length < 4){
+      //         allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //       }
+      //       if(imageGroup.length == 4){
+      //         for(RobinMessage message in imageGroup){
+      //           allMessages.remove(message.id);
+      //         }
+      //       }
+      //     } else {
+      //       RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
+      //       allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
+      //       imageGroup = [];
+      //       imageGroup.add(robinMessage);
+      //       allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //     }
+      //   }
+      //   else {
+      //     imageGroup.add(robinMessage);
+      //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //   }
       // } else {
       //   if (imageGroup.isNotEmpty) {
       //     RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
       //     imageGroup = [];
-      //     allMessages = {robinMessage.id: groupRobinMessage, ...allMessages};
+      //     allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
       //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
       //   } else {
       //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
       //   }
       // }
+
+
+    }
+    if(imageGroup.length >= 4){
+      RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
+      imageGroup = [];
+      allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
     }
     if (unreadMessages.isNotEmpty) {
       sendReadReceipts(unreadMessages);
