@@ -405,12 +405,22 @@ class _MessageGroupState extends State<MessageGroup> {
             onTap: rc.selectMessageView.value
                 ? () {
                     if (rc.selectedMessageIds.contains(widget.message.id)) {
-                      rc.selectedMessageIds.remove(widget.message.id);
+                      if (widget.message.isGroupOfAttachments) {
+                        for (String messageId in widget.message.groupIds) {
+                          rc.selectedMessageIds.remove(messageId);
+                        }
+                      } else {
+                        rc.selectedMessageIds.remove(widget.message.id);
+                      }
                       if (rc.selectedMessageIds.isEmpty) {
                         rc.selectMessageView.value = false;
                       }
                     } else {
-                      rc.selectedMessageIds.add(widget.message.id);
+                      if (widget.message.isGroupOfAttachments) {
+                        rc.selectedMessageIds.value += widget.message.groupIds;
+                      } else {
+                        rc.selectedMessageIds.add(widget.message.id);
+                      }
                     }
                   }
                 : null,
@@ -418,7 +428,11 @@ class _MessageGroupState extends State<MessageGroup> {
                 ? () {
                     HapticFeedback.selectionClick();
                     rc.selectMessageView.value = true;
-                    rc.selectedMessageIds.add(widget.message.id);
+                    if (widget.message.isGroupOfAttachments) {
+                      rc.selectedMessageIds.value = widget.message.groupIds;
+                    } else {
+                      rc.selectedMessageIds.value = [widget.message.id];
+                    }
                   }
                 : null,
             child: Column(
@@ -692,18 +706,31 @@ class _MessageGroupState extends State<MessageGroup> {
                                                               width: 15,
                                                               height: 15,
                                                             ),
-                                                            Text(
-                                                              '2',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal,
-                                                                fontSize: 14,
-                                                                color: Color(
-                                                                    0XFF51545C),
-                                                              ),
-                                                            ),
+                                                            widget
+                                                                        .message
+                                                                        .allReactions[
+                                                                            reaction]!
+                                                                        .number >
+                                                                    1
+                                                                ? Text(
+                                                                    widget
+                                                                        .message
+                                                                        .allReactions[
+                                                                            reaction]!
+                                                                        .number
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Color(
+                                                                          0XFF51545C),
+                                                                    ),
+                                                                  )
+                                                                : const SizedBox(),
                                                           ],
                                                         ),
                                                       )

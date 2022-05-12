@@ -187,7 +187,7 @@ class RobinController extends GetxController {
               handleMessageForward(data['value']);
               break;
             case 'delete.message':
-              handleDeleteMessages(data['value']['ids']);
+              handleDeleteMessagesFromEvent(data['value']);
               break;
             case 'new.group.moderator':
               handleNewGroupModerator(data['value']);
@@ -210,7 +210,13 @@ class RobinController extends GetxController {
                   }
                 }
                 if (!reactionExists) {
-                  robinMessage.allReactions[reaction.type] = reaction;
+                  if (robinMessage.allReactions[reaction.type] != null) {
+                    reaction.number =
+                        robinMessage.allReactions[reaction.type]!.number += 1;
+                    robinMessage.allReactions[reaction.type] = reaction;
+                  } else {
+                    robinMessage.allReactions[reaction.type] = reaction;
+                  }
                   if (reaction.userToken == currentUser?.robinToken) {
                     robinMessage.myReactions[reaction.type] = reaction;
                   }
@@ -462,7 +468,8 @@ class RobinController extends GetxController {
           break;
         }
       }
-    } else if (currentUser?.robinToken == robinConversation.token) {
+    } else if (currentUser?.robinToken == robinConversation.token ||
+        currentUser?.robinToken == robinConversation.altToken) {
       allConversations = {
         robinConversation.id!: robinConversation,
         ...allConversations,
@@ -987,17 +994,67 @@ class RobinController extends GetxController {
   Map<String, RobinMessage> toRobinMessage(List messages) {
     Map<String, RobinMessage> allMessages = {};
     List<String> unreadMessages = [];
+
+    List<RobinMessage> imageGroup = [];
+
     for (Map message in messages) {
       RobinMessage robinMessage = RobinMessage.fromJson(message, true);
       if (!robinMessage.isRead && !robinMessage.sentByMe) {
         unreadMessages.add(robinMessage.id);
       }
+
       allMessages = {robinMessage.id: robinMessage, ...allMessages};
-      // allMessages[robinMessage.id] = robinMessage;
+
+      // if (robinMessage.isAttachment &&
+      //     fileType(
+      //           path: robinMessage.link,
+      //         ) ==
+      //         'image' &&
+      //     robinMessage.text.isEmpty) {
+      //   if (imageGroup.isNotEmpty) {
+      //     RobinMessage previousMessage = imageGroup.last;
+      //     if (similarImageCheck(previousMessage, robinMessage)) {
+      //       imageGroup.add(robinMessage);
+      //       if(imageGroup.length < 4){
+      //         allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //       }
+      //       if(imageGroup.length == 4){
+      //         for(RobinMessage message in imageGroup){
+      //           allMessages.remove(message.id);
+      //         }
+      //       }
+      //     } else {
+      //       RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
+      //       allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
+      //       imageGroup = [];
+      //       imageGroup.add(robinMessage);
+      //       allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //     }
+      //   }
+      //   else {
+      //     imageGroup.add(robinMessage);
+      //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //   }
+      // } else {
+      //   if (imageGroup.isNotEmpty) {
+      //     RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
+      //     imageGroup = [];
+      //     allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
+      //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //   } else {
+      //     allMessages = {robinMessage.id: robinMessage, ...allMessages};
+      //   }
+      // }
+
+
     }
-    if (unreadMessages.isNotEmpty &&
-        currentConversation.value.isGroup != null) {
-      if (!currentConversation.value.isGroup!) sendReadReceipts(unreadMessages);
+    if(imageGroup.length >= 4){
+      RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
+      imageGroup = [];
+      allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
+    }
+    if (unreadMessages.isNotEmpty) {
+      sendReadReceipts(unreadMessages);
     }
     return allMessages;
   }
@@ -1102,9 +1159,7 @@ class RobinController extends GetxController {
         isFileSending.value = false;
       } else if (file.isNotEmpty) {
         isFileSending.value = true;
-        print(file.length);
         for (int index = 0; index < file.length; index++) {
-          print('Sending ${index + 1}...');
           var currentFile = file[index];
           Map<String, String> body = {
             'conversation_id': currentConversation.value.id!,
@@ -1251,6 +1306,7 @@ class RobinController extends GetxController {
     Map<String, dynamic> body = {
       'conversation_id': currentConversation.value.id!,
       'message_ids': messageIds,
+      'user_token': currentUser!.robinToken,
     };
     robinCore!.sendReadReceipts(body);
   }
@@ -1267,6 +1323,21 @@ class RobinController extends GetxController {
   void handleDeleteMessages(List messageIds) {
     for (String messageId in messageIds) {
       conversationMessages.remove(messageId);
+    }
+  }
+
+  void handleDeleteMessagesFromEvent(List deleteInfo) {
+    bool didDelete = false;
+    for (Map info in deleteInfo) {
+      if (info['complete_delete'] ||
+          info['delete_for'] == currentUser!.robinToken) {
+        didDelete = true;
+        conversationMessages.remove(info['id']);
+      }
+    }
+    if (didDelete) {
+      String conversationId = currentConversation.value.id ?? '';
+      updateLocalConversationMessages(conversationId, {});
     }
   }
 

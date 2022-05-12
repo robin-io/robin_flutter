@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:linkify/linkify.dart';
 import 'package:flutter/material.dart';
+import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -24,6 +25,7 @@ import 'package:robin_flutter/src/components/robin_conversation_media.dart';
 import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
+import 'package:robin_flutter/src/components/robin_media_options.dart';
 
 final RobinController rc = Get.find();
 
@@ -123,7 +125,7 @@ void showCreateConversation(BuildContext context) {
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (_) => RobinCreateConversation(),
+    builder: (_) => const RobinCreateConversation(),
   );
 }
 
@@ -150,7 +152,7 @@ void showSelectGroupParticipants(BuildContext context) {
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (_) => RobinSelectGroupParticipants(),
+    builder: (_) => const RobinSelectGroupParticipants(),
   );
 }
 
@@ -217,7 +219,19 @@ InputDecoration textFieldDecoration({double? radius, int? style}) {
   );
 }
 
-getMedia(BuildContext context, {required String source, bool? isGroup}) async {
+//Let the user choose if they want to either
+//send  a picture or a video
+void showMediaOptions(BuildContext context, String source) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => RobinMediaOptions(source: source),
+  );
+}
+
+getMedia(BuildContext context,
+    {required String source, bool? isGroup, bool? isVideo}) async {
   final ImagePicker picker = ImagePicker();
   if (isGroup != null && isGroup == true) {
     XFile? file = await picker.pickImage(
@@ -231,23 +245,62 @@ getMedia(BuildContext context, {required String source, bool? isGroup}) async {
     }
   } else {
     if (source == 'gallery') {
-      final List<XFile>? images = await picker.pickMultiImage();
-      if (images != null) {
-        rc.file.value = images;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RobinSendImage(),
-          ),
+      if (isVideo != null && isVideo) {
+        final XFile? video =
+            await picker.pickVideo(source: ImageSource.gallery);
+        if (video != null) {
+          rc.file.value = [video];
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RobinSendMedia(isVideo: true,),
+            ),
+          );
+        }
+      } else {
+        final List<XFile>? images = await picker.pickMultiImage(
+          imageQuality: 10,
         );
+        if (images != null) {
+          rc.file.value = images;
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RobinSendMedia(),
+            ),
+          );
+        }
       }
     } else {
-      XFile? file = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 10,
-      );
-      if (file != null) {
-        rc.file.value = [file];
+      if (isVideo != null && isVideo) {
+        final XFile? video = await picker.pickVideo(source: ImageSource.camera);
+        if (video != null) {
+          rc.file.value = [video];
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RobinSendMedia(isVideo: true),
+            ),
+          );
+        }
+      } else {
+        XFile? file = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 10,
+        );
+        if (file != null) {
+          rc.file.value = [file];
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RobinSendMedia(),
+            ),
+          );
+        }
       }
     }
   }
@@ -266,6 +319,9 @@ String fileType({String? path}) {
 
   if (imageFormats.contains(ext)) {
     return 'image';
+  }
+  if (videoFormats.contains(ext)) {
+    return 'video';
   }
   if (audioFormats.contains(ext)) {
     return 'audio';
@@ -491,6 +547,22 @@ String reactionToText(String value) {
   return reaction;
 }
 
+/// To group a series of images together while rendering
+/// They have to be sent by the same person,
+/// be a reply to either the same message or none
+/// be sent in the same day
+/// This function carries out all those checks
+bool similarImageCheck(RobinMessage imageOne, RobinMessage imageTwo) {
+  return imageOne.senderToken == imageTwo.senderToken &&
+      imageOne.replyTo == imageTwo.replyTo &&
+      dayFromDateTime(imageOne.timestamp) ==
+          dayFromDateTime(imageTwo.timestamp);
+}
+
+String dayFromDateTime(DateTime timestamp) {
+  return '${timestamp.year}/${timestamp.day}';
+}
+
 void updateLocalConversations() async {
   String userToken = rc.currentUser!.robinToken;
   String fileName = 'userDetails$userToken.json';
@@ -512,22 +584,26 @@ void updateLocalConversations() async {
 }
 
 void updateLocalConversationMessages(String conversationId, Map message) async {
-  String userToken = rc.currentUser!.robinToken;
-  String fileName = 'conversation$conversationId$userToken.json';
-  var dir = await getTemporaryDirectory();
-  File file = File(dir.path + '/$fileName');
-  List messagesList = [];
-  if (file.existsSync()) {
-    final fileData = file.readAsStringSync();
-    final response = jsonDecode(fileData);
-    messagesList = response['data'];
+  if (conversationId.isNotEmpty) {
+    String userToken = rc.currentUser!.robinToken;
+    String fileName = 'conversation$conversationId$userToken.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/$fileName');
+    List messagesList = [];
+    if (file.existsSync()) {
+      final fileData = file.readAsStringSync();
+      final response = jsonDecode(fileData);
+      messagesList = response['data'];
+    }
+    if (message.isNotEmpty) {
+      messagesList.add(message);
+    }
+    file.writeAsStringSync(
+      jsonEncode({
+        'data': messagesList,
+      }),
+      flush: true,
+      mode: FileMode.write,
+    );
   }
-  messagesList.add(message);
-  file.writeAsStringSync(
-    jsonEncode({
-      'data': messagesList,
-    }),
-    flush: true,
-    mode: FileMode.write,
-  );
 }

@@ -152,6 +152,7 @@ class Conversation extends StatelessWidget {
         } else {
           rc.renderHomeConversations();
         }
+        updateLocalConversations();
         Navigator.push(
           context,
           MaterialPageRoute(

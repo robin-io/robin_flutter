@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/components/measure_size.dart';
 import 'package:robin_flutter/src/components/robin_audio_player.dart';
+import 'package:robin_flutter/src/components/robin_video_thumbnail.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:robin_flutter/src/utils/functions.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
@@ -494,6 +495,84 @@ class _TextBubbleState extends State<TextBubble> {
         ),
       );
     }
+    if (widget.message.isAttachment &&
+        (fileType(
+                  path: widget.message.link,
+                ) ==
+                'image' ||
+            fileType(
+                  path: widget.message.link,
+                ) ==
+                'video')) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(6, 10, 6, 3),
+        constraints: BoxConstraints(
+          maxWidth: widget.maxWidth,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 5,
+              height: 49,
+              color: const Color(0XFF9999BC),
+            ),
+            Container(
+              color: const Color(0XFFF5F7FC),
+              width: imageWidth - 9 < 0 ? null : imageWidth - 9,
+              padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    reply.sentByMe ? 'You' : reply.senderName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0XFF9999BC),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    constraints: imageWidth - 6 < 0
+                        ? null
+                        : reply.isAttachment
+                            ? BoxConstraints(maxWidth: imageWidth - 21)
+                            : BoxConstraints(maxWidth: imageWidth - 21),
+                    child: Text(
+                      !reply.isAttachment
+                          ? reply.text
+                          : fileType(
+                                    path: reply.link,
+                                  ) ==
+                                  'image'
+                              ? "Photo"
+                              : !reply.isAttachment
+                                  ? reply.text
+                                  : fileType(
+                                            path: reply.link,
+                                          ) ==
+                                          'video'
+                                      ? "Video"
+                                      : fileName(reply.link),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0XFF101010),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Container(
       padding: !widget.message.isAttachment
           ? const EdgeInsets.fromLTRB(15, 12, 15, 0)
@@ -545,9 +624,14 @@ class _TextBubbleState extends State<TextBubble> {
                             : fileType(
                                       path: reply.link,
                                     ) ==
-                                    'audio'
-                                ? "Audio"
-                                : fileName(reply.link),
+                                    'video'
+                                ? "Video"
+                                : fileType(
+                                          path: reply.link,
+                                        ) ==
+                                        'audio'
+                                    ? "Audio"
+                                    : fileName(reply.link),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: const TextStyle(
@@ -624,7 +708,7 @@ class _TextBubbleState extends State<TextBubble> {
                         width: 60,
                       ),
                     )
-                  : SizedBox(),
+                  : const SizedBox(),
               widget.firstInSeries
                   ? Padding(
                       padding:
@@ -646,226 +730,1019 @@ class _TextBubbleState extends State<TextBubble> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          fileType(path: widget.message.link) == 'image'
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          (MediaQuery.of(context).size.width *
-                                                  0.75) -
-                                              91,
-                                      maxHeight: 211,
-                                    ),
-                                    child: GestureDetector(
-                                      onTap: !rc.selectMessageView.value
-                                          ? () {
-                                              showGeneralDialog(
-                                                barrierLabel: "Label",
-                                                barrierDismissible: false,
-                                                barrierColor:
-                                                    Colors.transparent,
-                                                transitionDuration:
-                                                    const Duration(
-                                                        milliseconds: 200),
-                                                context: context,
-                                                pageBuilder:
-                                                    (context, anim1, anim2) {
-                                                  return ImagePreview(
-                                                    attachment:
-                                                        widget.message.link,
-                                                    isLocal: !widget.message
-                                                            .delivered! &&
-                                                        widget.message.filePath
-                                                            .isNotEmpty,
-                                                  );
-                                                },
-                                                transitionBuilder: (context,
-                                                    anim1, anim2, child) {
-                                                  return SlideTransition(
-                                                    position: Tween(
-                                                            begin: const Offset(
-                                                                0, 1),
-                                                            end: const Offset(
-                                                                0, 0))
-                                                        .animate(anim1),
-                                                    child: child,
-                                                  );
-                                                },
-                                              );
-                                            }
-                                          : null,
-                                      child: Hero(
-                                        tag: widget.message.link,
-                                        child: MeasureSize(
-                                          onChange: (size) {
-                                            if (mounted) {
-                                              setState(() {
-                                                imageWidth = size.width;
-                                              });
-                                            }
-                                          },
-                                          child: widget.message.delivered!
-                                              ? CachedNetworkImage(
-                                                  imageUrl: widget.message.link,
-                                                  fit: BoxFit.fitWidth,
-                                                  placeholder: (context, url) {
-                                                    if (widget
-                                                            .message.justSent &&
-                                                        widget.message.filePath
-                                                            .isNotEmpty) {
-                                                      return Image.file(
-                                                        File(widget
-                                                            .message.filePath),
-                                                        fit: BoxFit.fitWidth,
-                                                      );
-                                                    }
-                                                    return const Padding(
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              10, 10, 15, 10),
-                                                      child: SizedBox(
-                                                        width: 26,
-                                                        height: 26,
-                                                        child: Center(
-                                                          child: SizedBox(
-                                                            width: 24,
-                                                            height: 24,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              strokeWidth: 2.5,
-                                                              valueColor:
-                                                                  AlwaysStoppedAnimation<
-                                                                      Color>(
-                                                                Color(
-                                                                    0XFF15AE73),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  errorWidget: (context, url,
-                                                          error) =>
-                                                      const Icon(Icons.error),
-                                                )
-                                              : Image.file(
-                                                  File(widget.message.link),
-                                                  fit: BoxFit.fitWidth,
-                                                ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : fileType(path: widget.message.link) == 'audio'
-                                  ? RobinAudioPlayer(url: widget.message.link)
-                                  : Obx(
-                                      () => InkWell(
-                                        onTap: () {
-                                          if (fileDownloaded.value) {
-                                            OpenFile.open(filePath['path']);
-                                          } else {
-                                            if (!fileDownloading.value) {
-                                              downloadFile(widget.message.link);
-                                            }
-                                          }
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(2),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      const Color(0XFFF5F7FC),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        10, 15, 10, 15),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Image.asset(
-                                                      'assets/images/fileTypes/${fileType(path: widget.message.link)}.png',
-                                                      package: 'robin_flutter',
-                                                      fit: BoxFit.fitHeight,
-                                                      width: 34,
-                                                      height: 40,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 7,
-                                                    ),
-                                                    Expanded(
-                                                      flex: 10000,
-                                                      child: Text(
-                                                        fileName(widget
-                                                            .message.link),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 1,
-                                                        style: const TextStyle(
-                                                          fontSize: 15,
-                                                          color:
-                                                              Color(0XFF000000),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const Spacer(
-                                                      flex: 1,
-                                                    ),
-                                                    fileDownloaded.value
-                                                        ? Container()
-                                                        : !widget.message
-                                                                .delivered!
-                                                            ? Container()
-                                                            : SizedBox(
-                                                                width: 20,
-                                                                height: 20,
-                                                                child: fileDownloading
-                                                                        .value
-                                                                    ? const SizedBox(
+                          fileType(path: widget.message.link) == 'image' &&
+                                  widget.message.isGroupOfAttachments
+                              ? MeasureSize(
+                                  onChange: (size) {
+                                    if (mounted) {
+                                      setState(() {
+                                        imageWidth = size.width;
+                                      });
+                                    }
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    ((MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                0.75) -
+                                                            33) /
+                                                        2,
+                                                maxHeight: 104,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: !rc
+                                                        .selectMessageView.value
+                                                    ? () {
+                                                        showGeneralDialog(
+                                                          barrierLabel: "Label",
+                                                          barrierDismissible:
+                                                              false,
+                                                          barrierColor: Colors
+                                                              .transparent,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      200),
+                                                          context: context,
+                                                          pageBuilder: (context,
+                                                              anim1, anim2) {
+                                                            return ImagePreview(
+                                                              attachment: widget
+                                                                  .message
+                                                                  .groupLinks[0],
+                                                              isLocal: !widget
+                                                                          .message
+                                                                          .groupDelivered[
+                                                                      0] &&
+                                                                  widget
+                                                                      .message
+                                                                      .groupFilePaths[
+                                                                          0]
+                                                                      .isNotEmpty,
+                                                            );
+                                                          },
+                                                          transitionBuilder:
+                                                              (context,
+                                                                  anim1,
+                                                                  anim2,
+                                                                  child) {
+                                                            return SlideTransition(
+                                                              position: Tween(
+                                                                      begin:
+                                                                          const Offset(
+                                                                              0,
+                                                                              1),
+                                                                      end: const Offset(
+                                                                          0, 0))
+                                                                  .animate(
+                                                                      anim1),
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                child: Hero(
+                                                  tag: widget
+                                                      .message.groupLinks[0],
+                                                  child:
+                                                      widget.message
+                                                              .groupDelivered[0]
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: widget
+                                                                  .message
+                                                                  .groupLinks[0],
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                              placeholder:
+                                                                  (context,
+                                                                      url) {
+                                                                if (widget.message
+                                                                            .groupJustSent[
+                                                                        0] &&
+                                                                    widget
+                                                                        .message
+                                                                        .groupFilePaths[
+                                                                            0]
+                                                                        .isNotEmpty) {
+                                                                  return Image
+                                                                      .file(
+                                                                    File(widget
+                                                                        .message
+                                                                        .groupFilePaths[0]),
+                                                                    width: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    height: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  );
+                                                                }
+                                                                return const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .fromLTRB(
+                                                                          10,
+                                                                          10,
+                                                                          15,
+                                                                          10),
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: 26,
+                                                                    height: 26,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          SizedBox(
                                                                         width:
-                                                                            20,
+                                                                            24,
                                                                         height:
-                                                                            20,
+                                                                            24,
                                                                         child:
                                                                             CircularProgressIndicator(
                                                                           strokeWidth:
                                                                               2.5,
                                                                           valueColor:
-                                                                              AlwaysStoppedAnimation(
-                                                                            green,
+                                                                              AlwaysStoppedAnimation<Color>(
+                                                                            Color(0XFF15AE73),
                                                                           ),
                                                                         ),
-                                                                      )
-                                                                    : Center(
-                                                                        child: SvgPicture
-                                                                            .asset(
-                                                                          'assets/icons/export.svg',
-                                                                          package:
-                                                                              'robin_flutter',
-                                                                          width:
-                                                                              20,
-                                                                          height:
-                                                                              20,
-                                                                        ),
                                                                       ),
-                                                              ),
-                                                  ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(Icons
+                                                                      .error),
+                                                            )
+                                                          : Image.file(
+                                                              File(widget
+                                                                  .message
+                                                                  .groupLinks[0]),
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                            ),
                                                 ),
                                               ),
-                                            ],
+                                            ),
+                                          ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    ((MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                0.75) -
+                                                            33) /
+                                                        2,
+                                                maxHeight: 104,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: !rc
+                                                        .selectMessageView.value
+                                                    ? () {
+                                                        showGeneralDialog(
+                                                          barrierLabel: "Label",
+                                                          barrierDismissible:
+                                                              false,
+                                                          barrierColor: Colors
+                                                              .transparent,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      200),
+                                                          context: context,
+                                                          pageBuilder: (context,
+                                                              anim1, anim2) {
+                                                            return ImagePreview(
+                                                              attachment: widget
+                                                                  .message
+                                                                  .groupLinks[1],
+                                                              isLocal: !widget
+                                                                          .message
+                                                                          .groupDelivered[
+                                                                      1] &&
+                                                                  widget
+                                                                      .message
+                                                                      .groupFilePaths[
+                                                                          1]
+                                                                      .isNotEmpty,
+                                                            );
+                                                          },
+                                                          transitionBuilder:
+                                                              (context,
+                                                                  anim1,
+                                                                  anim2,
+                                                                  child) {
+                                                            return SlideTransition(
+                                                              position: Tween(
+                                                                      begin:
+                                                                          const Offset(
+                                                                              0,
+                                                                              1),
+                                                                      end: const Offset(
+                                                                          0, 0))
+                                                                  .animate(
+                                                                      anim1),
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                child: Hero(
+                                                  tag: widget
+                                                      .message.groupLinks[1],
+                                                  child:
+                                                      widget.message
+                                                              .groupDelivered[1]
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: widget
+                                                                  .message
+                                                                  .groupLinks[1],
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                              placeholder:
+                                                                  (context,
+                                                                      url) {
+                                                                if (widget.message
+                                                                            .groupJustSent[
+                                                                        1] &&
+                                                                    widget
+                                                                        .message
+                                                                        .groupFilePaths[
+                                                                            1]
+                                                                        .isNotEmpty) {
+                                                                  return Image
+                                                                      .file(
+                                                                    File(widget
+                                                                        .message
+                                                                        .groupFilePaths[1]),
+                                                                    width: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    height: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  );
+                                                                }
+                                                                return const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .fromLTRB(
+                                                                          10,
+                                                                          10,
+                                                                          15,
+                                                                          10),
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: 26,
+                                                                    height: 26,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          SizedBox(
+                                                                        width:
+                                                                            24,
+                                                                        height:
+                                                                            24,
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          strokeWidth:
+                                                                              2.5,
+                                                                          valueColor:
+                                                                              AlwaysStoppedAnimation<Color>(
+                                                                            Color(0XFF15AE73),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(Icons
+                                                                      .error),
+                                                            )
+                                                          : Image.file(
+                                                              File(widget
+                                                                  .message
+                                                                  .groupLinks[1]),
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    ((MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                0.75) -
+                                                            33) /
+                                                        2,
+                                                maxHeight: 104,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: !rc
+                                                        .selectMessageView.value
+                                                    ? () {
+                                                        showGeneralDialog(
+                                                          barrierLabel: "Label",
+                                                          barrierDismissible:
+                                                              false,
+                                                          barrierColor: Colors
+                                                              .transparent,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      200),
+                                                          context: context,
+                                                          pageBuilder: (context,
+                                                              anim1, anim2) {
+                                                            return ImagePreview(
+                                                              attachment: widget
+                                                                  .message
+                                                                  .groupLinks[2],
+                                                              isLocal: !widget
+                                                                          .message
+                                                                          .groupDelivered[
+                                                                      2] &&
+                                                                  widget
+                                                                      .message
+                                                                      .groupFilePaths[
+                                                                          2]
+                                                                      .isNotEmpty,
+                                                            );
+                                                          },
+                                                          transitionBuilder:
+                                                              (context,
+                                                                  anim1,
+                                                                  anim2,
+                                                                  child) {
+                                                            return SlideTransition(
+                                                              position: Tween(
+                                                                      begin:
+                                                                          const Offset(
+                                                                              0,
+                                                                              1),
+                                                                      end: const Offset(
+                                                                          0, 0))
+                                                                  .animate(
+                                                                      anim1),
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                child: Hero(
+                                                  tag: widget
+                                                      .message.groupLinks[2],
+                                                  child:
+                                                      widget.message
+                                                              .groupDelivered[2]
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: widget
+                                                                  .message
+                                                                  .groupLinks[2],
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                              placeholder:
+                                                                  (context,
+                                                                      url) {
+                                                                if (widget.message
+                                                                            .groupJustSent[
+                                                                        2] &&
+                                                                    widget
+                                                                        .message
+                                                                        .groupFilePaths[
+                                                                            2]
+                                                                        .isNotEmpty) {
+                                                                  return Image
+                                                                      .file(
+                                                                    File(widget
+                                                                        .message
+                                                                        .groupFilePaths[2]),
+                                                                    width: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    height: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  );
+                                                                }
+                                                                return const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .fromLTRB(
+                                                                          10,
+                                                                          10,
+                                                                          15,
+                                                                          10),
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: 26,
+                                                                    height: 26,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          SizedBox(
+                                                                        width:
+                                                                            24,
+                                                                        height:
+                                                                            24,
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          strokeWidth:
+                                                                              2.5,
+                                                                          valueColor:
+                                                                              AlwaysStoppedAnimation<Color>(
+                                                                            Color(0XFF15AE73),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(Icons
+                                                                      .error),
+                                                            )
+                                                          : Image.file(
+                                                              File(widget
+                                                                  .message
+                                                                  .groupLinks[2]),
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    ((MediaQuery.of(context)
+                                                                    .size
+                                                                    .width *
+                                                                0.75) -
+                                                            33) /
+                                                        2,
+                                                maxHeight: 104,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: !rc
+                                                        .selectMessageView.value
+                                                    ? () {
+                                                        showGeneralDialog(
+                                                          barrierLabel: "Label",
+                                                          barrierDismissible:
+                                                              false,
+                                                          barrierColor: Colors
+                                                              .transparent,
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      200),
+                                                          context: context,
+                                                          pageBuilder: (context,
+                                                              anim1, anim2) {
+                                                            return ImagePreview(
+                                                              attachment: widget
+                                                                  .message
+                                                                  .groupLinks[3],
+                                                              isLocal: !widget
+                                                                          .message
+                                                                          .groupDelivered[
+                                                                      3] &&
+                                                                  widget
+                                                                      .message
+                                                                      .groupFilePaths[
+                                                                          3]
+                                                                      .isNotEmpty,
+                                                            );
+                                                          },
+                                                          transitionBuilder:
+                                                              (context,
+                                                                  anim1,
+                                                                  anim2,
+                                                                  child) {
+                                                            return SlideTransition(
+                                                              position: Tween(
+                                                                      begin:
+                                                                          const Offset(
+                                                                              0,
+                                                                              1),
+                                                                      end: const Offset(
+                                                                          0, 0))
+                                                                  .animate(
+                                                                      anim1),
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                child: Hero(
+                                                  tag: widget
+                                                      .message.groupLinks[3],
+                                                  child:
+                                                      widget.message
+                                                              .groupDelivered[3]
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: widget
+                                                                  .message
+                                                                  .groupLinks[3],
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                              placeholder:
+                                                                  (context,
+                                                                      url) {
+                                                                if (widget.message
+                                                                            .groupJustSent[
+                                                                        3] &&
+                                                                    widget
+                                                                        .message
+                                                                        .groupFilePaths[
+                                                                            3]
+                                                                        .isNotEmpty) {
+                                                                  return Image
+                                                                      .file(
+                                                                    File(widget
+                                                                        .message
+                                                                        .groupFilePaths[3]),
+                                                                    width: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    height: ((MediaQuery.of(context).size.width *
+                                                                                0.75) -
+                                                                            50) /
+                                                                        2,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  );
+                                                                }
+                                                                return const Padding(
+                                                                  padding: EdgeInsets
+                                                                      .fromLTRB(
+                                                                          10,
+                                                                          10,
+                                                                          15,
+                                                                          10),
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: 26,
+                                                                    height: 26,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          SizedBox(
+                                                                        width:
+                                                                            24,
+                                                                        height:
+                                                                            24,
+                                                                        child:
+                                                                            CircularProgressIndicator(
+                                                                          strokeWidth:
+                                                                              2.5,
+                                                                          valueColor:
+                                                                              AlwaysStoppedAnimation<Color>(
+                                                                            Color(0XFF15AE73),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(Icons
+                                                                      .error),
+                                                            )
+                                                          : Image.file(
+                                                              File(widget
+                                                                  .message
+                                                                  .groupLinks[3]),
+                                                              width: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              height: ((MediaQuery.of(context)
+                                                                              .size
+                                                                              .width *
+                                                                          0.75) -
+                                                                      33) /
+                                                                  2,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : fileType(path: widget.message.link) == 'image'
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          maxWidth: (MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.75) -
+                                              91,
+                                          maxHeight: 211,
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: !rc.selectMessageView.value
+                                              ? () {
+                                                  showGeneralDialog(
+                                                    barrierLabel: "Label",
+                                                    barrierDismissible: false,
+                                                    barrierColor:
+                                                        Colors.transparent,
+                                                    transitionDuration:
+                                                        const Duration(
+                                                            milliseconds: 200),
+                                                    context: context,
+                                                    pageBuilder: (context,
+                                                        anim1, anim2) {
+                                                      return ImagePreview(
+                                                        attachment:
+                                                            widget.message.link,
+                                                        isLocal: !widget.message
+                                                                .delivered! &&
+                                                            widget
+                                                                .message
+                                                                .filePath
+                                                                .isNotEmpty,
+                                                      );
+                                                    },
+                                                    transitionBuilder: (context,
+                                                        anim1, anim2, child) {
+                                                      return SlideTransition(
+                                                        position: Tween(
+                                                                begin:
+                                                                    const Offset(
+                                                                        0, 1),
+                                                                end:
+                                                                    const Offset(
+                                                                        0, 0))
+                                                            .animate(anim1),
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  );
+                                                }
+                                              : null,
+                                          child: Hero(
+                                            tag: widget.message.link,
+                                            child: MeasureSize(
+                                              onChange: (size) {
+                                                if (mounted) {
+                                                  setState(() {
+                                                    imageWidth = size.width;
+                                                  });
+                                                }
+                                              },
+                                              child: widget.message.delivered!
+                                                  ? CachedNetworkImage(
+                                                      imageUrl:
+                                                          widget.message.link,
+                                                      fit: BoxFit.fitWidth,
+                                                      placeholder:
+                                                          (context, url) {
+                                                        if (widget.message
+                                                                .justSent &&
+                                                            widget
+                                                                .message
+                                                                .filePath
+                                                                .isNotEmpty) {
+                                                          return Image.file(
+                                                            File(widget.message
+                                                                .filePath),
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                          );
+                                                        }
+                                                        return const Padding(
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(10, 10,
+                                                                  15, 10),
+                                                          child: SizedBox(
+                                                            width: 26,
+                                                            height: 26,
+                                                            child: Center(
+                                                              child: SizedBox(
+                                                                width: 24,
+                                                                height: 24,
+                                                                child:
+                                                                    CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      2.5,
+                                                                  valueColor:
+                                                                      AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                    Color(
+                                                                        0XFF15AE73),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Icon(
+                                                              Icons.error),
+                                                    )
+                                                  : Image.file(
+                                                      File(widget.message.link),
+                                                      fit: BoxFit.fitWidth,
+                                                    ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    )
+                                  : fileType(path: widget.message.link) ==
+                                          'video'
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    (MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.75) -
+                                                        91,
+                                                maxHeight: 211,
+                                              ),
+                                              child: RobinVideoThumbnail(
+                                                shouldPlay: true,
+                                                isDelivered:
+                                                    widget.message.delivered,
+                                                path: widget.message.link,
+                                              )),
+                                        )
+                                      : fileType(path: widget.message.link) ==
+                                              'audio'
+                                          ? RobinAudioPlayer(
+                                              key: Key(widget.message.id),
+                                              url: widget.message.link,
+                                              conversationId:
+                                                  widget.message.conversationId,
+                                            )
+                                          : Obx(
+                                              () => InkWell(
+                                                onTap: () {
+                                                  if (fileDownloaded.value) {
+                                                    OpenFile.open(
+                                                        filePath['path']);
+                                                  } else {
+                                                    if (!fileDownloading
+                                                        .value) {
+                                                      downloadFile(
+                                                          widget.message.link);
+                                                    }
+                                                  }
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(2),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color(
+                                                              0XFFF5F7FC),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                10, 15, 10, 15),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Image.asset(
+                                                              'assets/images/fileTypes/${fileType(path: widget.message.link)}.png',
+                                                              package:
+                                                                  'robin_flutter',
+                                                              fit: BoxFit
+                                                                  .fitHeight,
+                                                              width: 34,
+                                                              height: 40,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 7,
+                                                            ),
+                                                            Expanded(
+                                                              flex: 10000,
+                                                              child: Text(
+                                                                fileName(widget
+                                                                    .message
+                                                                    .link),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines: 1,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 15,
+                                                                  color: Color(
+                                                                      0XFF000000),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const Spacer(
+                                                              flex: 1,
+                                                            ),
+                                                            fileDownloaded.value
+                                                                ? Container()
+                                                                : !widget
+                                                                        .message
+                                                                        .delivered!
+                                                                    ? Container()
+                                                                    : SizedBox(
+                                                                        width:
+                                                                            20,
+                                                                        height:
+                                                                            20,
+                                                                        child: fileDownloading.value
+                                                                            ? const SizedBox(
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                child: CircularProgressIndicator(
+                                                                                  strokeWidth: 2.5,
+                                                                                  valueColor: AlwaysStoppedAnimation(
+                                                                                    green,
+                                                                                  ),
+                                                                                ),
+                                                                              )
+                                                                            : Center(
+                                                                                child: SvgPicture.asset(
+                                                                                  'assets/icons/export.svg',
+                                                                                  package: 'robin_flutter',
+                                                                                  width: 20,
+                                                                                  height: 20,
+                                                                                ),
+                                                                              ),
+                                                                      ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                           const SizedBox(
                             height: 5,
                           ),
@@ -882,7 +1759,7 @@ class _TextBubbleState extends State<TextBubble> {
                                         maxWidth:
                                             (MediaQuery.of(context).size.width *
                                                     0.75) -
-                                                111,
+                                                50,
                                       ),
                                       child: formatText(widget.message.text,
                                           truncate: widget.loadUrl != null &&
@@ -951,7 +1828,7 @@ class _TextBubbleState extends State<TextBubble> {
                                         maxWidth:
                                             (MediaQuery.of(context).size.width *
                                                     0.75) -
-                                                10,
+                                                50,
                                       ),
                                       child: formatText(widget.message.text,
                                           truncate: widget.loadUrl != null &&
@@ -1037,7 +1914,7 @@ class _TextBubbleState extends State<TextBubble> {
                                         maxWidth:
                                             (MediaQuery.of(context).size.width *
                                                     0.75) -
-                                                111,
+                                                50,
                                       ),
                                       child: formatText(widget.message.text,
                                           truncate: widget.loadUrl != null &&
@@ -1106,7 +1983,7 @@ class _TextBubbleState extends State<TextBubble> {
                                         maxWidth:
                                             (MediaQuery.of(context).size.width *
                                                     0.75) -
-                                                111,
+                                                50,
                                       ),
                                       child: formatText(widget.message.text,
                                           truncate: widget.loadUrl != null &&

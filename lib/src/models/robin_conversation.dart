@@ -7,6 +7,7 @@ class RobinConversation {
   bool? isGroup;
   String? name;
   String? token;
+  String? altToken;
   String? moderatorName;
   String? moderatorToken;
   String? conversationIcon;
@@ -36,10 +37,12 @@ class RobinConversation {
         sentByMe = true;
         name = json['receiver_name'];
         token = json['receiver_token'];
+        altToken = json['sender_token'];
       } else {
         sentByMe = false;
         name = json['sender_name'];
         token = json['sender_token'];
+        altToken = json['receiver_token'];
       }
     }
     lastMessage = RobinLastMessage.fromJson(json['last_message']);

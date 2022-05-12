@@ -53,8 +53,9 @@ class ChatBottomBar extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 InkWell(
-                                  onTap: () {
-                                    getMedia(context, source: 'camera');
+                                  onTap: () async {
+                                    // await getMedia(context, source: 'camera');
+                                    showMediaOptions(context, 'camera');
                                     disposeChatOptions();
                                   },
                                   child: Padding(
@@ -89,7 +90,8 @@ class ChatBottomBar extends StatelessWidget {
                                 ),
                                 InkWell(
                                   onTap: () async {
-                                    await getMedia(context, source: 'gallery');
+                                    // await getMedia(context, source: 'gallery');
+                                    showMediaOptions(context, 'gallery');
                                     disposeChatOptions();
                                   },
                                   child: Padding(
@@ -259,11 +261,18 @@ class ChatBottomBar extends StatelessWidget {
                                                                     .replyMessage!
                                                                     .link,
                                                               ) ==
-                                                              'audio'
-                                                          ? "Audio"
-                                                          : fileName(rc
-                                                              .replyMessage!
-                                                              .link),
+                                                              'video'
+                                                          ? "Video"
+                                                          : fileType(
+                                                                    path: rc
+                                                                        .replyMessage!
+                                                                        .link,
+                                                                  ) ==
+                                                                  'audio'
+                                                              ? "Audio"
+                                                              : fileName(rc
+                                                                  .replyMessage!
+                                                                  .link),
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: const TextStyle(
@@ -356,7 +365,9 @@ class ChatBottomBar extends StatelessWidget {
                             child: Text(
                               fileType() == 'image'
                                   ? 'Photo'
-                                  : rc.file[0].name.toString(),
+                                  : fileType() == 'video'
+                                      ? 'Video'
+                                      : rc.file[0].name.toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: const TextStyle(

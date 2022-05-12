@@ -802,9 +802,11 @@ class RobinConversationInfo extends StatelessWidget {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            rc.currentConversation.value.isGroup!
-                                ? 'Group Info'
-                                : 'Chat Info',
+                            rc.currentConversation.value.isGroup == null
+                                ? "Chat Info"
+                                : rc.currentConversation.value.isGroup!
+                                    ? 'Group Info'
+                                    : 'Chat Info',
                             style: const TextStyle(
                               color: black,
                               fontSize: 15,
