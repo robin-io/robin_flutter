@@ -15,10 +15,7 @@ Before we begin adding instant messaging to our flutter application, there are a
 
 If you have all of the above ready, I guess we can begin.
 
-<aside>
 ℹ️ Want to see the full code for setup? Check [here](https://www.notion.so/FLUTTER-SDK-ROBIN-DOCS-914f03e591ec43398b74851b58a1614c)
-
-</aside>
 
 ## The Robin App
 
@@ -120,7 +117,7 @@ We’re going to use our API key for this demo. You can get yours from the [API 
 After you get your app’s API key, store it as a constant `apiKey` for easy reference across your codebase.
 
 ```dart
-	final String apiKey = '/* YOUR API KEY */';
+final String apiKey = '/* YOUR API KEY */';
 ```
 
 You can now proceed to import the Robin SDK into your file
@@ -182,15 +179,15 @@ List<Map> getAllUsers() async {
 	      "Content-Type": "application/json",
 	    },
 	  );
-	  final String res = response.body;
-	  final int statusCode = response.statusCode;
-	  return _decoder.convert(res)['users'];
+      final String res = response.body;
+      final int statusCode = response.statusCode;
+      return _decoder.convert(res)['users'];
 }
 ```
 
 Your function ultimately should return something similar to the type and structure of the code snippet below. The snippet below is a list of Map objects with the `emailAddress`, `fullName` and `robinToken` fields.
 
-```json
+```javascript
 [
 	{
 		emailAddress: "johndoe@mail.com",
