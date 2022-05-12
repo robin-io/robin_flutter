@@ -2,10 +2,7 @@
 
 Need to add instant messaging to your new or existing Flutter app? In this article, we’ll be exploring how to implement the Robin SDK with a Flutter app. We’ll be using a sample Flutter application for our demo.
 
-<aside>
 💡 Flutter is a framework managed by Google for building natively compiled cross-platform applications. This guide assumes that you understand the concept of building cross-platform applications with Flutter, if you need a quick refresher, feel free to check [here](https://docs.flutter.dev/reference/tutorials)
-
-</aside>
 
 ## Pre-requisites
 
