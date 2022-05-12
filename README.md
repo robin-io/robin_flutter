@@ -217,7 +217,7 @@ For the Robin Flutter Chat SDK, the **user token**, their **display name** and a
 
 For example, if your User model looks something like this:
 
-```dart
+```javascript
 [{
 		"emailAddress": "johndoe@mail.com",
 		"fullName": "John Doe",
@@ -236,7 +236,7 @@ your `robinToken` value would be `["robinDetails", "token"]` since we first need
 
 For example, if your user model looks like this:
 
-```dart
+```javascript
 [{
 		"emailAddress": "johndoe@mail.com",
 		"firstName": "John",
@@ -250,7 +250,7 @@ your `displayName` value would be `[["firstName"],["lastName"],]` for “John Do
 
 Or if your user model looks like this:
 
-```dart
+```javascript
 [
 	{
 		"emailAddress": "johndoe@mail.com",
@@ -282,7 +282,7 @@ RobinKeys keys =  RobinKeys(
   displayName: [
     ['firstName'],['lastName']
   ],
-	separator: " - "
+  separator: " - "
 );
 ```
 
