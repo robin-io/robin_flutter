@@ -25,6 +25,12 @@ The Fully Authenticated Robin App ensures that every form of communication is fu
 
 # Project Setup
 
+## Minimum Supported Platforms
+
+|  | Android | iOS |
+| --- | --- | --- |
+| Support | SDK 19+ | 11.0+ |
+
 ## Create Flutter Application
 
 Navigate to your desired folder and create a new Flutter project, we would call it **robin_test_app**.
