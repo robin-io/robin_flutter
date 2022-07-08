@@ -250,7 +250,7 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
                 rc.createGroupParticipants.value = {};
                 showCreateGroupChat(context);
               },
-              child: Container(
+              child: rc.canCreateGroupChats ? Container(
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
@@ -285,7 +285,7 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
                     ),
                   ],
                 ),
-              ),
+              ) : Container(),
             ),
             rc.isGettingUsersLoading.value
                 ? const UsersLoading()

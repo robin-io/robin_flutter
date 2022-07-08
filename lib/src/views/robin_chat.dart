@@ -81,7 +81,7 @@ class RobinChat extends StatelessWidget {
                                 color: Color(0XFF51545C),
                               ),
                             ),
-                            InkWell(
+                            rc.canForwardMessages ? InkWell(
                               onTap: rc.selectedMessageIds.isEmpty
                                   ? null
                                   : () {
@@ -103,7 +103,7 @@ class RobinChat extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            )
+                            ) : Container()
                           ],
                         ),
                       ),

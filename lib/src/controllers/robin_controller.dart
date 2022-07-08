@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:robin_flutter/src/models/robin_last_message.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/models/robin_message_reaction.dart';
+import 'package:robin_flutter/src/models/robin_options.dart';
 import 'dart:convert';
 import 'package:robin_flutter/src/models/robin_user.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -98,6 +99,14 @@ class RobinController extends GetxController {
 
   RxBool groupChatNameEmpty = true.obs;
 
+  Widget? appIcon;
+
+  bool canCreateGroupChats = true;
+
+  bool canForwardMessages = true;
+
+  bool canDeleteMessages = true;
+
   TextEditingController homeSearchController = TextEditingController();
   TextEditingController archiveSearchController = TextEditingController();
 
@@ -113,12 +122,16 @@ class RobinController extends GetxController {
   AppLifecycleState state = AppLifecycleState.resumed;
 
   void initializeController(String _apiKey, RobinCurrentUser _currentUser,
-      Function _getUsers, RobinKeys _keys) {
+      Function _getUsers, RobinKeys _keys, RobinOptions? options) {
     robinCore = RobinCore();
     apiKey = _apiKey;
     currentUser = _currentUser;
     getUsers = _getUsers;
     keys = _keys;
+    appIcon = options?.appIcon;
+    canDeleteMessages = options?.canDeleteMessages ?? true;
+    canForwardMessages = options?.canForwardMessages ?? true;
+    canCreateGroupChats = options?.canCreateGroupChats ?? true;
     robinConnect();
     robinInitialized = true;
     getConversations(refresh: false);

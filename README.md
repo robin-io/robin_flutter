@@ -190,7 +190,7 @@ Your function ultimately should return something similar to the type and structu
 
 ```javascript
 [
-	{
+  {
 		emailAddress: "johndoe@mail.com",
 		fullName: "John Doe",
 		robinToken: "BLAaUGurGvTewxIGKKrVANhn",

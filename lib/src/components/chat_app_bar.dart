@@ -25,7 +25,9 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       options.add('Leave Group');
     } else {
       options.insert(0, 'Contact Info');
-      options.add('Delete Conversation');
+      if(rc.canDeleteMessages){
+        options.add('Delete Conversation');
+      }
     }
 
     return options;
@@ -427,7 +429,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
         centerTitle: false,
         actions: [
-          rc.selectMessageView.value
+          rc.selectMessageView.value && rc.canDeleteMessages
               ? InkWell(
                   onTap: rc.selectedMessageIds.isEmpty
                       ? null

@@ -216,45 +216,49 @@ class _TextBubbleState extends State<TextBubble> {
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              entry?.remove();
-                              rc.selectMessageView.value = true;
-                              rc.selectedMessageIds.add(widget.message.id);
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 1,
-                                    color: Color(0XFFF4F4F4),
-                                  ),
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Forward",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0XFF101010),
+                          rc.canForwardMessages
+                              ? GestureDetector(
+                                  onTap: () {
+                                    entry?.remove();
+                                    rc.selectMessageView.value = true;
+                                    rc.selectedMessageIds
+                                        .add(widget.message.id);
+                                  },
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          width: 1,
+                                          color: Color(0XFFF4F4F4),
+                                        ),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Forward",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0XFF101010),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        SvgPicture.asset(
+                                          'assets/icons/forward.svg',
+                                          package: 'robin_flutter',
+                                          width: 22,
+                                          height: 22,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  SvgPicture.asset(
-                                    'assets/icons/forward.svg',
-                                    package: 'robin_flutter',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                )
+                              : Container(),
                           !widget.message.isAttachment
                               ? GestureDetector(
                                   onTap: () {
@@ -375,38 +379,42 @@ class _TextBubbleState extends State<TextBubble> {
                           //     ),
                           //   ),
                           // ),
-                          GestureDetector(
-                            onTap: () {
-                              entry?.remove();
-                              rc.selectMessageView.value = true;
-                              rc.selectedMessageIds.add(widget.message.id);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              color: Colors.transparent,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Delete Message",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0XFF101010),
+                          rc.canDeleteMessages
+                              ? GestureDetector(
+                                  onTap: () {
+                                    entry?.remove();
+                                    rc.selectMessageView.value = true;
+                                    rc.selectedMessageIds
+                                        .add(widget.message.id);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Delete Message",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0XFF101010),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        SvgPicture.asset(
+                                          'assets/icons/delete.svg',
+                                          package: 'robin_flutter',
+                                          width: 22,
+                                          height: 22,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  SvgPicture.asset(
-                                    'assets/icons/delete.svg',
-                                    package: 'robin_flutter',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                )
+                              : Container(),
                         ],
                       ),
                     ),

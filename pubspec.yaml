@@ -1,7 +1,7 @@
 name: robin_flutter
 description: Robin Message SDK
 repository: https://github.com/robin-io/robin_flutter
-version: 0.0.1
+version: 0.0.2
 homepage:
 
 environment:

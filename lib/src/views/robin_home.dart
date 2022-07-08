@@ -12,11 +12,14 @@ import 'package:robin_flutter/src/models/robin_keys.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 import 'package:get/get.dart';
 
+import '../models/robin_options.dart';
+
 class Robin extends StatelessWidget with WidgetsBindingObserver {
   final String apiKey;
   final RobinCurrentUser currentUser;
   final Function getUsers;
   final RobinKeys keys;
+  RobinOptions? options;
   final RobinController rc = Get.put(RobinController());
 
   Robin({
@@ -25,8 +28,9 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
     required this.currentUser,
     required this.getUsers,
     required this.keys,
+    this.options,
   }) : super(key: key) {
-    rc.initializeController(apiKey, currentUser, getUsers, keys);
+    rc.initializeController(apiKey, currentUser, getUsers, keys, options);
     WidgetsBinding.instance?.addObserver(this);
   }
 
@@ -54,7 +58,7 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
           appBar: AppBar(
             backgroundColor: white,
             title: !rc.showHomeSearch.value
-                ? const Text(
+                ? rc.appIcon ?? const Text(
                     'Robin Chat',
                     style: TextStyle(
                       color: black,

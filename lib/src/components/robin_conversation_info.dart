@@ -1088,7 +1088,7 @@ class RobinConversationInfo extends StatelessWidget {
                           const SizedBox(
                             height: 15,
                           ),
-                          rc.currentConversation.value.isGroup!
+                          rc.currentConversation.value.isGroup! && rc.canDeleteMessages
                               ? InkWell(
                                   onTap: () {
                                     confirmLeaveGroup(context);
@@ -1118,7 +1118,7 @@ class RobinConversationInfo extends StatelessWidget {
                                     ),
                                   ),
                                 )
-                              : InkWell(
+                              : rc.canDeleteMessages ? InkWell(
                                   onTap: () {
                                     confirmDeleteConversation(context);
                                   },
@@ -1146,7 +1146,7 @@ class RobinConversationInfo extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                ),
+                                ) : Container(),
                           const SizedBox(
                             height: 40,
                           ),
