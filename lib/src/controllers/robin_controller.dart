@@ -1059,9 +1059,8 @@ class RobinController extends GetxController {
       //   }
       // }
 
-
     }
-    if(imageGroup.length >= 4){
+    if (imageGroup.length >= 4) {
       RobinMessage groupRobinMessage = RobinMessage.fromGroup(imageGroup);
       imageGroup = [];
       allMessages = {groupRobinMessage.id: groupRobinMessage, ...allMessages};
@@ -1377,8 +1376,8 @@ class RobinController extends GetxController {
   void getConversationInfo() async {
     try {
       conversationInfoLoading.value = true;
-      currentConversationInfo.value =
-          await robinCore!.getConversationInfo(currentConversation.value.id!);
+      currentConversationInfo.value = await robinCore!.getConversationInfo(
+          currentConversation.value.id!, currentUser!.robinToken);
       List docs = [];
       List photos = [];
       if (currentConversationInfo['documents'] != null) {

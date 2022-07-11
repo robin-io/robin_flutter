@@ -299,8 +299,8 @@ class DataSource {
     });
   }
 
-  getConversationInfo(String conversationId) async {
-    return netUtil.get('$getConversationInfoUrl/$conversationId').then((response) {
+  getConversationInfo(String conversationId, String userToken) async {
+    return netUtil.get('$getConversationInfoUrl/$conversationId/$userToken').then((response) {
       if (response['error']) {
         throw response['msg'];
       } else {

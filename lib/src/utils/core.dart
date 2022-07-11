@@ -272,9 +272,9 @@ class RobinCore {
     }
   }
 
-  getConversationInfo(String conversationId) async {
+  getConversationInfo(String conversationId, String userToken) async {
     try {
-      return await api.getConversationInfo(conversationId);
+      return await api.getConversationInfo(conversationId, userToken);
     } catch (e) {
       throw e.toString();
     }
