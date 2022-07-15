@@ -372,7 +372,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     UserAvatar(
                       name: rc.currentConversation.value.name ?? '',
-                      conversationIcon:
+                      imageUrl:
                           rc.currentConversation.value.conversationIcon,
                       size: 40,
                     ),

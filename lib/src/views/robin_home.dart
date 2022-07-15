@@ -19,7 +19,7 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
   final RobinCurrentUser currentUser;
   final Function getUsers;
   final RobinKeys keys;
-  RobinOptions? options;
+  final RobinOptions? options;
   final RobinController rc = Get.put(RobinController());
 
   Robin({
@@ -58,13 +58,14 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
           appBar: AppBar(
             backgroundColor: white,
             title: !rc.showHomeSearch.value
-                ? rc.appIcon ?? const Text(
-                    'Robin Chat',
-                    style: TextStyle(
-                      color: black,
-                      fontSize: 16,
-                    ),
-                  )
+                ? rc.appIcon ??
+                    const Text(
+                      'Robin Chat',
+                      style: TextStyle(
+                        color: black,
+                        fontSize: 16,
+                      ),
+                    )
                 : TextFormField(
                     style: const TextStyle(
                       color: Color(0XFF535F89),

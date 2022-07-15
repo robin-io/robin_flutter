@@ -1,16 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:robin_flutter/src/utils/functions.dart';
 
 class UserAvatar extends StatelessWidget {
   final String name;
-  final String? conversationIcon;
+  final String? imageUrl;
   final double? size;
 
   const UserAvatar({
     Key? key,
     required this.name,
-    this.conversationIcon,
+    this.imageUrl,
     this.size,
   }) : super(key: key);
 
@@ -28,7 +29,9 @@ class UserAvatar extends StatelessWidget {
         break;
       }
     }
-    return conversationIcon == null || conversationIcon!.isEmpty
+    return imageUrl == null ||
+            imageUrl!.isEmpty ||
+            fileType(path: imageUrl) != 'image'
         ? Container(
             width: size ?? 45,
             height: size ?? 45,
@@ -66,7 +69,7 @@ class UserAvatar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular((size ?? 45) / 2),
               child: CachedNetworkImage(
-                imageUrl: conversationIcon!,
+                imageUrl: imageUrl!,
                 fit: BoxFit.cover,
                 width: size ?? 45,
                 height: size ?? 45,

@@ -828,7 +828,7 @@ class RobinConversationInfo extends StatelessWidget {
                           ),
                           UserAvatar(
                             name: rc.currentConversation.value.name!,
-                            conversationIcon:
+                            imageUrl:
                                 rc.currentConversation.value.conversationIcon,
                             size: 75,
                           ),

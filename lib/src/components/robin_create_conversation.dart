@@ -142,6 +142,7 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
               children: [
                 UserAvatar(
                   name: user.displayName,
+                  imageUrl: user.profilePicture,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -250,42 +251,44 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
                 rc.createGroupParticipants.value = {};
                 showCreateGroupChat(context);
               },
-              child: rc.canCreateGroupChats ? Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      width: 1,
-                      style: BorderStyle.solid,
-                      color: Color(0XFFEFEFEF),
-                    ),
-                  ),
-                ),
-                padding: const EdgeInsets.only(
-                    left: 15, right: 15, top: 12, bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/users.svg',
-                        package: 'robin_flutter',
-                        width: 20,
-                        height: 20,
+              child: rc.canCreateGroupChats
+                  ? Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            width: 1,
+                            style: BorderStyle.solid,
+                            color: Color(0XFFEFEFEF),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Create Group Chat',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: green,
+                      padding: const EdgeInsets.only(
+                          left: 15, right: 15, top: 12, bottom: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: SvgPicture.asset(
+                              'assets/icons/users.svg',
+                              package: 'robin_flutter',
+                              width: 20,
+                              height: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Create Group Chat',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: green,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ) : Container(),
+                    )
+                  : Container(),
             ),
             rc.isGettingUsersLoading.value
                 ? const UsersLoading()

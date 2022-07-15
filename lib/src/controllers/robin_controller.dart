@@ -625,8 +625,10 @@ class RobinController extends GetxController {
       for (Map user in response) {
         String displayName = '';
         String robinToken = '';
+        String profilePicture = '';
         Map displayNameMap = user;
         Map robinTokenMap = user;
+        Map profilePictureMap = user;
         try {
           for (int i = 0; i < keys!.robinToken.length; i++) {
             if (i == keys!.robinToken.length - 1) {
@@ -637,6 +639,17 @@ class RobinController extends GetxController {
           }
         } catch (e) {
           throw "RobinKeys robinToken does not match user model";
+        }
+        try {
+          for (int i = 0; i < keys!.profilePicture!.length; i++) {
+            if (i == keys!.profilePicture!.length - 1) {
+              profilePicture = profilePictureMap[keys!.profilePicture![i]];
+            } else {
+              profilePictureMap = profilePictureMap[keys!.profilePicture![i]];
+            }
+          }
+        } catch (e) {
+          profilePicture = '';
         }
         try {
           String separator = keys!.separator ?? " ";
@@ -656,7 +669,11 @@ class RobinController extends GetxController {
           throw "RobinKeys displayName does not match user model";
         }
         allRobinUsers.add(
-          RobinUser(displayName: displayName, robinToken: robinToken),
+          RobinUser(
+            displayName: displayName,
+            robinToken: robinToken,
+            profilePicture: profilePicture,
+          ),
         );
       }
       allRobinUsers.sort(
@@ -1076,7 +1093,7 @@ class RobinController extends GetxController {
       if (messageController.text.isNotEmpty) {
         Map<String, String> message = {
           'msg': messageController.text.trim(),
-          'timestamp': formatISOTime(DateTime.now()),
+          'timestamp': DateTime.now().toString(),
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
           'local_id': uuid.v4()

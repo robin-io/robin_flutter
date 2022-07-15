@@ -223,7 +223,7 @@ class Conversation extends StatelessWidget {
                 children: [
                   UserAvatar(
                     name: conversation.name!,
-                    conversationIcon: conversation.conversationIcon,
+                    imageUrl: conversation.conversationIcon,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
