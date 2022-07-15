@@ -620,7 +620,7 @@ class RobinController extends GetxController {
       isCreatingConversation.value = false;
       isCreatingGroup.value = false;
       allUsersSearchController.clear();
-      var response = await getUsers!();
+      var response = await getUsers!() ?? [];
       allRobinUsers = [];
       for (Map user in response) {
         String displayName = '';
