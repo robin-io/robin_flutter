@@ -26,10 +26,17 @@ class _MessageReactionsState extends State<MessageReactions> {
 
   bool _expand = false;
 
+  bool _showIcons = false;
+
   _startAnimation() {
     Future.delayed(const Duration(milliseconds: 20), () {
       setState(() {
         _expand = true;
+      });
+      Future.delayed(const Duration(milliseconds: 100), () {
+        setState(() {
+          _showIcons = true;
+        });
       });
     });
   }
@@ -45,6 +52,7 @@ class _MessageReactionsState extends State<MessageReactions> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 195),
       width: _expand ? 218 : 35,
+      height: 46,
       decoration: BoxDecoration(
         color: const Color(0XFFFFFFFF),
         borderRadius: BorderRadius.circular(24),
@@ -72,7 +80,9 @@ class _MessageReactionsState extends State<MessageReactions> {
                     }
                     widget.entry?.remove();
                   },
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 195),
+                    height: _showIcons ? 40 : 15,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: widget.message.myReactions.keys
