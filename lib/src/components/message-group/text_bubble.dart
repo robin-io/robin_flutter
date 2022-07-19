@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/components/measure_size.dart';
+import 'package:robin_flutter/src/components/message-group/message_options.dart';
+import 'package:robin_flutter/src/components/message-group/message_reactions.dart';
 import 'package:robin_flutter/src/components/robin_audio_player.dart';
 import 'package:robin_flutter/src/components/robin_video_thumbnail.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
@@ -50,6 +52,8 @@ class _TextBubbleState extends State<TextBubble> {
 
   double textWidth = 0;
 
+  double _optionsHeight = 35;
+
   void downloadFile(String url) async {
     fileDownloading.value = true;
     try {
@@ -76,16 +80,14 @@ class _TextBubbleState extends State<TextBubble> {
     if (offset.dy - 47 < 50) {
       offset = Offset(offset.dx, 100);
     }
-    if (size.height < 165) {
-      if (offset.dy + size.height + 240 > MediaQuery.of(context).size.height) {
-        offset = Offset(
-            offset.dx,
-            offset.dy -
-                (offset.dy +
-                    size.height +
-                    245 -
-                    MediaQuery.of(context).size.height));
-      }
+    if (offset.dy + size.height + 250 > MediaQuery.of(context).size.height) {
+      offset = Offset(
+          offset.dx,
+          offset.dy -
+              (offset.dy +
+                  size.height +
+                  300 -
+                  MediaQuery.of(context).size.height));
     }
     OverlayEntry? entry;
     entry = OverlayEntry(
@@ -107,52 +109,9 @@ class _TextBubbleState extends State<TextBubble> {
                       : CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        color: const Color(0XFFFFFFFF),
-                      ),
-                      padding: const EdgeInsets.all(1.5),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (String reaction in reactions)
-                            Padding(
-                              padding: const EdgeInsets.all(1.5),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (widget.message.myReactions.keys
-                                      .contains(reaction)) {
-                                    rc.removeReaction(
-                                        widget.message.id,
-                                        widget
-                                            .message.myReactions[reaction]!.id);
-                                  } else {
-                                    rc.sendReaction(
-                                        reaction, widget.message.id);
-                                  }
-                                  entry?.remove();
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: widget.message.myReactions.keys
-                                            .contains(reaction)
-                                        ? robinOrange
-                                        : null,
-                                  ),
-                                  padding: const EdgeInsets.all(9),
-                                  child: Image.asset(
-                                    'assets/images/reactions/${reactionToText(reaction)}.png',
-                                    package: 'robin_flutter',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                    MessageReactions(
+                      message: widget.message,
+                      entry: entry,
                     ),
                     const SizedBox(height: 3),
                     SizedBox(
@@ -166,257 +125,9 @@ class _TextBubbleState extends State<TextBubble> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Container(
-                      width: 195,
-                      decoration: BoxDecoration(
-                        color: const Color(0XFFFFFFFF),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              entry?.remove();
-                              rc.replyView.value = false;
-                              rc.replyMessage = widget.message;
-                              rc.replyView.value = true;
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 1,
-                                    color: Color(0XFFF4F4F4),
-                                  ),
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Reply Message",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0XFF101010),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  SvgPicture.asset(
-                                    'assets/icons/reply.svg',
-                                    package: 'robin_flutter',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          rc.canForwardMessages
-                              ? GestureDetector(
-                                  onTap: () {
-                                    entry?.remove();
-                                    rc.selectMessageView.value = true;
-                                    rc.selectedMessageIds
-                                        .add(widget.message.id);
-                                  },
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 1,
-                                          color: Color(0XFFF4F4F4),
-                                        ),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Forward",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0XFF101010),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        SvgPicture.asset(
-                                          'assets/icons/forward.svg',
-                                          package: 'robin_flutter',
-                                          width: 22,
-                                          height: 22,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                          !widget.message.isAttachment
-                              ? GestureDetector(
-                                  onTap: () {
-                                    entry?.remove();
-                                    Clipboard.setData(
-                                      ClipboardData(
-                                        text: widget.message.text,
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 1,
-                                          color: Color(0XFFF4F4F4),
-                                        ),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: const [
-                                        Text(
-                                          "Copy",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0XFF101010),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Icon(
-                                          Icons.content_copy,
-                                          size: 22,
-                                          color: Color(0XFF51545C),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                          GestureDetector(
-                            onTap: () {
-                              entry?.remove();
-                              rc.selectMessageView.value = true;
-                              rc.selectedMessageIds.add(widget.message.id);
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 1,
-                                    color: Color(0XFFF4F4F4),
-                                  ),
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Select Message",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0XFF101010),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  SvgPicture.asset(
-                                    'assets/icons/select_messages.svg',
-                                    package: 'robin_flutter',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // GestureDetector(
-                          //   onTap: () {
-                          //     entry?.remove();
-                          //   },
-                          //   child: Container(
-                          //     decoration: const BoxDecoration(
-                          //       border: Border(
-                          //         bottom: BorderSide(
-                          //           width: 1,
-                          //           color: Color(0XFFF4F4F4),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     padding: const EdgeInsets.all(12),
-                          //     child: Row(
-                          //       crossAxisAlignment: CrossAxisAlignment.center,
-                          //       mainAxisAlignment:
-                          //           MainAxisAlignment.spaceBetween,
-                          //       children: [
-                          //         const Text(
-                          //           "Star Message",
-                          //           style: TextStyle(
-                          //             fontSize: 14,
-                          //             color: Color(0XFF101010),
-                          //           ),
-                          //         ),
-                          //         const SizedBox(width: 10),
-                          //         SvgPicture.asset(
-                          //           'assets/icons/star.svg',
-                          //           package: 'robin_flutter',
-                          //           width: 22,
-                          //           height: 22,
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                          rc.canDeleteMessages
-                              ? GestureDetector(
-                                  onTap: () {
-                                    entry?.remove();
-                                    rc.selectMessageView.value = true;
-                                    rc.selectedMessageIds
-                                        .add(widget.message.id);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Delete Message",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color(0XFF101010),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        SvgPicture.asset(
-                                          'assets/icons/delete.svg',
-                                          package: 'robin_flutter',
-                                          width: 22,
-                                          height: 22,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                        ],
-                      ),
+                    MessageOptions(
+                      message: widget.message,
+                      entry: entry,
                     ),
                   ],
                 ),
@@ -427,6 +138,9 @@ class _TextBubbleState extends State<TextBubble> {
       },
     );
     overlay.insert(entry);
+    setState(() {
+      // _optionsHeight = null;
+    });
   }
 
   Widget renderReply() {

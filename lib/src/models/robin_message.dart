@@ -61,7 +61,6 @@ class RobinMessage {
     myReactions = reactions[1];
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);
-    print(json['created_at']);
     timestamp = json['created_at'] == null
         ? DateTime.now()
         : DateTime.parse(json['created_at']).toLocal();
