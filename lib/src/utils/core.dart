@@ -11,8 +11,9 @@ class RobinCore {
   static final DataSource api = DataSource();
   final RobinController rc = Get.find();
 
-  WebSocketChannel connect(String? apiKey, String? userToken) {
-    String url = '$wsUrl/$apiKey/$userToken';
+  WebSocketChannel connect(String? apiKey, String? userToken, String? fcmKey) {
+    String url = '$wsUrl/$apiKey/$userToken?fcm_key=$fcmKey';
+    print('$wsUrl/$apiKey/$userToken?fcm_key=$fcmKey');
     return WebSocketChannel.connect(
       Uri.parse(url),
     );
@@ -119,6 +120,14 @@ class RobinCore {
       } else {
         return response['data']['user_token'];
       }
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  sendDeviceToken(String userToken, String deviceToken) async {
+    try {
+      return await api.sendDeviceToken(userToken, deviceToken);
     } catch (e) {
       throw e.toString();
     }

@@ -3,6 +3,7 @@ import 'package:robin_flutter/src/utils/constants.dart';
 const createUserTokenUrl = '$httpUrl/chat/user_token';
 const getDetailsFromUserTokenUrl = '$httpUrl/chat/user_token';
 
+const sendDeviceTokenUrl = '$httpUrl/chat/user_token/device_token';
 const createConversationUrl = '$httpUrl/conversation';
 const getConversationMessagesUrl = '$httpUrl/conversation/messages';
 const createGroupChatUrl = '$httpUrl/chat/conversation/group';

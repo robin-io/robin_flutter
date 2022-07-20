@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const String baseUrl = "api.robinapp.co";
+const String devBaseUrl = "robbin-api.herokuapp.com";
 const String httpUrl = "https://$baseUrl/api/v1";
 const String wsUrl = 'wss://$baseUrl/ws';
 

@@ -5,12 +5,17 @@ class RobinOptions{
   bool? canCreateGroupChats;
   bool? canForwardMessages;
   bool? canDeleteMessages;
+  String? deviceToken;
+  String? fcmKey;
+
 
   RobinOptions({
     this.appIcon,
     this.canCreateGroupChats,
     this.canForwardMessages,
     this.canDeleteMessages,
+    this.deviceToken,
+    this.fcmKey,
   });
 
 }

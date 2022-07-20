@@ -32,7 +32,7 @@ class DataSource {
     String fileName = 'userDetails$userToken.json';
     var dir = await getTemporaryDirectory();
     File file = File(dir.path + '/$fileName');
-    if(refresh == false && file.existsSync()){
+    if (refresh == false && file.existsSync()) {
       final fileData = file.readAsStringSync();
       final response = jsonDecode(fileData);
       return response['data']['conversations'];
@@ -42,14 +42,27 @@ class DataSource {
         .then((response) {
       if (response['error']) {
         throw response['msg'];
-      }
-      else {
-        file.writeAsStringSync(jsonEncode(response), flush: true, mode: FileMode.write);
+      } else {
+        file.writeAsStringSync(jsonEncode(response),
+            flush: true, mode: FileMode.write);
         return response['data']['conversations'];
       }
     }).catchError((e) {
-      print('Tope');
       print(e);
+      errorHandler.handleError(e);
+    });
+  }
+
+  sendDeviceToken(String userToken, String deviceToken) async {
+    return netUtil.post(
+        '$sendDeviceTokenUrl/$userToken', {"device_token": deviceToken}).then((response) {
+          print(response);
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
       errorHandler.handleError(e);
     });
   }
@@ -66,24 +79,24 @@ class DataSource {
     });
   }
 
-  getConversationMessages(String conversationId, String userToken, {bool? refresh}) async {
+  getConversationMessages(String conversationId, String userToken,
+      {bool? refresh}) async {
     String fileName = 'conversation$conversationId$userToken.json';
     var dir = await getTemporaryDirectory();
     File file = File(dir.path + '/$fileName');
-    if(refresh == false && file.existsSync()){
+    if (refresh == false && file.existsSync()) {
       final fileData = file.readAsStringSync();
       final response = jsonDecode(fileData);
       return response['data'];
-    }
-    else {
+    } else {
       return netUtil
           .get('$getConversationMessagesUrl/$conversationId/$userToken')
           .then((response) {
         if (response['error']) {
           throw response['msg'];
-        }
-        else {
-          file.writeAsStringSync(jsonEncode(response), flush: true, mode: FileMode.write);
+        } else {
+          file.writeAsStringSync(jsonEncode(response),
+              flush: true, mode: FileMode.write);
           return response['data'];
         }
       }).catchError((e) {
@@ -300,7 +313,9 @@ class DataSource {
   }
 
   getConversationInfo(String conversationId, String userToken) async {
-    return netUtil.get('$getConversationInfoUrl/$conversationId/$userToken').then((response) {
+    return netUtil
+        .get('$getConversationInfoUrl/$conversationId/$userToken')
+        .then((response) {
       if (response['error']) {
         throw response['msg'];
       } else {
@@ -334,5 +349,4 @@ class DataSource {
       errorHandler.handleError(e);
     });
   }
-
 }

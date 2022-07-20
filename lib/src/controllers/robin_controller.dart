@@ -107,6 +107,10 @@ class RobinController extends GetxController {
 
   bool canDeleteMessages = true;
 
+  String fcmKey = '';
+
+  String deviceToken = '';
+
   TextEditingController homeSearchController = TextEditingController();
   TextEditingController archiveSearchController = TextEditingController();
 
@@ -132,6 +136,8 @@ class RobinController extends GetxController {
     canDeleteMessages = options?.canDeleteMessages ?? true;
     canForwardMessages = options?.canForwardMessages ?? true;
     canCreateGroupChats = options?.canCreateGroupChats ?? true;
+    fcmKey = options?.fcmKey ?? "";
+    deviceToken = options?.deviceToken ?? "";
     robinConnect();
     robinInitialized = true;
     getConversations(refresh: false);
@@ -177,7 +183,11 @@ class RobinController extends GetxController {
   }
 
   Future robinConnect() async {
-    robinConnection = robinCore!.connect(apiKey, currentUser!.robinToken);
+    if(deviceToken.isNotEmpty){
+      print('sending device token');
+      robinCore!.sendDeviceToken(currentUser!.robinToken, deviceToken);
+    }
+    robinConnection = robinCore!.connect(apiKey, currentUser!.robinToken, fcmKey);
     Future.delayed(const Duration(milliseconds: 750), () {
       robinCore!.subscribe();
     });
@@ -1395,19 +1405,6 @@ class RobinController extends GetxController {
       conversationInfoLoading.value = true;
       currentConversationInfo.value = await robinCore!.getConversationInfo(
           currentConversation.value.id!, currentUser!.robinToken);
-      List docs = [];
-      List photos = [];
-      if (currentConversationInfo['documents'] != null) {
-        for (Map file in currentConversationInfo['documents']) {
-          if (fileType(path: file['content']['attachment']) == 'image') {
-            photos.add(file);
-          } else {
-            docs.add(file);
-          }
-        }
-      }
-      currentConversationInfo['documents'] = docs;
-      currentConversationInfo['photos'] = photos;
       conversationInfoLoading.value = false;
     } catch (e) {
       conversationInfoLoading.value = false;
