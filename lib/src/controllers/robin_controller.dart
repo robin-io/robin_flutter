@@ -1395,19 +1395,6 @@ class RobinController extends GetxController {
       conversationInfoLoading.value = true;
       currentConversationInfo.value = await robinCore!.getConversationInfo(
           currentConversation.value.id!, currentUser!.robinToken);
-      List docs = [];
-      List photos = [];
-      if (currentConversationInfo['documents'] != null) {
-        for (Map file in currentConversationInfo['documents']) {
-          if (fileType(path: file['content']['attachment']) == 'image') {
-            photos.add(file);
-          } else {
-            docs.add(file);
-          }
-        }
-      }
-      currentConversationInfo['documents'] = docs;
-      currentConversationInfo['photos'] = photos;
       conversationInfoLoading.value = false;
     } catch (e) {
       conversationInfoLoading.value = false;

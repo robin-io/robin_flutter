@@ -94,6 +94,27 @@ class UserAvatar extends StatelessWidget {
                     ),
                   );
                 },
+                errorWidget: (context, url, error) {
+                  return Container(
+                    width: size ?? 45,
+                    height: size ?? 45,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0XFFF4F6F8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        initials,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: (size ?? 45) / 2.81,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0XFF9999BC),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           );
