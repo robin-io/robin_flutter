@@ -1383,6 +1383,7 @@ class RobinController extends GetxController {
   void sendReaction(String reaction, String messageId) async {
     Map<String, dynamic> body = {
       'user_token': currentUser!.robinToken,
+      'sender_name': currentUser!.fullName,
       'reaction': reaction,
       'conversation_id': currentConversation.value.id,
       'timestamp': getTimestamp(),

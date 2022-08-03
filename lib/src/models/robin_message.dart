@@ -100,4 +100,13 @@ class RobinMessage {
     }
 
   }
+
+  toJson(){
+    return {
+      "id": id,
+      "text": text,
+      "isAttachment": isAttachment,
+      "timestamp": timestamp.toString(),
+    };
+  }
 }

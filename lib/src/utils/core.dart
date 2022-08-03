@@ -13,7 +13,6 @@ class RobinCore {
 
   WebSocketChannel connect(String? apiKey, String? userToken, String? fcmKey) {
     String url = '$wsUrl/$apiKey/$userToken?fcm_key=$fcmKey';
-    print('$wsUrl/$apiKey/$userToken?fcm_key=$fcmKey');
     return WebSocketChannel.connect(
       Uri.parse(url),
     );

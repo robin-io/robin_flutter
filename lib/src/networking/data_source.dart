@@ -276,6 +276,8 @@ class DataSource {
 
   sendReaction(Map<String, dynamic> body, String messageId) async {
     return netUtil.post('$sendReactionUrl/$messageId', body).then((response) {
+      print('$sendReactionUrl/$messageId');
+      print(body);
       if (response['error']) {
         throw response['msg'];
       } else {
