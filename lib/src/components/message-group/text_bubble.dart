@@ -52,8 +52,6 @@ class _TextBubbleState extends State<TextBubble> {
 
   double textWidth = 0;
 
-  double _optionsHeight = 35;
-
   void downloadFile(String url) async {
     fileDownloading.value = true;
     try {
@@ -80,14 +78,16 @@ class _TextBubbleState extends State<TextBubble> {
     if (offset.dy - 47 < 50) {
       offset = Offset(offset.dx, 100);
     }
-    if (offset.dy + size.height + 250 > MediaQuery.of(context).size.height) {
-      offset = Offset(
-          offset.dx,
-          offset.dy -
-              (offset.dy +
-                  size.height +
-                  300 -
-                  MediaQuery.of(context).size.height));
+    if (size.height < 250) {
+      if (offset.dy + size.height + 250 > MediaQuery.of(context).size.height) {
+        offset = Offset(
+            offset.dx,
+            offset.dy -
+                (offset.dy +
+                    size.height +
+                    300 -
+                    MediaQuery.of(context).size.height));
+      }
     }
     OverlayEntry? entry;
     entry = OverlayEntry(
