@@ -2,8 +2,8 @@ import 'package:robin_flutter/src/utils/constants.dart';
 
 const createUserTokenUrl = '$httpUrl/chat/user_token';
 const getDetailsFromUserTokenUrl = '$httpUrl/chat/user_token';
-
 const sendDeviceTokenUrl = '$httpUrl/chat/user_token/device_token';
+
 const createConversationUrl = '$httpUrl/conversation';
 const getConversationMessagesUrl = '$httpUrl/conversation/messages';
 const createGroupChatUrl = '$httpUrl/chat/conversation/group';
@@ -16,8 +16,9 @@ const unarchiveConversationUrl = '$httpUrl/conversation/unarchive';
 const forwardMessagesUrl = '$httpUrl/conversation/forward_messages';
 const deleteConversationUrl = '$httpUrl/conversation/delete';
 const getConversationInfoUrl = '$httpUrl/conversation/details';
-const starMessage = '$httpUrl/chat/message';
 
+const starMessage = '$httpUrl/chat/message';
+const onlineStatusUrl = '$httpUrl/chat/user_token/get_online_status';
 const deleteMessagesUrl = '$httpUrl/chat/message';
 const sendAttachmentUrl = '$httpUrl/chat/message/send/attachment';
 const replyWithAttachmentUrl = '$httpUrl/chat/message/send/attachment/reply';

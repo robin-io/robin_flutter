@@ -13,10 +13,21 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   ChatAppBar({Key? key})
       : preferredSize = const Size.fromHeight(kToolbarHeight),
-        super(key: key);
+        super(key: key) {
+    getOnlineStatus();
+  }
 
   @override
   final Size preferredSize;
+
+  RxString onlineStatus = ''.obs;
+
+  void getOnlineStatus() async {
+    if(!(rc.currentConversation.value.isGroup ?? false)){
+      Map response = await rc.getOnlineStatus([rc.currentConversation.value.token]);
+      onlineStatus.value = response[rc.currentConversation.value.token] ?? '';
+    }
+  }
 
   List<String> chatOptions() {
     List<String> options = ['Select Messages'];
@@ -25,11 +36,10 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       options.add('Leave Group');
     } else {
       options.insert(0, 'Contact Info');
-      if(rc.canDeleteMessages){
+      if (rc.canDeleteMessages) {
         options.add('Delete Conversation');
       }
     }
-
     return options;
   }
 
@@ -372,8 +382,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     UserAvatar(
                       name: rc.currentConversation.value.name ?? '',
-                      imageUrl:
-                          rc.currentConversation.value.conversationIcon,
+                      imageUrl: rc.currentConversation.value.conversationIcon,
                       size: 40,
                     ),
                     const SizedBox(width: 10),
@@ -420,7 +429,29 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                     ],
                                   ),
                                 )
-                              : Container(),
+                              : onlineStatus.value.length > 2
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 3.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Obx(
+                                              () => Text(
+                                                onlineStatus.value,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Color(0XFF7A7A7A),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
                         ],
                       ),
                     ),

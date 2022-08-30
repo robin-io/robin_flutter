@@ -175,6 +175,20 @@ class DataSource {
     });
   }
 
+  getOnlineStatus(Map<String, dynamic> body) async{
+    return netUtil
+        .post(onlineStatusUrl, body)
+        .then((response) {
+      if (response['error']) {
+        throw response['msg'];
+      } else {
+        return response['data'];
+      }
+    }).catchError((e) {
+      errorHandler.handleError(e);
+    });
+  }
+
   archiveConversation(String conversationId, String userToken) async {
     return netUtil
         .put('$archiveConversationUrl/$conversationId/$userToken')

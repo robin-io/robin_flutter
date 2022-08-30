@@ -198,6 +198,14 @@ class RobinCore {
     }
   }
 
+  getOnlineStatus(Map<String, dynamic> body) async{
+    try {
+      return await api.getOnlineStatus(body);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   archiveConversation(String conversationId, String userToken) async {
     try {
       return await api.archiveConversation(conversationId, userToken);

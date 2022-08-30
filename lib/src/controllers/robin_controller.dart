@@ -183,11 +183,12 @@ class RobinController extends GetxController {
   }
 
   Future robinConnect() async {
-    if(deviceToken.isNotEmpty){
+    if (deviceToken.isNotEmpty) {
       print('sending device token');
       robinCore!.sendDeviceToken(currentUser!.robinToken, deviceToken);
     }
-    robinConnection = robinCore!.connect(apiKey, currentUser!.robinToken, fcmKey);
+    robinConnection =
+        robinCore!.connect(apiKey, currentUser!.robinToken, fcmKey);
     Future.delayed(const Duration(milliseconds: 750), () {
       robinCore!.subscribe();
     });
@@ -1237,6 +1238,18 @@ class RobinController extends GetxController {
       isFileSending.value = false;
       showErrorMessage(e.toString());
       rethrow;
+    }
+  }
+
+  Future<Map> getOnlineStatus(List userTokens) async {
+    try {
+      Map<String, dynamic> body = {
+        'user_tokens': userTokens
+      };
+      Map onlineStatus = await robinCore!.getOnlineStatus(body);
+      return onlineStatus;
+    } catch (e) {
+      return {};
     }
   }
 
