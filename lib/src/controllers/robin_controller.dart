@@ -1135,7 +1135,7 @@ class RobinController extends GetxController {
       if (messageController.text.isNotEmpty) {
         Map<String, String> message = {
           'msg': messageController.text.trim(),
-          'timestamp': formatISOTime(DateTime.now()),
+          'timestamp': DateTime.now().toString(),
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
           'local_id': uuid.v4()
@@ -1174,7 +1174,7 @@ class RobinController extends GetxController {
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
           'msg': messageController.text.trim(),
-          'timestamp': formatISOTime(DateTime.now()),
+          'timestamp': DateTime.now().toString(),
           'file_path': path,
           'local_id': uuid.v4(),
         };
@@ -1208,7 +1208,7 @@ class RobinController extends GetxController {
             'msg': captions != null && index < captions.length
                 ? captions[index]
                 : messageController.text.trim(),
-            'timestamp': formatISOTime(DateTime.now()),
+            'timestamp': DateTime.now().toString(),
             'file_path': currentFile.path,
             'local_id': uuid.v4(),
           };
