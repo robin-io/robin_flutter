@@ -424,17 +424,17 @@ class _MessageGroupState extends State<MessageGroup> {
                     }
                   }
                 : null,
-            onLongPress: !rc.selectMessageView.value
-                ? () {
-                    HapticFeedback.selectionClick();
-                    rc.selectMessageView.value = true;
-                    if (widget.message.isGroupOfAttachments) {
-                      rc.selectedMessageIds.value = widget.message.groupIds;
-                    } else {
-                      rc.selectedMessageIds.value = [widget.message.id];
-                    }
-                  }
-                : null,
+            // onLongPress: !rc.selectMessageView.value
+            //     ? () {
+            //         HapticFeedback.selectionClick();
+            //         rc.selectMessageView.value = true;
+            //         if (widget.message.isGroupOfAttachments) {
+            //           rc.selectedMessageIds.value = widget.message.groupIds;
+            //         } else {
+            //           rc.selectedMessageIds.value = [widget.message.id];
+            //         }
+            //       }
+            //     : null,
             child: Column(
               children: [
                 // message.replyTo != null ? renderReply() : Container(),

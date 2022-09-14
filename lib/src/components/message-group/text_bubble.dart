@@ -379,6 +379,12 @@ class _TextBubbleState extends State<TextBubble> {
               showOverLay(context);
             }
           : null,
+      onLongPress: widget.loadUrl == null || widget.loadUrl!
+          ? () {
+              HapticFeedback.selectionClick();
+              showOverLay(context);
+            }
+          : null,
       child: MeasureSize(
         onChange: (size) {
           if (mounted) {

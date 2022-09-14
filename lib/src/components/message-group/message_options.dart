@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 
+import '../../utils/functions.dart';
+
 class MessageOptions extends StatefulWidget {
   final RobinMessage message;
   final OverlayEntry? entry;
@@ -37,8 +39,8 @@ class _MessageOptionsState extends State<MessageOptions> {
     double items = 2;
     if(rc.canForwardMessages) items += 1;
     if(!widget.message.isAttachment) items += 1;
-    if(rc.canDeleteMessages) items += 1;
-    return items * 47;
+    if(rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)) items += 1;
+    return items * 46.5;
   }
 
   @override
@@ -258,7 +260,7 @@ class _MessageOptionsState extends State<MessageOptions> {
             //     ),
             //   ),
             // ),
-            rc.canDeleteMessages
+            rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)
                 ? GestureDetector(
                     onTap: () {
                       widget.entry?.remove();

@@ -97,6 +97,28 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
                 ? null
                 : [
                     IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color:
+                              rc.filterUnreadConversations.value ? green : null,
+                        ),
+                        child: Icon(
+                          Icons.filter_list,
+                          size: 24,
+                          color: rc.filterUnreadConversations.value
+                              ? white
+                              : green,
+                        ),
+                      ),
+                      onPressed: () {
+                        rc.filterUnreadConversations.value = !rc.filterUnreadConversations.value;
+                        rc.renderHomeConversations();
+                      },
+                    ),
+                    IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/search_black.svg',
                         semanticsLabel: 'edit',

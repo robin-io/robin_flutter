@@ -7,6 +7,7 @@ class RobinOptions{
   bool? canDeleteMessages;
   String? deviceToken;
   String? fcmKey;
+  int? maxDeleteDuration;
 
 
   RobinOptions({
@@ -16,6 +17,7 @@ class RobinOptions{
     this.canDeleteMessages,
     this.deviceToken,
     this.fcmKey,
+    this.maxDeleteDuration,
   });
 
 }

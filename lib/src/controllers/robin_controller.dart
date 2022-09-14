@@ -34,6 +34,8 @@ class RobinController extends GetxController {
 
   RxBool isConversationsLoading = true.obs;
 
+  RxBool filterUnreadConversations = false.obs;
+
   RxBool isGettingUsersLoading = false.obs;
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
@@ -101,6 +103,10 @@ class RobinController extends GetxController {
 
   Widget? appIcon;
 
+  bool maxDelete = false;
+
+  int maxDeleteDuration = 60;
+
   bool canCreateGroupChats = true;
 
   bool canForwardMessages = true;
@@ -138,6 +144,10 @@ class RobinController extends GetxController {
     canCreateGroupChats = options?.canCreateGroupChats ?? true;
     fcmKey = options?.fcmKey ?? "";
     deviceToken = options?.deviceToken ?? "";
+    if (options?.maxDeleteDuration != null) {
+      maxDelete = true;
+      maxDeleteDuration = options?.maxDeleteDuration ?? 60;
+    }
     robinConnect();
     robinInitialized = true;
     getConversations(refresh: false);
@@ -541,17 +551,34 @@ class RobinController extends GetxController {
 
   void renderHomeConversations() {
     List<RobinConversation> conversations = [];
-    conversations = allConversations.values
-        .where((RobinConversation conversation) =>
-            !conversation.archived! &&
-            (conversation.name!
-                    .toLowerCase()
-                    .contains(homeSearchController.text.toLowerCase()) ||
-                (!conversation.lastMessage!.isAttachment &&
-                    conversation.lastMessage!.text
-                        .toLowerCase()
-                        .contains(homeSearchController.text.toLowerCase()))))
-        .toList();
+    if(filterUnreadConversations.value){
+      conversations = allConversations.values
+          .where((RobinConversation conversation) =>
+          conversation.unreadMessages! > 0 && conversation.lastMessage!.text.isNotEmpty &&
+          !conversation.archived! &&
+          (conversation.name!
+              .toLowerCase()
+              .contains(homeSearchController.text.toLowerCase()) ||
+              (!conversation.lastMessage!.isAttachment &&
+                  conversation.lastMessage!.text
+                      .toLowerCase()
+                      .contains(homeSearchController.text.toLowerCase()))))
+          .toList();
+    }else{
+      conversations = allConversations.values
+          .where((RobinConversation conversation) =>
+      conversation.lastMessage!.text.isNotEmpty &&
+          !conversation.archived! &&
+          (conversation.name!
+              .toLowerCase()
+              .contains(homeSearchController.text.toLowerCase()) ||
+              (!conversation.lastMessage!.isAttachment &&
+                  conversation.lastMessage!.text
+                      .toLowerCase()
+                      .contains(homeSearchController.text.toLowerCase()))))
+          .toList();
+    }
+
     homeConversations.value = conversations;
   }
 
@@ -1243,9 +1270,7 @@ class RobinController extends GetxController {
 
   Future<Map> getOnlineStatus(List userTokens) async {
     try {
-      Map<String, dynamic> body = {
-        'user_tokens': userTokens
-      };
+      Map<String, dynamic> body = {'user_tokens': userTokens};
       Map onlineStatus = await robinCore!.getOnlineStatus(body);
       return onlineStatus;
     } catch (e) {

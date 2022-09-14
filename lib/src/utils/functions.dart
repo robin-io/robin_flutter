@@ -342,6 +342,14 @@ String formatISOTime(DateTime date) {
   }
 }
 
+bool checkDeleteDuration(DateTime timestamp){
+  if (rc.maxDelete){
+    DateTime now = DateTime.now();
+    return now.difference(timestamp).inSeconds < rc.maxDeleteDuration;
+  }
+  return true;
+}
+
 String fileName(String path) {
   return path.split('/').last;
 }
