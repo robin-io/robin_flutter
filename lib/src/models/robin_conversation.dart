@@ -23,7 +23,7 @@ class RobinConversation {
   RobinConversation.fromJson(Map json) {
     final RobinController rc = Get.find();
     id = json['_id'];
-    isGroup = json['is_group'];
+    isGroup = json['is_group'] ?? false;
     participants = json['participants'] ?? [];
     if (isGroup!) {
       name = json['name'];
@@ -58,7 +58,7 @@ class RobinConversation {
 
   RobinConversation.empty() {
     id = null;
-    isGroup = null;
+    isGroup = false;
     participants = null;
     name = null;
     moderatorToken = null;
