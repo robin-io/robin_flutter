@@ -4,6 +4,8 @@ import 'package:robin_flutter/src/utils/constants.dart';
 import 'dart:io';
 import 'package:video_player/video_player.dart';
 
+import '../views/robin_video_preview.dart';
+
 class RobinVideoThumbnail extends StatefulWidget {
   const RobinVideoThumbnail({
     Key? key,
@@ -55,23 +57,32 @@ class _RobinVideoThumbnailState extends State<RobinVideoThumbnail> {
                 autoPlay: true,
                 looping: false,
               );
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Material(
-                    color: const Color(0XFF04051F),
-                    child: SafeArea(
-                      child: Chewie(
-                        controller: chewieController,
-                      ),
+              await showGeneralDialog(
+                barrierLabel: "Label",
+                barrierDismissible: false,
+                barrierColor: Colors.transparent,
+                transitionDuration: const Duration(milliseconds: 200),
+                context: context,
+                pageBuilder: (context, anim1, anim2) {
+                  return VideoPreview(
+                    path: widget.path,
+                    controller: _controller,
+                    child: Chewie(
+                      controller: chewieController,
                     ),
-                  ),
-                ),
+                  );
+                },
+                transitionBuilder: (context, anim1, anim2, child) {
+                  return SlideTransition(
+                    position: Tween(
+                            begin: const Offset(0, 1), end: const Offset(0, 0))
+                        .animate(anim1),
+                    child: child,
+                  );
+                },
               );
               _controller.pause();
-              _controller.seekTo(
-                const Duration(milliseconds: 0),
-              );
+              _controller.seekTo(const Duration(milliseconds: 0));
             },
             child: AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
@@ -110,5 +121,11 @@ class _RobinVideoThumbnailState extends State<RobinVideoThumbnail> {
               ),
             ),
           );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

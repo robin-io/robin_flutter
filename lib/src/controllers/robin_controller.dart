@@ -194,7 +194,6 @@ class RobinController extends GetxController {
 
   Future robinConnect() async {
     if (deviceToken.isNotEmpty) {
-      print('sending device token');
       robinCore!.sendDeviceToken(currentUser!.robinToken, deviceToken);
     }
     robinConnection =
@@ -212,7 +211,6 @@ class RobinController extends GetxController {
     robinStream = robinConnection?.stream.listen(
       (data) {
         data = json.decode(data);
-        print(data);
         if (data['is_event'] == null || data['is_event'] == false) {
           handleNewMessage(data);
         } else {

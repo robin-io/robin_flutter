@@ -293,7 +293,7 @@ class _RobinSendMediaState extends State<RobinSendMedia> {
                                       decoration: textFieldDecoration(
                                               radius: 24, style: 1)
                                           .copyWith(
-                                        hintText: 'Add Photo Caption...',
+                                        hintText: 'Add A Caption...',
                                         fillColor: const Color(0XFFFBFBFB),
                                       ),
                                     ),

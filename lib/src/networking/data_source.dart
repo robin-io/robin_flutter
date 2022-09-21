@@ -48,7 +48,6 @@ class DataSource {
         return response['data']['conversations'];
       }
     }).catchError((e) {
-      print(e);
       errorHandler.handleError(e);
     });
   }
@@ -56,7 +55,6 @@ class DataSource {
   sendDeviceToken(String userToken, String deviceToken) async {
     return netUtil.post(
         '$sendDeviceTokenUrl/$userToken', {"device_token": deviceToken}).then((response) {
-          print(response);
       if (response['error']) {
         throw response['msg'];
       } else {
@@ -290,8 +288,6 @@ class DataSource {
 
   sendReaction(Map<String, dynamic> body, String messageId) async {
     return netUtil.post('$sendReactionUrl/$messageId', body).then((response) {
-      print('$sendReactionUrl/$messageId');
-      print(body);
       if (response['error']) {
         throw response['msg'];
       } else {

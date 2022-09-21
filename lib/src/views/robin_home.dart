@@ -97,21 +97,14 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
                 ? null
                 : [
                     IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color:
-                              rc.filterUnreadConversations.value ? green : null,
-                        ),
-                        child: Icon(
-                          Icons.filter_list,
-                          size: 24,
-                          color: rc.filterUnreadConversations.value
-                              ? white
-                              : green,
-                        ),
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.filter_list,
+                        size: 24,
+                        color: rc.filterUnreadConversations.value
+                            ? green
+                            : const Color.fromRGBO(8, 21, 58, 1),
                       ),
                       onPressed: () {
                         rc.filterUnreadConversations.value = !rc.filterUnreadConversations.value;
@@ -119,6 +112,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
                       },
                     ),
                     IconButton(
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
                       icon: SvgPicture.asset(
                         'assets/icons/search_black.svg',
                         semanticsLabel: 'edit',

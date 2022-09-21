@@ -1218,8 +1218,8 @@ class _TextBubbleState extends State<TextBubble> {
                                         ),
                                         child: GestureDetector(
                                           onTap: !rc.selectMessageView.value
-                                              ? () {
-                                                  showGeneralDialog(
+                                              ? () async{
+                                                  await showGeneralDialog(
                                                     barrierLabel: "Label",
                                                     barrierDismissible: false,
                                                     barrierColor:
@@ -1335,21 +1335,20 @@ class _TextBubbleState extends State<TextBubble> {
                                           borderRadius:
                                               BorderRadius.circular(8),
                                           child: Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    (MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.75) -
-                                                        91,
-                                                maxHeight: 211,
-                                              ),
-                                              child: RobinVideoThumbnail(
-                                                shouldPlay: true,
-                                                isDelivered:
-                                                    widget.message.delivered,
-                                                path: widget.message.link,
-                                              )),
+                                            constraints: BoxConstraints(
+                                              maxWidth: (MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.75) -
+                                                  91,
+                                            ),
+                                            child: RobinVideoThumbnail(
+                                              shouldPlay: true,
+                                              isDelivered:
+                                                  widget.message.delivered,
+                                              path: widget.message.link,
+                                            ),
+                                          ),
                                         )
                                       : fileType(path: widget.message.link) ==
                                               'audio'
