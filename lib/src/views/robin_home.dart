@@ -21,7 +21,6 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
   final RobinKeys keys;
   final RobinOptions? options;
   final String? conversationId;
-  final BuildContext context;
   final RobinController rc = Get.put(RobinController());
 
   Robin({
@@ -32,9 +31,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
     required this.keys,
     this.options,
     this.conversationId,
-    required this.context,
   }) : super(key: key) {
-    rc.initializeController(apiKey, currentUser, getUsers, keys, options, conversationId, context);
+    rc.initializeController(apiKey, currentUser, getUsers, keys, options, conversationId);
     WidgetsBinding.instance?.addObserver(this);
   }
 
@@ -51,6 +49,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    rc.appContext ??= context;
+
     return GestureDetector(
       onTap: () {
         rc.homeSearchController.clear();

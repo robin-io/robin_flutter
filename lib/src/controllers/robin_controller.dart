@@ -74,6 +74,8 @@ class RobinController extends GetxController {
 
   RobinMessage? replyMessage;
 
+  BuildContext? appContext;
+
   Map userColors = {};
 
   Map messageDrafts = {};
@@ -143,8 +145,7 @@ class RobinController extends GetxController {
       Function _getUsers,
       RobinKeys _keys,
       RobinOptions? options,
-      String? conversationId,
-      BuildContext context) {
+      String? conversationId) {
     robinCore = RobinCore();
     apiKey = _apiKey;
     currentUser = _currentUser;
@@ -164,28 +165,10 @@ class RobinController extends GetxController {
     getMessageQueue();
     robinConnect();
     robinInitialized = true;
-    getConversations(refresh: false);
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (conversationId != null) {
-        for (RobinConversation conversation
-            in rc.allConversations.values.toList()) {
-          if (conversationId == conversation.id) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RobinChat(
-                  conversation: conversation,
-                ),
-              ),
-            ).then((value) {
-              Future.delayed(const Duration(milliseconds: 100), () {
-                rc.currentConversation.value = RobinConversation.empty();
-              });
-            });
-          }
-        }
-      }
-    });
+    getConversations(
+      conversationId: conversationId,
+      refresh: false,
+    );
     homeSearchController.addListener(() {
       renderHomeConversations();
     });
@@ -214,6 +197,7 @@ class RobinController extends GetxController {
     groupChatNameController.addListener(() {
       groupChatNameEmpty.value = groupChatNameController.text.isEmpty;
     });
+    getConversations(refresh: true);
   }
 
   void appResume() {
@@ -577,13 +561,35 @@ class RobinController extends GetxController {
     );
   }
 
-  void getConversations({bool? refresh}) async {
+  void getConversations({
+    bool? refresh,
+    String? conversationId,
+  }) async {
     try {
       if (allConversations.isEmpty) isConversationsLoading.value = true;
       var conversations = await robinCore!
           .getDetailsFromUserToken(currentUser!.robinToken, refresh: refresh);
       allConversations =
           conversations == null ? {} : toRobinConversations(conversations);
+      if (conversationId != null && appContext != null) {
+        for (RobinConversation conversation
+            in rc.allConversations.values.toList()) {
+          if (conversationId == conversation.id) {
+            Navigator.push(
+              appContext!,
+              MaterialPageRoute(
+                builder: (context) => RobinChat(
+                  conversation: conversation,
+                ),
+              ),
+            ).then((value) {
+              Future.delayed(const Duration(milliseconds: 100), () {
+                rc.currentConversation.value = RobinConversation.empty();
+              });
+            });
+          }
+        }
+      }
       renderHomeConversations();
       renderArchivedConversations();
       isConversationsLoading.value = false;
