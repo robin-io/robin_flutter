@@ -60,11 +60,19 @@ bool switchToCol(double width, int chars) {
 }
 
 String formatDate(String dateString) {
-  String formattedDate = Jiffy(dateString).fromNow();
-  formattedDate = formattedDate.replaceAll(' ago', '');
-  formattedDate = formattedDate.replaceAll('a few seconds', 'few seconds');
-  formattedDate = formattedDate.replaceAll("a day", 'Yesterday');
-  return formattedDate;
+  DateTime date = DateTime.parse(dateString);
+  DateTime now = DateTime.now();
+  final yesterday = DateTime(now.year, now.month, now.day - 1);
+  if(DateFormat('dd/MM/YYYY').format(yesterday) == DateFormat('dd/MM/YYYY').format(date)){
+    return 'Yesterday';
+  }
+  else if(now.difference(date).inDays < 1){
+    return DateFormat('hh:mm').format(date);
+  }
+  else if(now.difference(date).inDays < 6){
+    return DateFormat('EEEE').format(date);
+  }
+  return DateFormat('dd/MM/yy').format(date);
 }
 
 String formatTimestamp(DateTime dateTime) {
