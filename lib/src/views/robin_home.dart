@@ -20,6 +20,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
   final Function getUsers;
   final RobinKeys keys;
   final RobinOptions? options;
+  final String? conversationId;
+  final BuildContext context;
   final RobinController rc = Get.put(RobinController());
 
   Robin({
@@ -29,8 +31,10 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
     required this.getUsers,
     required this.keys,
     this.options,
+    this.conversationId,
+    required this.context,
   }) : super(key: key) {
-    rc.initializeController(apiKey, currentUser, getUsers, keys, options);
+    rc.initializeController(apiKey, currentUser, getUsers, keys, options, conversationId, context);
     WidgetsBinding.instance?.addObserver(this);
   }
 

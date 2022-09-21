@@ -20,6 +20,8 @@ import 'package:robin_flutter/src/models/robin_conversation.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../views/robin_chat.dart';
+
 class RobinController extends GetxController {
   RobinCore? robinCore;
   WebSocketChannel? robinConnection;
@@ -135,8 +137,14 @@ class RobinController extends GetxController {
 
   AppLifecycleState state = AppLifecycleState.resumed;
 
-  void initializeController(String _apiKey, RobinCurrentUser _currentUser,
-      Function _getUsers, RobinKeys _keys, RobinOptions? options) {
+  void initializeController(
+      String _apiKey,
+      RobinCurrentUser _currentUser,
+      Function _getUsers,
+      RobinKeys _keys,
+      RobinOptions? options,
+      String? conversationId,
+      BuildContext context) {
     robinCore = RobinCore();
     apiKey = _apiKey;
     currentUser = _currentUser;
@@ -157,6 +165,27 @@ class RobinController extends GetxController {
     robinConnect();
     robinInitialized = true;
     getConversations(refresh: false);
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (conversationId != null) {
+        for (RobinConversation conversation
+            in rc.allConversations.values.toList()) {
+          if (conversationId == conversation.id) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RobinChat(
+                  conversation: conversation,
+                ),
+              ),
+            ).then((value) {
+              Future.delayed(const Duration(milliseconds: 100), () {
+                rc.currentConversation.value = RobinConversation.empty();
+              });
+            });
+          }
+        }
+      }
+    });
     homeSearchController.addListener(() {
       renderHomeConversations();
     });
@@ -185,7 +214,6 @@ class RobinController extends GetxController {
     groupChatNameController.addListener(() {
       groupChatNameEmpty.value = groupChatNameController.text.isEmpty;
     });
-    getConversations(refresh: true);
   }
 
   void appResume() {
@@ -211,7 +239,6 @@ class RobinController extends GetxController {
     Future.delayed(const Duration(milliseconds: 1350), () {
       sendAllInMessageQueue();
     });
-
   }
 
   connectionStartListen() async {
@@ -336,10 +363,10 @@ class RobinController extends GetxController {
 
   handleNewMessage(Map data, {bool? isDelivered}) {
     bool delivered = isDelivered ?? true;
-    if(data['sender_token'] == currentUser!.robinToken){
-      if(delivered){
+    if (data['sender_token'] == currentUser!.robinToken) {
+      if (delivered) {
         removeFromMessageQueue(data['content']['local_id']);
-      }else{
+      } else {
         addToMessageQueue(data['_id'], data);
       }
     }
