@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import 'functions.dart';
+
 class RobinCore {
   static final DataSource api = DataSource();
   final RobinController rc = Get.find();
@@ -38,8 +40,9 @@ class RobinCore {
     }
   }
 
-  void sendTextMessage(Map message, String conversationId, String senderToken,
-      String senderName) async {
+  void sendTextMessage(
+      Map message, String conversationId, String senderToken, String senderName,
+      {int retries = 0}) async {
     Map body = {
       'type': 1,
       'channel': robinChannel,
@@ -54,10 +57,15 @@ class RobinCore {
       }
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
-      rc.robinConnect();
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        sendTextMessage(message, conversationId, senderToken, senderName);
-      });
+      if (retries >= 2) {
+        messageFailed(message['_id']);
+      } else {
+        rc.robinConnect();
+        await Future.delayed(const Duration(milliseconds: 1000), () {
+          sendTextMessage(message, conversationId, senderToken, senderName,
+              retries: retries + 1);
+        });
+      }
     }
   }
 
@@ -198,7 +206,7 @@ class RobinCore {
     }
   }
 
-  getOnlineStatus(Map<String, dynamic> body) async{
+  getOnlineStatus(Map<String, dynamic> body) async {
     try {
       return await api.getOnlineStatus(body);
     } catch (e) {

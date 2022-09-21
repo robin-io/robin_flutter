@@ -40,6 +40,8 @@ class RobinController extends GetxController {
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
 
+  bool wsConnected = false;
+
   RxBool selectMessageView = false.obs;
   RxBool replyView = false.obs;
   RxBool chatViewLoading = false.obs;
@@ -89,6 +91,8 @@ class RobinController extends GetxController {
   List<RobinUser> allRobinUsers = [];
 
   RxList allUsers = [].obs;
+
+  Map<String, Map> messageQueue = {};
 
   RxList homeConversations = [].obs;
   RxList archivedConversations = [].obs;
@@ -148,6 +152,8 @@ class RobinController extends GetxController {
       maxDelete = true;
       maxDeleteDuration = options?.maxDeleteDuration ?? 60;
     }
+    // clearQueue();
+    getMessageQueue();
     robinConnect();
     robinInitialized = true;
     getConversations(refresh: false);
@@ -183,12 +189,10 @@ class RobinController extends GetxController {
   }
 
   void appResume() {
-    if (robinConnection!.closeCode != null) {
-      robinConnect();
-      getConversations(refresh: false);
-      if (currentConversation.value.id != null) {
-        getMessages(refresh: true);
-      }
+    robinConnect();
+    getConversations(refresh: false);
+    if (currentConversation.value.id != null) {
+      getMessages(refresh: true);
     }
   }
 
@@ -201,13 +205,18 @@ class RobinController extends GetxController {
     Future.delayed(const Duration(milliseconds: 750), () {
       robinCore!.subscribe();
     });
-    Future.delayed(const Duration(milliseconds: 750), () {
+    Future.delayed(const Duration(milliseconds: 950), () {
       connectionStartListen();
     });
+    Future.delayed(const Duration(milliseconds: 1350), () {
+      sendAllInMessageQueue();
+    });
+
   }
 
   connectionStartListen() async {
     await robinStream?.cancel();
+    wsConnected = true;
     robinStream = robinConnection?.stream.listen(
       (data) {
         data = json.decode(data);
@@ -315,20 +324,31 @@ class RobinController extends GetxController {
         }
       },
       onError: (error) {
-        // print(error.toString());
-        // Future.delayed(const Duration(seconds: 1), () {
-        //   print('on error');
-        //   robinConnect();
-        // });
+        wsConnected = false;
+        appResume();
+      },
+      onDone: () {
+        wsConnected = false;
+        appResume();
       },
     );
   }
 
   handleNewMessage(Map data, {bool? isDelivered}) {
     bool delivered = isDelivered ?? true;
+    if(data['sender_token'] == currentUser!.robinToken){
+      if(delivered){
+        removeFromMessageQueue(data['content']['local_id']);
+      }else{
+        addToMessageQueue(data['_id'], data);
+      }
+    }
     RobinMessage robinMessage = RobinMessage.fromJson(data, delivered);
+
     if (allConversations[robinMessage.conversationId] != null) {
-      if (delivered) {
+      if (robinMessage.isAttachment && delivered) {
+        updateLocalConversationMessages(robinMessage.conversationId, data);
+      } else if (!robinMessage.isAttachment) {
         updateLocalConversationMessages(robinMessage.conversationId, data);
       }
       if (!robinMessage.sentByMe && state == AppLifecycleState.resumed) {
@@ -549,31 +569,32 @@ class RobinController extends GetxController {
 
   void renderHomeConversations() {
     List<RobinConversation> conversations = [];
-    if(filterUnreadConversations.value){
+    if (filterUnreadConversations.value) {
       conversations = allConversations.values
           .where((RobinConversation conversation) =>
-          conversation.unreadMessages! > 0 && conversation.lastMessage!.text.isNotEmpty &&
-          !conversation.archived! &&
-          (conversation.name!
-              .toLowerCase()
-              .contains(homeSearchController.text.toLowerCase()) ||
-              (!conversation.lastMessage!.isAttachment &&
-                  conversation.lastMessage!.text
+              conversation.unreadMessages! > 0 &&
+              conversation.lastMessage!.text.isNotEmpty &&
+              !conversation.archived! &&
+              (conversation.name!
                       .toLowerCase()
-                      .contains(homeSearchController.text.toLowerCase()))))
+                      .contains(homeSearchController.text.toLowerCase()) ||
+                  (!conversation.lastMessage!.isAttachment &&
+                      conversation.lastMessage!.text
+                          .toLowerCase()
+                          .contains(homeSearchController.text.toLowerCase()))))
           .toList();
-    }else{
+    } else {
       conversations = allConversations.values
           .where((RobinConversation conversation) =>
-      conversation.lastMessage!.text.isNotEmpty &&
-          !conversation.archived! &&
-          (conversation.name!
-              .toLowerCase()
-              .contains(homeSearchController.text.toLowerCase()) ||
-              (!conversation.lastMessage!.isAttachment &&
-                  conversation.lastMessage!.text
+              conversation.lastMessage!.text.isNotEmpty &&
+              !conversation.archived! &&
+              (conversation.name!
                       .toLowerCase()
-                      .contains(homeSearchController.text.toLowerCase()))))
+                      .contains(homeSearchController.text.toLowerCase()) ||
+                  (!conversation.lastMessage!.isAttachment &&
+                      conversation.lastMessage!.text
+                          .toLowerCase()
+                          .contains(homeSearchController.text.toLowerCase()))))
           .toList();
     }
 
@@ -805,6 +826,7 @@ class RobinController extends GetxController {
       body['sender_name'] = currentUser!.fullName;
       body['sender_token'] = currentUser!.robinToken;
       var response = await robinCore!.createConversation(body);
+      print(response);
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
         conversation.id!: conversation,
@@ -1259,7 +1281,6 @@ class RobinController extends GetxController {
         isFileSending.value = false;
       }
     } catch (e) {
-      print(e);
       isFileSending.value = false;
       showErrorMessage(e.toString());
       rethrow;
@@ -1286,7 +1307,7 @@ class RobinController extends GetxController {
           'sender_token': currentUser!.robinToken,
           'sender_name': currentUser!.fullName,
           'msg': messageController.text.trim(),
-          'timestamp': formatISOTime(DateTime.now()),
+          'timestamp': DateTime.now().toString(),
           'file_path': path,
           'local_id': uuid.v4()
         };
@@ -1324,7 +1345,7 @@ class RobinController extends GetxController {
             'msg': captions != null && index < captions.length
                 ? captions[index]
                 : messageController.text.trim(),
-            'timestamp': formatISOTime(DateTime.now()),
+            'timestamp': DateTime.now().toString(),
             'file_path': currentFile.path,
             'local_id': uuid.v4()
           };

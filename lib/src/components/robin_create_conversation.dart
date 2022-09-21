@@ -117,7 +117,9 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
                             RobinConversation.empty();
                       });
                     });
-                  } finally {
+                  } catch(e){
+                    print(e);
+                  }finally {
                     // widget was disposed before conversation was created
                   }
                 }

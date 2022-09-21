@@ -7,6 +7,7 @@ import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 
 import '../../utils/functions.dart';
+import 'package:http/http.dart' as http;
 
 class MessageOptions extends StatefulWidget {
   final RobinMessage message;
@@ -35,11 +36,14 @@ class _MessageOptionsState extends State<MessageOptions> {
     });
   }
 
-  double _fullHeight(){
+  double _fullHeight() {
     double items = 2;
-    if(rc.canForwardMessages) items += 1;
-    if(!widget.message.isAttachment) items += 1;
-    if(rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)) items += 1;
+    if (rc.canForwardMessages) items += 1;
+    if (!widget.message.isAttachment) items += 1;
+    if (!widget.message.delivered) items += 1;
+    if (rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)) {
+      items += 1;
+    }
     return items * 46.5;
   }
 
@@ -47,6 +51,76 @@ class _MessageOptionsState extends State<MessageOptions> {
   void initState() {
     _startAnimation();
     super.initState();
+  }
+
+  void retryMessage() async{
+    rc.appResume();
+    Map message = widget.message.toJson();
+
+    if (widget.message.isAttachment) {
+      rc.isFileSending.value = true;
+      if (widget.message.replyTo != null) {
+        Map<String, String> body = {
+          'conversation_id': message['conversation_id'],
+          'message_id': message['reply_to'],
+          'sender_token': message['sender_token'],
+          'sender_name': message['sender_token'],
+          'msg': message['content']['msg'],
+          'timestamp': DateTime.now().toString(),
+          'file_path': message['content']['attachment'],
+          'local_id': message['_id'],
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            message['content']['attachment'],
+          ),
+        ];
+        rc.robinCore!.replyWithAttachment(body, files);
+        rc.isFileSending.value = false;
+      } else {
+        Map<String, String> body = {
+          'conversation_id': message['conversation_id'],
+          'sender_token': message['sender_token'],
+          'sender_name': message['sender_token'],
+          'msg': message['content']['msg'],
+          'timestamp': DateTime.now().toString(),
+          'file_path': message['content']['attachment'],
+          'local_id': message['_id'],
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            message['content']['attachment'],
+          ),
+        ];
+        rc.robinCore!.sendAttachment(body, files);
+        rc.isFileSending.value = false;
+      }
+    } else {
+      Map<String, String> msg = {
+        'msg': message['content']['msg'],
+        'timestamp': DateTime.now().toString(),
+        'sender_token': message['sender_token'],
+        'sender_name': message['sender_token'],
+        'local_id': message['_id']
+      };
+      if (widget.message.replyTo != null) {
+        rc.robinCore!.replyToMessage(
+            msg,
+            message['conversation_id'],
+            rc.currentUser!.robinToken,
+            rc.currentUser!.fullName,
+            message['reply_to']);
+      } else {
+        rc.robinCore!.sendTextMessage(
+          msg,
+          message['conversation_id'],
+          rc.currentUser!.robinToken,
+          rc.currentUser!.fullName,
+        );
+      }
+    }
   }
 
   @override
@@ -260,7 +334,46 @@ class _MessageOptionsState extends State<MessageOptions> {
             //     ),
             //   ),
             // ),
-            rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)
+            !widget.message.delivered
+                ? GestureDetector(
+                    onTap: () {
+                      widget.entry?.remove();
+                      retryMessage();
+                    },
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            width: 1,
+                            color: Color(0XFFF4F4F4),
+                          ),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Retry",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0XFF101010),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(
+                            Icons.refresh,
+                            size: 22,
+                            color: Color(0XFF51545C),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Container(),
+            rc.canDeleteMessages &&
+                    checkDeleteDuration(widget.message.timestamp)
                 ? GestureDetector(
                     onTap: () {
                       widget.entry?.remove();

@@ -15,8 +15,9 @@ class RobinMessage {
   late final String senderToken;
   late final String? replyTo;
   late final String? localId;
-  late bool? delivered;
+  late bool delivered;
   bool isRead = false;
+  bool failed = false;
   late bool justSent;
   late String filePath;
   late final bool isForwarded;
@@ -24,6 +25,8 @@ class RobinMessage {
   late final Map<String, RobinMessageReaction> myReactions;
   late final bool deletedForMe;
   late final DateTime timestamp;
+
+  late List jsonReactions;
 
   List<String> groupIds = [];
   List<String> groupLinks = [];
@@ -53,15 +56,15 @@ class RobinMessage {
     localId = json['content']['local_id'] ?? '';
     filePath = json['content']['file_path'] ?? '';
     justSent = rc.conversationMessages.keys.contains(localId);
-    delivered = isDelivered;
+    delivered = json['delivered'] ?? isDelivered;
     isRead = json['is_read'] ?? false;
+    jsonReactions = json['reactions'] ?? [];
     List<Map<String, RobinMessageReaction>> reactions =
         getReactions(json['reactions'] ?? []);
     allReactions = reactions[0];
     myReactions = reactions[1];
     List deletedFor = json['deleted_for'] ?? [];
     deletedForMe = deletedFor.contains(rc.currentUser?.robinToken);
-    print(json['created_at']);
     timestamp = json['created_at'] == null
         ? DateTime.now()
         : DateTime.parse(json['created_at']).toLocal();
@@ -82,6 +85,7 @@ class RobinMessage {
     filePath = '';
     justSent = group[0].justSent;
     delivered = true;
+    jsonReactions = [];
     isRead = group[0].isRead;
     allReactions = group[0].allReactions;
     myReactions = group[0].myReactions;
@@ -93,7 +97,7 @@ class RobinMessage {
       groupLinks.add(message.link);
       groupJustSent.add(message.justSent);
       groupIsReads.add(message.isRead);
-      groupDelivered.add(message.delivered ?? true);
+      groupDelivered.add(message.delivered);
       groupFilePaths.add(message.filePath);
       groupAllReactions.add(message.allReactions);
       groupMyReactions.add(message.myReactions);
@@ -105,9 +109,24 @@ class RobinMessage {
   toJson(){
     return {
       "id": id,
-      "text": text,
-      "isAttachment": isAttachment,
-      "timestamp": timestamp.toString(),
+      "is_forwarded": isForwarded,
+      'conversation_id': conversationId,
+      "sender_name": senderName,
+      "sender_token": senderToken,
+      "reply_to": replyTo,
+      "delivered": delivered,
+      "is_read": isRead,
+      "reactions": jsonReactions,
+      "deleted_for": [],
+      "created_at": timestamp.toString(),
+      'content': {
+        "msg": text,
+        "isAttachment": isAttachment,
+        'local_id': localId,
+        "sender_name": senderName,
+        "sender_token": senderToken,
+        'attachment': link,
+      }
     };
   }
 }

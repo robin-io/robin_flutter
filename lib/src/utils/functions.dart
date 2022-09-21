@@ -6,6 +6,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:linkify/linkify.dart';
 import 'package:flutter/material.dart';
 import 'package:robin_flutter/src/models/robin_message.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -26,6 +27,7 @@ import 'package:robin_flutter/src/components/robin_encryption_details.dart';
 import 'package:robin_flutter/src/components/robin_group_participant_options.dart';
 import 'package:robin_flutter/src/components/robin_select_group_participants.dart';
 import 'package:robin_flutter/src/components/robin_media_options.dart';
+import 'package:http/http.dart' as http;
 
 final RobinController rc = Get.find();
 
@@ -51,6 +53,115 @@ void showSuccessMessage(String message) {
   );
 }
 
+void getMessageQueue() async {
+  final prefs = await SharedPreferences.getInstance();
+  String encodedMessageQueue = prefs.getString('messageQueue') ?? '{}';
+  Map<String, Map> messageQueue =
+      Map<String, Map>.from(json.decode(encodedMessageQueue));
+  rc.messageQueue = messageQueue;
+  print(messageQueue);
+}
+
+void addToMessageQueue(String messageId, Map message) {
+  rc.messageQueue = {...rc.messageQueue, messageId: message};
+  updateMessageQueue();
+}
+
+void removeFromMessageQueue(String messageId) {
+  rc.messageQueue.remove(messageId);
+  updateMessageQueue();
+}
+
+void updateMessageQueue() async {
+  final prefs = await SharedPreferences.getInstance();
+  String encodedMessageQueue = json.encode(rc.messageQueue);
+  await prefs.setString('messageQueue', encodedMessageQueue);
+  print(encodedMessageQueue);
+}
+
+void clearQueue() async{
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('messageQueue', '{}');
+}
+
+void messageFailed(Map message) {
+  if (rc.currentConversation.value.id != null &&
+      rc.currentConversation.value.id == message['conversation_id']) {
+    if (rc.conversationMessages[message['_id']] != null) {
+      rc.conversationMessages[message['_id']].failed = true;
+    }
+  }
+}
+
+void sendAllInMessageQueue() async{
+  for (var message in rc.messageQueue.values) {
+    if (message['content']['is_attachment']) {
+      rc.isFileSending.value = true;
+      if (message['reply_to'] != null) {
+        Map<String, String> body = {
+          'conversation_id': message['conversation_id'],
+          'message_id': message['reply_to'],
+          'sender_token': message['sender_token'],
+          'sender_name': message['sender_token'],
+          'msg': message['content']['msg'],
+          'timestamp': DateTime.now().toString(),
+          'file_path': message['content']['attachment'],
+          'local_id': message['_id'],
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            message['content']['attachment'],
+          ),
+        ];
+        rc.robinCore!.replyWithAttachment(body, files);
+        rc.isFileSending.value = false;
+      } else {
+        Map<String, String> body = {
+          'conversation_id': message['conversation_id'],
+          'sender_token': message['sender_token'],
+          'sender_name': message['sender_token'],
+          'msg': message['content']['msg'],
+          'timestamp': DateTime.now().toString(),
+          'file_path': message['content']['attachment'],
+          'local_id': message['_id'],
+        };
+        List<http.MultipartFile> files = [
+          await http.MultipartFile.fromPath(
+            'file',
+            message['content']['attachment'],
+          ),
+        ];
+        rc.robinCore!.sendAttachment(body, files);
+        rc.isFileSending.value = false;
+      }
+    } else {
+      Map<String, String> msg = {
+        'msg': message['content']['msg'],
+        'timestamp': DateTime.now().toString(),
+        'sender_token': message['sender_token'],
+        'sender_name': message['sender_token'],
+        'local_id': message['_id']
+      };
+      if (message['reply_to'] != null) {
+        rc.robinCore!.replyToMessage(
+            msg,
+            message['conversation_id'],
+            rc.currentUser!.robinToken,
+            rc.currentUser!.fullName,
+            message['reply_to']);
+      } else {
+        rc.robinCore!.sendTextMessage(
+          msg,
+          message['conversation_id'],
+          rc.currentUser!.robinToken,
+          rc.currentUser!.fullName,
+        );
+      }
+    }
+  }
+}
+
 bool switchToCol(double width, int chars) {
   bool shouldSwitch = false;
   if ((width / 14) * 1.5 > chars) {
@@ -63,13 +174,12 @@ String formatDate(String dateString) {
   DateTime date = DateTime.parse(dateString);
   DateTime now = DateTime.now();
   final yesterday = DateTime(now.year, now.month, now.day - 1);
-  if(DateFormat('dd/MM/YYYY').format(yesterday) == DateFormat('dd/MM/YYYY').format(date)){
+  if (DateFormat('dd/MM/YYYY').format(yesterday) ==
+      DateFormat('dd/MM/YYYY').format(date)) {
     return 'Yesterday';
-  }
-  else if(now.difference(date).inDays < 1){
+  } else if (now.difference(date).inDays < 1) {
     return DateFormat('hh:mm').format(date);
-  }
-  else if(now.difference(date).inDays < 6){
+  } else if (now.difference(date).inDays < 6) {
     return DateFormat('EEEE').format(date);
   }
   return DateFormat('dd/MM/yy').format(date);
@@ -262,7 +372,9 @@ getMedia(BuildContext context,
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const RobinSendMedia(isVideo: true,),
+              builder: (context) => const RobinSendMedia(
+                isVideo: true,
+              ),
             ),
           );
         }
@@ -350,8 +462,8 @@ String formatISOTime(DateTime date) {
   }
 }
 
-bool checkDeleteDuration(DateTime timestamp){
-  if (rc.maxDelete){
+bool checkDeleteDuration(DateTime timestamp) {
+  if (rc.maxDelete) {
     DateTime now = DateTime.now();
     return now.difference(timestamp).inSeconds < rc.maxDeleteDuration;
   }
@@ -522,6 +634,7 @@ Map localRobinMessageJson(
     'is_forwarded': false,
     'reply_to': replyTo,
     'is_read': false,
+    'delivered': false,
     'reactions': [],
     'deleted_for': [],
     'created_at': message['timestamp']

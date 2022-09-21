@@ -1234,7 +1234,7 @@ class _TextBubbleState extends State<TextBubble> {
                                                         attachment:
                                                             widget.message.link,
                                                         isLocal: !widget.message
-                                                                .delivered! &&
+                                                                .delivered &&
                                                             widget
                                                                 .message
                                                                 .filePath
@@ -1268,7 +1268,7 @@ class _TextBubbleState extends State<TextBubble> {
                                                   });
                                                 }
                                               },
-                                              child: widget.message.delivered!
+                                              child: widget.message.delivered
                                                   ? CachedNetworkImage(
                                                       imageUrl:
                                                           widget.message.link,
@@ -1435,7 +1435,7 @@ class _TextBubbleState extends State<TextBubble> {
                                                                 ? Container()
                                                                 : !widget
                                                                         .message
-                                                                        .delivered!
+                                                                        .delivered
                                                                     ? Container()
                                                                     : SizedBox(
                                                                         width:
@@ -1510,7 +1510,7 @@ class _TextBubbleState extends State<TextBubble> {
                                           ),
                                         ),
                                         widget.message.sentByMe
-                                            ? !widget.message.delivered!
+                                            ? !widget.message.delivered
                                                 ? Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -1580,7 +1580,7 @@ class _TextBubbleState extends State<TextBubble> {
                                           ),
                                         ),
                                         widget.message.sentByMe
-                                            ? !widget.message.delivered!
+                                            ? !widget.message.delivered
                                                 ? Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -1665,7 +1665,7 @@ class _TextBubbleState extends State<TextBubble> {
                                           ),
                                         ),
                                         widget.message.sentByMe
-                                            ? !widget.message.delivered!
+                                            ? !widget.message.delivered
                                                 ? Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -1735,7 +1735,7 @@ class _TextBubbleState extends State<TextBubble> {
                                           ),
                                         ),
                                         widget.message.sentByMe
-                                            ? !widget.message.delivered!
+                                            ? !widget.message.delivered
                                                 ? Padding(
                                                     padding:
                                                         const EdgeInsets.only(
