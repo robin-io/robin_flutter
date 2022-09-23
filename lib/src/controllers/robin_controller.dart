@@ -121,6 +121,8 @@ class RobinController extends GetxController {
 
   bool canDeleteMessages = true;
 
+  bool canDeleteConversations = true;
+
   String fcmKey = '';
 
   String deviceToken = '';
@@ -155,6 +157,7 @@ class RobinController extends GetxController {
     canDeleteMessages = options?.canDeleteMessages ?? true;
     canForwardMessages = options?.canForwardMessages ?? true;
     canCreateGroupChats = options?.canCreateGroupChats ?? true;
+    canDeleteConversations = options?.canDeleteConversations ?? true;
     fcmKey = options?.fcmKey ?? "";
     deviceToken = options?.deviceToken ?? "";
     if (options?.maxDeleteDuration != null) {
@@ -363,7 +366,7 @@ class RobinController extends GetxController {
         updateLocalConversationMessages(robinMessage.conversationId, data);
       }
       if (!robinMessage.sentByMe && state == AppLifecycleState.resumed) {
-        FlutterRingtonePlayer.playNotification();
+        // FlutterRingtonePlayer.playNotification();
       }
       allConversations[robinMessage.conversationId]?.lastMessage =
           RobinLastMessage.fromRobinMessage(robinMessage);

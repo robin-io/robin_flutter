@@ -46,48 +46,63 @@ class Conversation extends StatelessWidget {
     rc.leaveGroup(conversation.id!, showLoader: false);
   }
 
-  void showPopupMenu(BuildContext context) {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    double width = renderBox.size.width;
-    double height = renderBox.localToGlobal(Offset.zero).dy;
-    showMenu<int>(
-      context: context,
-      position: RelativeRect.fromLTRB(width, height + 75, 0, 0),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(6.0),
+  List<PopupMenuItem<int>> getMenuItems() {
+    List<PopupMenuItem<int>> menuItems = [
+      PopupMenuItem<int>(
+        padding: const EdgeInsets.only(left: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              conversation.archived! ? 'Unarchive' : 'Archive',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Color(0XFF101010),
+              ),
+            ),
+            SizedBox(
+              width: conversation.isGroup! ? 45 : 90,
+            ),
+            SvgPicture.asset(
+              'assets/icons/archive_black.svg',
+              semanticsLabel: 'archive',
+              package: 'robin_flutter',
+              width: 22,
+              height: 22,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+          ],
         ),
+        value: 1,
       ),
-      items: [
-        PopupMenuItem<int>(
-          padding: const EdgeInsets.only(left: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                conversation.archived! ? 'Unarchive' : 'Archive',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0XFF101010),
-                ),
-              ),
-              SizedBox(
-                width: conversation.isGroup! ? 45 : 90,
-              ),
-              SvgPicture.asset(
-                'assets/icons/archive_black.svg',
-                semanticsLabel: 'archive',
-                package: 'robin_flutter',
-                width: 22,
-                height: 22,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-            ],
-          ),
-          value: 1,
-        ),
+      // PopupMenuItem<int>(
+      //   padding: const EdgeInsets.only(left: 15),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       Text(
+      //         conversation.archived! ? 'Pin' : 'Pin',
+      //         style: const TextStyle(
+      //           fontSize: 14,
+      //           color: Color(0XFF101010),
+      //         ),
+      //       ),
+      //       const SizedBox(
+      //         width: 90,
+      //       ),
+      //       const Icon(Icons.pin_drop),
+      //       const SizedBox(
+      //         width: 10,
+      //       ),
+      //     ],
+      //   ),
+      //   value: 2,
+      // ),
+    ];
+    if (rc.canDeleteConversations) {
+      menuItems.add(
         PopupMenuItem<int>(
           padding: const EdgeInsets.only(left: 15),
           child: Row(
@@ -115,15 +130,34 @@ class Conversation extends StatelessWidget {
               ),
             ],
           ),
-          value: 2,
+          value: 3,
         ),
-      ],
+      );
+    }
+    return menuItems;
+  }
+
+  void showPopupMenu(BuildContext context) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    double width = renderBox.size.width;
+    double height = renderBox.localToGlobal(Offset.zero).dy;
+    showMenu<int>(
+      context: context,
+      position: RelativeRect.fromLTRB(width, height + 75, 0, 0),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(6.0),
+        ),
+      ),
+      items: getMenuItems(),
       elevation: 4,
     ).then((value) {
       rc.selectedConversation.value = '';
       if (value == 1) {
         handleArchive(context);
       } else if (value == 2) {
+        //pin
+      } else if (value == 3) {
         if (conversation.isGroup!) {
           leaveGroup(context);
         } else {
