@@ -42,8 +42,6 @@ class RobinController extends GetxController {
   RxBool isCreatingConversation = false.obs;
   RxBool isCreatingGroup = false.obs;
 
-  bool wsConnected = false;
-
   RxBool selectMessageView = false.obs;
   RxBool replyView = false.obs;
   RxBool chatViewLoading = false.obs;
@@ -204,6 +202,7 @@ class RobinController extends GetxController {
   }
 
   void appResume() {
+    print('app resume');
     robinConnect();
     getConversations(refresh: false);
     if (currentConversation.value.id != null) {
@@ -212,6 +211,7 @@ class RobinController extends GetxController {
   }
 
   Future robinConnect() async {
+    print('robin connect');
     if (deviceToken.isNotEmpty) {
       robinCore!.sendDeviceToken(currentUser!.robinToken, deviceToken);
     }
@@ -230,7 +230,6 @@ class RobinController extends GetxController {
 
   connectionStartListen() async {
     await robinStream?.cancel();
-    wsConnected = true;
     robinStream = robinConnection?.stream.listen(
       (data) {
         data = json.decode(data);
@@ -338,11 +337,7 @@ class RobinController extends GetxController {
         }
       },
       onError: (error) {
-        wsConnected = false;
-        appResume();
-      },
-      onDone: () {
-        wsConnected = false;
+        print(error);
         appResume();
       },
     );
