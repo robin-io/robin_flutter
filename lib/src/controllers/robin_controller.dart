@@ -201,10 +201,9 @@ class RobinController extends GetxController {
     getConversations(refresh: true);
   }
 
-  void appResume() {
-    print('app resume');
+  Future appResume() async{
     robinConnect();
-    getConversations(refresh: false);
+    await getConversations(refresh: true);
     if (currentConversation.value.id != null) {
       getMessages(refresh: true);
     }
@@ -559,7 +558,7 @@ class RobinController extends GetxController {
     );
   }
 
-  void getConversations({
+  Future getConversations({
     bool? refresh,
     String? conversationId,
   }) async {

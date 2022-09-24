@@ -32,7 +32,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
     this.options,
     this.conversationId,
   }) : super(key: key) {
-    rc.initializeController(apiKey, currentUser, getUsers, keys, options, conversationId);
+    rc.initializeController(
+        apiKey, currentUser, getUsers, keys, options, conversationId);
     WidgetsBinding.instance?.addObserver(this);
   }
 
@@ -111,7 +112,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
                             : const Color.fromRGBO(8, 21, 58, 1),
                       ),
                       onPressed: () {
-                        rc.filterUnreadConversations.value = !rc.filterUnreadConversations.value;
+                        rc.filterUnreadConversations.value =
+                            !rc.filterUnreadConversations.value;
                         rc.renderHomeConversations();
                       },
                     ),
@@ -128,7 +130,8 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
                       onPressed: () {
                         rc.showHomeSearch.value = true;
                       },
-                    )
+                    ),
+                    const SizedBox(width: 10),
                   ],
             shadowColor: const Color.fromRGBO(0, 50, 201, 0.2),
             bottom: rc.archivedConversations.isNotEmpty
@@ -186,13 +189,20 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
               } else if (rc.homeConversations.isEmpty) {
                 return const EmptyConversation();
               } else {
-                return ListView(
-                  children: [
-                    for (RobinConversation conversation in rc.homeConversations)
-                      Conversation(
-                        conversation: conversation,
-                      )
-                  ],
+                return RefreshIndicator(
+                  displacement: 20,
+                  color: green,
+                  onRefresh: () async{
+                    return await rc.appResume();
+                  },
+                  child: ListView(
+                    children: [
+                      for (RobinConversation conversation in rc.homeConversations)
+                        Conversation(
+                          conversation: conversation,
+                        )
+                    ],
+                  ),
                 );
               }
             },

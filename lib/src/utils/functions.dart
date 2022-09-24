@@ -54,6 +54,7 @@ void showSuccessMessage(String message) {
 }
 
 void getMessageQueue() async {
+  print('get message queue');
   final prefs = await SharedPreferences.getInstance();
   String encodedMessageQueue = prefs.getString('messageQueue') ?? '{}';
   Map<String, Map> messageQueue =
