@@ -1278,7 +1278,8 @@ class RobinController extends GetxController {
             path,
           ),
         ];
-        robinCore!.sendAttachment(body, files);
+        // robinCore!.sendAttachment(body, files);
+        sendAllInMessageQueue();
         messageController.clear();
         file.value = [];
         isFileSending.value = false;
@@ -1312,7 +1313,8 @@ class RobinController extends GetxController {
               currentFile.path,
             ),
           ];
-          robinCore!.sendAttachment(body, files);
+          // robinCore!.sendAttachment(body, files);
+          sendAllInMessageQueue();
         }
         messageController.clear();
         file.value = [];
@@ -1365,7 +1367,8 @@ class RobinController extends GetxController {
             path,
           ),
         ];
-        robinCore!.replyWithAttachment(body, files);
+        // robinCore!.replyWithAttachment(body, files);
+        sendAllInMessageQueue();
         messageController.clear();
         file.value = [];
         isFileSending.value = false;
@@ -1403,7 +1406,8 @@ class RobinController extends GetxController {
               currentFile.path,
             ),
           ];
-          robinCore!.replyWithAttachment(body, files);
+          // robinCore!.replyWithAttachment(body, files);
+          sendAllInMessageQueue();
         }
         messageController.clear();
         file.value = [];

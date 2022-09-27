@@ -95,7 +95,8 @@ void messageFailed(Map message) {
 }
 
 void sendAllInMessageQueue() async{
-  for (var message in rc.messageQueue.values) {
+  List<String> dequeue = [];
+  for (Map message in rc.messageQueue.values) {
     if (message['content']['is_attachment']) {
       rc.isFileSending.value = true;
       if (message['reply_to'] != null) {
@@ -115,7 +116,7 @@ void sendAllInMessageQueue() async{
             message['content']['attachment'],
           ),
         ];
-        rc.robinCore!.replyWithAttachment(body, files);
+        rc.robinCore!.replyWithAttachment(body, files, message);
         rc.isFileSending.value = false;
       } else {
         Map<String, String> body = {
@@ -133,9 +134,10 @@ void sendAllInMessageQueue() async{
             message['content']['attachment'],
           ),
         ];
-        rc.robinCore!.sendAttachment(body, files);
+        rc.robinCore!.sendAttachment(body, files, message);
         rc.isFileSending.value = false;
       }
+      dequeue.add(message['_id']);
     } else {
       Map<String, String> msg = {
         'msg': message['content']['msg'],
@@ -160,6 +162,9 @@ void sendAllInMessageQueue() async{
         );
       }
     }
+  }
+  for(String id in dequeue){
+    removeFromMessageQueue(id);
   }
 }
 

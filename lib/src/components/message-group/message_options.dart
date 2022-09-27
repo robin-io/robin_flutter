@@ -55,72 +55,74 @@ class _MessageOptionsState extends State<MessageOptions> {
 
   void retryMessage() async{
     rc.appResume();
-    Map message = widget.message.toJson();
-
-    if (widget.message.isAttachment) {
-      rc.isFileSending.value = true;
-      if (widget.message.replyTo != null) {
-        Map<String, String> body = {
-          'conversation_id': message['conversation_id'],
-          'message_id': message['reply_to'],
-          'sender_token': message['sender_token'],
-          'sender_name': message['sender_token'],
-          'msg': message['content']['msg'],
-          'timestamp': DateTime.now().toString(),
-          'file_path': message['content']['attachment'],
-          'local_id': message['_id'],
-        };
-        List<http.MultipartFile> files = [
-          await http.MultipartFile.fromPath(
-            'file',
-            message['content']['attachment'],
-          ),
-        ];
-        rc.robinCore!.replyWithAttachment(body, files);
-        rc.isFileSending.value = false;
-      } else {
-        Map<String, String> body = {
-          'conversation_id': message['conversation_id'],
-          'sender_token': message['sender_token'],
-          'sender_name': message['sender_token'],
-          'msg': message['content']['msg'],
-          'timestamp': DateTime.now().toString(),
-          'file_path': message['content']['attachment'],
-          'local_id': message['_id'],
-        };
-        List<http.MultipartFile> files = [
-          await http.MultipartFile.fromPath(
-            'file',
-            message['content']['attachment'],
-          ),
-        ];
-        rc.robinCore!.sendAttachment(body, files);
-        rc.isFileSending.value = false;
-      }
-    } else {
-      Map<String, String> msg = {
-        'msg': message['content']['msg'],
-        'timestamp': DateTime.now().toString(),
-        'sender_token': message['sender_token'],
-        'sender_name': message['sender_token'],
-        'local_id': message['_id']
-      };
-      if (widget.message.replyTo != null) {
-        rc.robinCore!.replyToMessage(
-            msg,
-            message['conversation_id'],
-            rc.currentUser!.robinToken,
-            rc.currentUser!.fullName,
-            message['reply_to']);
-      } else {
-        rc.robinCore!.sendTextMessage(
-          msg,
-          message['conversation_id'],
-          rc.currentUser!.robinToken,
-          rc.currentUser!.fullName,
-        );
-      }
-    }
+    sendAllInMessageQueue();
+    // Map message = widget.message.toJson();
+    //
+    // if (widget.message.isAttachment) {
+    //   rc.isFileSending.value = true;
+    //   if (widget.message.replyTo != null) {
+    //     Map<String, String> body = {
+    //       'conversation_id': message['conversation_id'],
+    //       'message_id': message['reply_to'],
+    //       'sender_token': message['sender_token'],
+    //       'sender_name': message['sender_token'],
+    //       'msg': message['content']['msg'],
+    //       'timestamp': DateTime.now().toString(),
+    //       'file_path': message['content']['attachment'],
+    //       'local_id': message['_id'],
+    //     };
+    //     List<http.MultipartFile> files = [
+    //       await http.MultipartFile.fromPath(
+    //         'file',
+    //         message['content']['attachment'],
+    //       ),
+    //     ];
+    //     // rc.robinCore!.replyWithAttachment(body, files, message);
+    //     sendAllInMessageQueue();
+    //     rc.isFileSending.value = false;
+    //   } else {
+    //     Map<String, String> body = {
+    //       'conversation_id': message['conversation_id'],
+    //       'sender_token': message['sender_token'],
+    //       'sender_name': message['sender_token'],
+    //       'msg': message['content']['msg'],
+    //       'timestamp': DateTime.now().toString(),
+    //       'file_path': message['content']['attachment'],
+    //       'local_id': message['_id'],
+    //     };
+    //     List<http.MultipartFile> files = [
+    //       await http.MultipartFile.fromPath(
+    //         'file',
+    //         message['content']['attachment'],
+    //       ),
+    //     ];
+    //     rc.robinCore!.sendAttachment(body, files, message);
+    //     rc.isFileSending.value = false;
+    //   }
+    // } else {
+    //   Map<String, String> msg = {
+    //     'msg': message['content']['msg'],
+    //     'timestamp': DateTime.now().toString(),
+    //     'sender_token': message['sender_token'],
+    //     'sender_name': message['sender_token'],
+    //     'local_id': message['_id']
+    //   };
+    //   if (widget.message.replyTo != null) {
+    //     rc.robinCore!.replyToMessage(
+    //         msg,
+    //         message['conversation_id'],
+    //         rc.currentUser!.robinToken,
+    //         rc.currentUser!.fullName,
+    //         message['reply_to']);
+    //   } else {
+    //     rc.robinCore!.sendTextMessage(
+    //       msg,
+    //       message['conversation_id'],
+    //       rc.currentUser!.robinToken,
+    //       rc.currentUser!.fullName,
+    //     );
+    //   }
+    // }
   }
 
   @override

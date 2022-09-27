@@ -247,19 +247,21 @@ class RobinCore {
   }
 
   sendAttachment(
-      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+      Map<String, dynamic> body, List<http.MultipartFile> files, Map message) async {
     try {
-      return await api.sendAttachment(body, files);
+      await api.sendAttachment(body, files);
     } catch (e) {
+      rc.handleNewMessage(message, isDelivered: false);
       throw e.toString();
     }
   }
 
   replyWithAttachment(
-      Map<String, dynamic> body, List<http.MultipartFile> files) async {
+      Map<String, dynamic> body, List<http.MultipartFile> files, Map message) async {
     try {
-      return await api.replyWithAttachment(body, files);
+      await api.replyWithAttachment(body, files);
     } catch (e) {
+      rc.handleNewMessage(message, isDelivered: false);
       throw e.toString();
     }
   }
