@@ -54,118 +54,109 @@ void showSuccessMessage(String message) {
 }
 
 void getMessageQueue() async {
-  final prefs = await SharedPreferences.getInstance();
-  prefs.remove('messageQueue');
-  String encodedMessageQueue = prefs.getString('messageQueue${rc.currentUser!.robinToken}') ?? '{}';
-  Map<String, Map> messageQueue =
-      Map<String, Map>.from(json.decode(encodedMessageQueue));
-  rc.messageQueue = messageQueue;
-  print(messageQueue);
+  // final prefs = await SharedPreferences.getInstance();
+  // prefs.remove('messageQueue');
+  // String encodedMessageQueue = prefs.getString('messageQueue${rc.currentUser!.robinToken}') ?? '{}';
+  // Map<String, Map> messageQueue =
+  //     Map<String, Map>.from(json.decode(encodedMessageQueue));
+  // rc.messageQueue = messageQueue;
+  // print(messageQueue);
 }
 
 void addToMessageQueue(String messageId, Map message) {
-  rc.messageQueue = {...rc.messageQueue, messageId: message};
-  updateMessageQueue();
+  // rc.messageQueue = {...rc.messageQueue, messageId: message};
+  // updateMessageQueue();
 }
 
 void removeFromMessageQueue(String messageId) {
-  rc.messageQueue.remove(messageId);
-  updateMessageQueue();
+  // rc.messageQueue.remove(messageId);
+  // updateMessageQueue();
 }
 
 void updateMessageQueue() async {
-  final prefs = await SharedPreferences.getInstance();
-  String encodedMessageQueue = json.encode(rc.messageQueue);
-  await prefs.setString('messageQueue${rc.currentUser!.robinToken}', encodedMessageQueue);
-  print(encodedMessageQueue);
+  // final prefs = await SharedPreferences.getInstance();
+  // String encodedMessageQueue = json.encode(rc.messageQueue);
+  // await prefs.setString('messageQueue${rc.currentUser!.robinToken}', encodedMessageQueue);
+  // print(encodedMessageQueue);
 }
 
 void clearQueue() async{
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('messageQueue', '{}');
-}
-
-void messageFailed(Map message) {
-  if (rc.currentConversation.value.id != null &&
-      rc.currentConversation.value.id == message['conversation_id']) {
-    if (rc.conversationMessages[message['_id']] != null) {
-      rc.conversationMessages[message['_id']].failed = true;
-    }
-  }
+  // final prefs = await SharedPreferences.getInstance();
+  // await prefs.setString('messageQueue', '{}');
 }
 
 void sendAllInMessageQueue() async{
-  List<String> dequeue = [];
-  for (Map message in rc.messageQueue.values) {
-    if (message['content']['is_attachment']) {
-      rc.isFileSending.value = true;
-      if (message['reply_to'] != null) {
-        Map<String, String> body = {
-          'conversation_id': message['conversation_id'],
-          'message_id': message['reply_to'],
-          'sender_token': message['sender_token'],
-          'sender_name': message['sender_token'],
-          'msg': message['content']['msg'],
-          'timestamp': DateTime.now().toString(),
-          'file_path': message['content']['attachment'],
-          'local_id': message['_id'],
-        };
-        List<http.MultipartFile> files = [
-          await http.MultipartFile.fromPath(
-            'file',
-            message['content']['attachment'],
-          ),
-        ];
-        rc.robinCore!.replyWithAttachment(body, files, message);
-        rc.isFileSending.value = false;
-      } else {
-        Map<String, String> body = {
-          'conversation_id': message['conversation_id'],
-          'sender_token': message['sender_token'],
-          'sender_name': message['sender_token'],
-          'msg': message['content']['msg'],
-          'timestamp': DateTime.now().toString(),
-          'file_path': message['content']['attachment'],
-          'local_id': message['_id'],
-        };
-        List<http.MultipartFile> files = [
-          await http.MultipartFile.fromPath(
-            'file',
-            message['content']['attachment'],
-          ),
-        ];
-        rc.robinCore!.sendAttachment(body, files, message);
-        rc.isFileSending.value = false;
-      }
-      dequeue.add(message['_id']);
-    } else {
-      Map<String, String> msg = {
-        'msg': message['content']['msg'],
-        'timestamp': DateTime.now().toString(),
-        'sender_token': message['sender_token'],
-        'sender_name': message['sender_token'],
-        'local_id': message['_id']
-      };
-      if (message['reply_to'] != null) {
-        rc.robinCore!.replyToMessage(
-            msg,
-            message['conversation_id'],
-            rc.currentUser!.robinToken,
-            rc.currentUser!.fullName,
-            message['reply_to']);
-      } else {
-        rc.robinCore!.sendTextMessage(
-          msg,
-          message['conversation_id'],
-          rc.currentUser!.robinToken,
-          rc.currentUser!.fullName,
-        );
-      }
-    }
-  }
-  for(String id in dequeue){
-    removeFromMessageQueue(id);
-  }
+  // List<String> dequeue = [];
+  // for (Map message in rc.messageQueue.values) {
+  //   if (message['content']['is_attachment']) {
+  //     rc.isFileSending.value = true;
+  //     if (message['reply_to'] != null) {
+  //       Map<String, String> body = {
+  //         'conversation_id': message['conversation_id'],
+  //         'message_id': message['reply_to'],
+  //         'sender_token': message['sender_token'],
+  //         'sender_name': message['sender_token'],
+  //         'msg': message['content']['msg'],
+  //         'timestamp': DateTime.now().toString(),
+  //         'file_path': message['content']['attachment'],
+  //         'local_id': message['_id'],
+  //       };
+  //       List<http.MultipartFile> files = [
+  //         await http.MultipartFile.fromPath(
+  //           'file',
+  //           message['content']['attachment'],
+  //         ),
+  //       ];
+  //       rc.robinCore!.replyWithAttachment(body, files, message);
+  //       rc.isFileSending.value = false;
+  //     } else {
+  //       Map<String, String> body = {
+  //         'conversation_id': message['conversation_id'],
+  //         'sender_token': message['sender_token'],
+  //         'sender_name': message['sender_token'],
+  //         'msg': message['content']['msg'],
+  //         'timestamp': DateTime.now().toString(),
+  //         'file_path': message['content']['attachment'],
+  //         'local_id': message['_id'],
+  //       };
+  //       List<http.MultipartFile> files = [
+  //         await http.MultipartFile.fromPath(
+  //           'file',
+  //           message['content']['attachment'],
+  //         ),
+  //       ];
+  //       rc.robinCore!.sendAttachment(body, files, message);
+  //       rc.isFileSending.value = false;
+  //     }
+  //     dequeue.add(message['_id']);
+  //   } else {
+  //     Map<String, String> msg = {
+  //       'msg': message['content']['msg'],
+  //       'timestamp': DateTime.now().toString(),
+  //       'sender_token': message['sender_token'],
+  //       'sender_name': message['sender_token'],
+  //       'local_id': message['_id']
+  //     };
+  //     if (message['reply_to'] != null) {
+  //       rc.robinCore!.replyToMessage(
+  //           msg,
+  //           message['conversation_id'],
+  //           rc.currentUser!.robinToken,
+  //           rc.currentUser!.fullName,
+  //           message['reply_to']);
+  //     } else {
+  //       rc.robinCore!.sendTextMessage(
+  //         msg,
+  //         message['conversation_id'],
+  //         rc.currentUser!.robinToken,
+  //         rc.currentUser!.fullName,
+  //       );
+  //     }
+  //   }
+  // }
+  // for(String id in dequeue){
+  //   removeFromMessageQueue(id);
+  // }
 }
 
 bool switchToCol(double width, int chars) {

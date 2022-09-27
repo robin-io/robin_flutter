@@ -55,7 +55,7 @@ class _MessageOptionsState extends State<MessageOptions> {
 
   void retryMessage() async{
     rc.appResume();
-    sendAllInMessageQueue();
+    // sendAllInMessageQueue();
     // Map message = widget.message.toJson();
     //
     // if (widget.message.isAttachment) {

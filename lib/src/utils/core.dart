@@ -58,13 +58,12 @@ class RobinCore {
       rc.robinConnection!.sink.add(json.encode(body));
     } catch (e) {
       if (retries >= 2) {
-        messageFailed(message['_id']);
       } else {
-        rc.robinConnect();
-        await Future.delayed(const Duration(milliseconds: 1000), () {
-          sendTextMessage(message, conversationId, senderToken, senderName,
-              retries: retries + 1);
-        });
+        // rc.robinConnect();
+        // await Future.delayed(const Duration(milliseconds: 1000), () {
+        //   sendTextMessage(message, conversationId, senderToken, senderName,
+        //       retries: retries + 1);
+        // });
       }
     }
   }

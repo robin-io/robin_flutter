@@ -163,7 +163,7 @@ class RobinController extends GetxController {
       maxDeleteDuration = options?.maxDeleteDuration ?? 60;
     }
     // clearQueue();
-    getMessageQueue();
+    // getMessageQueue();
     robinConnect();
     robinInitialized = true;
     getConversations(
@@ -228,7 +228,7 @@ class RobinController extends GetxController {
       connectionStartListen();
     });
     Future.delayed(const Duration(milliseconds: 1350), () {
-      sendAllInMessageQueue();
+      // sendAllInMessageQueue();
     });
   }
 
@@ -352,13 +352,13 @@ class RobinController extends GetxController {
 
   handleNewMessage(Map data, {bool? isDelivered}) {
     bool delivered = isDelivered ?? true;
-    if (data['sender_token'] == currentUser!.robinToken) {
-      if (delivered) {
-        removeFromMessageQueue(data['content']['local_id']);
-      } else {
-        addToMessageQueue(data['_id'], data);
-      }
-    }
+    // if (data['sender_token'] == currentUser!.robinToken) {
+    //   if (delivered) {
+    //     removeFromMessageQueue(data['content']['local_id']);
+    //   } else {
+    //     addToMessageQueue(data['_id'], data);
+    //   }
+    // }
     RobinMessage robinMessage = RobinMessage.fromJson(data, delivered);
 
     if (allConversations[robinMessage.conversationId] != null) {
@@ -1278,8 +1278,8 @@ class RobinController extends GetxController {
             path,
           ),
         ];
-        // robinCore!.sendAttachment(body, files);
-        sendAllInMessageQueue();
+        robinCore!.sendAttachment(body, files, localMessage);
+        // sendAllInMessageQueue();
         messageController.clear();
         file.value = [];
         isFileSending.value = false;
@@ -1313,8 +1313,8 @@ class RobinController extends GetxController {
               currentFile.path,
             ),
           ];
-          // robinCore!.sendAttachment(body, files);
-          sendAllInMessageQueue();
+          robinCore!.sendAttachment(body, files, localMessage);
+          // sendAllInMessageQueue();
         }
         messageController.clear();
         file.value = [];
@@ -1367,8 +1367,8 @@ class RobinController extends GetxController {
             path,
           ),
         ];
-        // robinCore!.replyWithAttachment(body, files);
-        sendAllInMessageQueue();
+        robinCore!.replyWithAttachment(body, files, localMessage);
+        // sendAllInMessageQueue();
         messageController.clear();
         file.value = [];
         isFileSending.value = false;
@@ -1406,8 +1406,8 @@ class RobinController extends GetxController {
               currentFile.path,
             ),
           ];
-          // robinCore!.replyWithAttachment(body, files);
-          sendAllInMessageQueue();
+          robinCore!.replyWithAttachment(body, files, localMessage);
+          // sendAllInMessageQueue();
         }
         messageController.clear();
         file.value = [];
