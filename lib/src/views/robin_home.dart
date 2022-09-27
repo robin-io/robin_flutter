@@ -43,6 +43,7 @@ class Robin extends StatelessWidget with WidgetsBindingObserver {
     rc.state = state;
     switch (state) {
       case AppLifecycleState.resumed:
+        print('app resumed');
         rc.appResume();
         break;
     }

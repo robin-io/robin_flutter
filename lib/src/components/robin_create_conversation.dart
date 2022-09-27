@@ -96,33 +96,32 @@ class _RobinCreateConversationState extends State<RobinCreateConversation> {
                       rc.currentConversation.value = RobinConversation.empty();
                     });
                   });
-                } else {
-                  Map<String, String> body = {
-                    'receiver_name': user.displayName,
-                    'receiver_token': user.robinToken,
-                  };
-                  RobinConversation conversation =
-                      await rc.createConversation(body);
-                  try {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RobinChat(
-                          conversation: conversation,
-                        ),
-                      ),
-                    ).then((value) {
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        rc.currentConversation.value =
-                            RobinConversation.empty();
-                      });
-                    });
-                  } catch(e){
-                    print(e);
-                  }finally {
-                    // widget was disposed before conversation was created
-                  }
+                  return;
                 }
+              }
+              Map<String, String> body = {
+                'receiver_name': user.displayName,
+                'receiver_token': user.robinToken,
+              };
+              RobinConversation conversation =
+                  await rc.createConversation(body);
+              try {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RobinChat(
+                      conversation: conversation,
+                    ),
+                  ),
+                ).then((value) {
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    rc.currentConversation.value = RobinConversation.empty();
+                  });
+                });
+              } catch (e) {
+                print(e);
+              } finally {
+                // widget was disposed before conversation was created
               }
             }
           },

@@ -202,11 +202,16 @@ class RobinController extends GetxController {
   }
 
   Future appResume() async{
-    robinConnect();
-    await getConversations(refresh: true);
-    if (currentConversation.value.id != null) {
-      getMessages(refresh: true);
+    try{
+      await getConversations(refresh: true);
+      robinConnect();
+      if (currentConversation.value.id != null) {
+        getMessages(refresh: true);
+      }
+    }catch(e){
+      print(e);
     }
+
   }
 
   Future robinConnect() async {
@@ -215,7 +220,7 @@ class RobinController extends GetxController {
       robinCore!.sendDeviceToken(currentUser!.robinToken, deviceToken);
     }
     robinConnection =
-        robinCore!.connect(apiKey, currentUser!.robinToken, fcmKey);
+        robinCore!.connect(apiKey, currentUser!.robinToken);
     Future.delayed(const Duration(milliseconds: 750), () {
       robinCore!.subscribe();
     });
@@ -336,8 +341,11 @@ class RobinController extends GetxController {
         }
       },
       onError: (error) {
+        print('on error called');
         print(error);
-        appResume();
+        Future.delayed(const Duration(milliseconds: 250), (){
+          appResume();
+        });
       },
     );
   }
@@ -856,7 +864,7 @@ class RobinController extends GetxController {
       body['sender_name'] = currentUser!.fullName;
       body['sender_token'] = currentUser!.robinToken;
       var response = await robinCore!.createConversation(body);
-      print(response);
+      print('calling create conversation');
       RobinConversation conversation = RobinConversation.fromJson(response);
       allConversations = {
         conversation.id!: conversation,

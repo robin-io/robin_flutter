@@ -13,8 +13,8 @@ class RobinCore {
   static final DataSource api = DataSource();
   final RobinController rc = Get.find();
 
-  WebSocketChannel connect(String? apiKey, String? userToken, String? fcmKey) {
-    String url = '$wsUrl/$apiKey/$userToken?fcm_key=$fcmKey';
+  WebSocketChannel connect(String? apiKey, String? userToken) {
+    String url = '$wsUrl/$apiKey/$userToken';
     return WebSocketChannel.connect(
       Uri.parse(url),
     );

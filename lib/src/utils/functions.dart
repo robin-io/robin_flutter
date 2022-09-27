@@ -54,9 +54,9 @@ void showSuccessMessage(String message) {
 }
 
 void getMessageQueue() async {
-  print('get message queue');
   final prefs = await SharedPreferences.getInstance();
-  String encodedMessageQueue = prefs.getString('messageQueue') ?? '{}';
+  prefs.remove('messageQueue');
+  String encodedMessageQueue = prefs.getString('messageQueue${rc.currentUser!.robinToken}') ?? '{}';
   Map<String, Map> messageQueue =
       Map<String, Map>.from(json.decode(encodedMessageQueue));
   rc.messageQueue = messageQueue;
@@ -76,7 +76,7 @@ void removeFromMessageQueue(String messageId) {
 void updateMessageQueue() async {
   final prefs = await SharedPreferences.getInstance();
   String encodedMessageQueue = json.encode(rc.messageQueue);
-  await prefs.setString('messageQueue', encodedMessageQueue);
+  await prefs.setString('messageQueue${rc.currentUser!.robinToken}', encodedMessageQueue);
   print(encodedMessageQueue);
 }
 
@@ -179,7 +179,7 @@ String formatDate(String dateString) {
       DateFormat('dd/MM/YYYY').format(date)) {
     return 'Yesterday';
   } else if (now.difference(date).inDays < 1) {
-    return DateFormat('hh:mm').format(date);
+    return DateFormat('HH:mm').format(date);
   } else if (now.difference(date).inDays < 6) {
     return DateFormat('EEEE').format(date);
   }
