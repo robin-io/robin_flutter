@@ -107,6 +107,10 @@ class RobinController extends GetxController {
 
   Widget? appIcon;
 
+  bool maxDelete = false;
+
+  int maxDeleteDuration = 60;
+
   bool canCreateGroupChats = true;
 
   bool canForwardMessages = true;
@@ -148,6 +152,10 @@ class RobinController extends GetxController {
     canCreateGroupChats = options?.canCreateGroupChats ?? true;
     fcmKey = options?.fcmKey ?? "";
     deviceToken = options?.deviceToken ?? "";
+    if (options?.maxDeleteDuration != null) {
+      maxDelete = true;
+      maxDeleteDuration = options?.maxDeleteDuration ?? 60;
+    }
     robinConnect();
     robinInitialized = true;
     getMessageQueue();

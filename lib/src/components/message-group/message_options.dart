@@ -7,6 +7,8 @@ import 'package:robin_flutter/src/models/robin_message.dart';
 import 'package:robin_flutter/src/controllers/robin_controller.dart';
 import 'package:robin_flutter/src/utils/constants.dart';
 
+import '../../utils/functions.dart';
+
 class MessageOptions extends StatefulWidget {
   final RobinMessage message;
   final OverlayEntry? entry;
@@ -38,7 +40,7 @@ class _MessageOptionsState extends State<MessageOptions> {
     double items = 2;
     if(rc.canForwardMessages) items += 1;
     if(!widget.message.isAttachment) items += 1;
-    if(rc.canDeleteMessages) items += 1;
+    if(rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)) items += 1;
     return items * 47;
   }
 
@@ -297,38 +299,38 @@ class _MessageOptionsState extends State<MessageOptions> {
             //     ),
             //   ),
             // ),
-            rc.canDeleteMessages
+            rc.canDeleteMessages && checkDeleteDuration(widget.message.timestamp)
                 ? GestureDetector(
-                    onTap: () {
-                      widget.entry?.remove();
-                      rc.selectMessageView.value = true;
-                      rc.selectedMessageIds.add(widget.message.id);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      color: Colors.transparent,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Delete Message",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0XFF101010),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SvgPicture.asset(
-                            'assets/icons/delete.svg',
-                            package: 'robin_flutter',
-                            width: 22,
-                            height: 22,
-                          ),
-                        ],
+              onTap: () {
+                widget.entry?.remove();
+                rc.selectMessageView.value = true;
+                rc.selectedMessageIds.add(widget.message.id);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                color: Colors.transparent,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Delete Message",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0XFF101010),
                       ),
                     ),
-                  )
+                    const SizedBox(width: 10),
+                    SvgPicture.asset(
+                      'assets/icons/delete.svg',
+                      package: 'robin_flutter',
+                      width: 22,
+                      height: 22,
+                    ),
+                  ],
+                ),
+              ),
+            )
                 : Container(),
           ],
         ),

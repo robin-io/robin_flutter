@@ -5,8 +5,10 @@ class RobinOptions{
   bool? canCreateGroupChats;
   bool? canForwardMessages;
   bool? canDeleteMessages;
+  bool? canDeleteConversations;
   String? deviceToken;
   String? fcmKey;
+  int? maxDeleteDuration;
 
 
   RobinOptions({
@@ -14,8 +16,10 @@ class RobinOptions{
     this.canCreateGroupChats,
     this.canForwardMessages,
     this.canDeleteMessages,
+    this.canDeleteConversations,
     this.deviceToken,
     this.fcmKey,
+    this.maxDeleteDuration,
   });
 
 }

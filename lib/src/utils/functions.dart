@@ -252,6 +252,14 @@ void showCreateGroupChat(BuildContext context) {
   );
 }
 
+bool checkDeleteDuration(DateTime timestamp){
+  if (rc.maxDelete){
+    DateTime now = DateTime.now();
+    return now.difference(timestamp).inSeconds < rc.maxDeleteDuration;
+  }
+  return true;
+}
+
 void showConversationInfo(BuildContext context) {
   showModalBottomSheet(
     context: context,
